@@ -252,9 +252,14 @@ app.get('/api/seed', async (req, res) => {
     }
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`🌱 Servidor corriendo en http://localhost:${PORT}`);
-    console.log(`📊 Admin panel en http://localhost:${PORT}/admin`);
-    console.log(`🔑 Login: ${process.env.ADMIN_USERNAME || 'tamypau'} / ${process.env.ADMIN_PASSWORD || 'Isii2607'}`);
-});
+// Para desarrollo local
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🌱 Servidor corriendo en http://localhost:${PORT}`);
+        console.log(`📊 Admin panel en http://localhost:${PORT}/admin`);
+        console.log(`🔑 Login: ${process.env.ADMIN_USERNAME || 'tamypau'} / ${process.env.ADMIN_PASSWORD || 'Isii2607'}`);
+    });
+}
+
+// Para Vercel - exportar la app
+module.exports = app;
