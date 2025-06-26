@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Panel de Administración - Entre Hojas y Amigas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-header {
+            background: #2d5016;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .admin-nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #2d5016;
+            border-bottom-color: #2d5016;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            color: #2d5016;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2d5016;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .imagen-input-container {
+            position: relative;
+        }
+
+        .imagen-preview {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .imagen-preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+        }
+
+        .imagen-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .imagen-preview-item .remove-img {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #2d5016;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a3009;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .productos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .productos-table th,
+        .productos-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .productos-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .productos-table img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-activo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactivo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: #2d5016;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #2d5016;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .admin-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .productos-table {
+                font-size: 0.8rem;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <h1><i class="fas fa-leaf"></i> Panel de Administración - Entre Hojas y Amigas</h1>
+        <nav class="admin-nav">
+            <a href="/"><i class="fas fa-home"></i> Ver Tienda</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-seedling"></i>
+                <h3 id="totalProductos">0</h3>
+                <p>Total Productos</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-eye"></i>
+                <h3 id="productosActivos">0</h3>
+                <p>Productos Activos</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-eye-slash"></i>
+                <h3 id="productosInactivos">0</h3>
+                <p>Productos Inactivos</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-tags"></i>
+                <h3 id="totalCategorias">0</h3>
+                <p>Categorías</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <button class="tab-button active" onclick="cambiarTab('productos')">
+                <i class="fas fa-leaf"></i> Gestionar Productos
+            </button>
+            <button class="tab-button" onclick="cambiarTab('nuevo')">
+                <i class="fas fa-plus"></i> Nuevo Producto
+            </button>
+        </div>
+
+        <!-- Tab: Gestionar Productos -->
+        <div id="tab-productos" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Lista de Productos</h3>
+                </div>
+                <div class="card-body">
+                    <div id="productosContainer">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Cargando productos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Nuevo Producto -->
+        <div id="tab-nuevo" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-plus"></i> <span id="formTitle">Agregar Nuevo Producto</span></h3>
+                </div>
+                <div class="card-body">
+                    <div id="alertContainer"></div>
+                    <form id="productoForm">
+                        <input type="hidden" id="productoId">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nombre">Nombre de la Planta *</label>
+                                <input type="text" id="nombre" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="precio">Precio (CLP) *</label>
+                                <input type="number" id="precio" min="0" step="10" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="categoria">Categoría *</label>
+                                <select id="categoria" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="Interior">Interior</option>
+                                    <option value="Exterior">Exterior</option>
+                                    <option value="Interior Grande">Interior Grande</option>
+                                    <option value="Pet Friendly">Pet Friendly</option>
+                                    <option value="Fácil Cuidado">Fácil Cuidado</option>
+                                    <option value="Autorregante">Autorregante</option>
+                                    <option value="Regalo">Para Regalo</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="stock">Stock Disponible *</label>
+                                <input type="number" id="stock" min="0" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="descripcion">Descripción *</label>
+                                <textarea id="descripcion" placeholder="Describe las características y cuidados de la planta..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="imagenes">URLs de Imágenes</label>
+                                <div class="imagen-input-container">
+                                    <input type="url" id="nuevaImagen" placeholder="https://ejemplo.com/imagen.jpg">
+                                    <button type="button" onclick="agregarImagen()" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                                        <i class="fas fa-plus"></i> Agregar Imagen
+                                    </button>
+                                    <div class="imagen-preview" id="imagenPreview"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> <span id="btnText">Guardar Producto</span>
+                            </button>
+                            <button type="button" onclick="limpiarFormulario()" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Acción</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <p id="confirmMessage"></p>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn btn-danger" id="confirmBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let productos = [];
+        let imagenesSeleccionadas = [];
+        let productoEditando = null;
+
+        // Verificar autenticación al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarAuth();
+            cargarProductos();
+        });
+
+        async function verificarAuth() {
+            // Implementar verificación de sesión si es necesario
+            console.log('Usuario autenticado');
+        }
+
+        async function cargarProductos() {
+            try {
+                const response = await fetch('/api/admin/productos');
+                
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                productos = await response.json();
+                mostrarProductos();
+                actualizarEstadisticas();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error al cargar productos', 'error');
+            }
+        }
+
+        function mostrarProductos() {
+            const container = document.getElementById('productosContainer');
+            
+            if (productos.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-seedling" style="font-size: 3rem; margin-bottom: 1rem; color: #2d5016;"></i>
+                        <h3>No hay productos registrados</h3>
+                        <p>Comienza agregando tu primera planta</p>
+                        <button onclick="cambiarTab('nuevo')" class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Agregar Producto
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="productos-table">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${productos.map(producto => `
+                            <tr>
+                                <td>
+                                    <img src="${producto.imagenes[0] || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100'}" 
+                                         alt="${producto.nombre}">
+                                </td>
+                                <td><strong>${producto.nombre}</strong></td>
+                                <td>${producto.categoria}</td>
+                                <td>$${formatearPrecio(producto.precio)}</td>
+                                <td>${producto.stock}</td>
+                                <td>
+                                    <span class="status-badge ${producto.activo ? 'status-activo' : 'status-inactivo'}">
+                                        ${producto.activo ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn edit" onclick="editarProducto('${producto._id}')">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        <button class="action-btn delete" onclick="confirmarEliminar('${producto._id}', '${producto.nombre}')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function actualizarEstadisticas() {
+            const total = productos.length;
+            const activos = productos.filter(p => p.activo).length;
+            const inactivos = total - activos;
+            const categorias = [...new Set(productos.map(p => p.categoria))].length;
+
+            document.getElementById('totalProductos').textContent = total;
+            document.getElementById('productosActivos').textContent = activos;
+            document.getElementById('productosInactivos').textContent = inactivos;
+            document.getElementById('totalCategorias').textContent = categorias;
+        }
+
+        function cambiarTab(tab) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar tab seleccionado
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            event.target.classList.add('active');
+
+            // Limpiar formulario si vamos a nuevo producto
+            if (tab === 'nuevo') {
+                limpiarFormulario();
+            }
+        }
+
+        function agregarImagen() {
+            const input = document.getElementById('nuevaImagen');
+            const url = input.value.trim();
+
+            if (!url) {
+                mostrarAlerta('Por favor ingresa una URL válida', 'error');
+                return;
+            }
+
+            if (!isValidUrl(url)) {
+                mostrarAlerta('La URL no es válida', 'error');
+                return;
+            }
+
+            imagenesSeleccionadas.push(url);
+            input.value = '';
+            actualizarPreviewImagenes();
+        }
+
+        function actualizarPreviewImagenes() {
+            const container = document.getElementById('imagenPreview');
+            container.innerHTML = imagenesSeleccionadas.map((url, index) => `
+                <div class="imagen-preview-item">
+                    <img src="${url}" alt="Imagen ${index + 1}" onerror="this.src='https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100'">
+                    <button type="button" class="remove-img" onclick="eliminarImagen(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function eliminarImagen(index) {
+            imagenesSeleccionadas.splice(index, 1);
+            actualizarPreviewImagenes();
+        }
+
+        async function guardarProducto(event) {
+            event.preventDefault();
+
+            const formData = {
+                nombre: document.getElementById('nombre').value,
+                descripcion: document.getElementById('descripcion').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                categoria: document.getElementById('categoria').value,
+                stock: parseInt(document.getElementById('stock').value),
+                imagenes: imagenesSeleccionadas
+            };
+
+            try {
+                let response;
+                const productoId = document.getElementById('productoId').value;
+
+                if (productoId) {
+                    // Actualizar producto existente
+                    response = await fetch(`/api/productos/${productoId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    // Crear nuevo producto
+                    response = await fetch('/api/productos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                if (response.ok) {
+                    mostrarAlerta(`Producto ${productoId ? 'actualizado' : 'creado'} exitosamente`, 'success');
+                    limpiarFormulario();
+                    cargarProductos();
+                    cambiarTab('productos');
+                } else {
+                    const error = await response.json();
+                    mostrarAlerta(error.error || 'Error al guardar producto', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error de conexión', 'error');
+            }
+        }
+
+        function editarProducto(id) {
+            const producto = productos.find(p => p._id === id);
+            if (!producto) return;
+
+            productoEditando = producto;
+            imagenesSeleccionadas = [...producto.imagenes];
+
+            // Llenar formulario
+            document.getElementById('productoId').value = producto._id;
+            document.getElementById('nombre').value = producto.nombre;
+            document.getElementById('descripcion').value = producto.descripcion;
+            document.getElementById('precio').value = producto.precio;
+            document.getElementById('categoria').value = producto.categoria;
+            document.getElementById('stock').value = producto.stock;
+
+            // Actualizar UI
+            document.getElementById('formTitle').textContent = 'Editar Producto';
+            document.getElementById('btnText').textContent = 'Actualizar Producto';
+            actualizarPreviewImagenes();
+            cambiarTab('nuevo');
+        }
+
+        function confirmarEliminar(id, nombre) {
+            document.getElementById('confirmMessage').textContent = 
+                `¿Estás seguro de que deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`;
+            document.getElementById('confirmBtn').onclick = () => eliminarProducto(id);
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        async function eliminarProducto(id) {
+            try {
+                const response = await fetch(`/api/productos/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Producto eliminado exitosamente', 'success');
+                    cargarProductos();
+                    cerrarModal();
+                } else {
+                    const error = await response.json();
+                    mostrarAlerta(error.error || 'Error al eliminar producto', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error de conexión', 'error');
+            }
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('productoForm').reset();
+            document.getElementById('productoId').value = '';
+            imagenesSeleccionadas = [];
+            productoEditando = null;
+            
+            document.getElementById('formTitle').textContent = 'Agregar Nuevo Producto';
+            document.getElementById('btnText').textContent = 'Guardar Producto';
+            actualizarPreviewImagenes();
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+
+        function cerrarModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function mostrarAlerta(mensaje, tipo) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = tipo === 'success' ? 'alert-success' : 'alert-error';
+            const icon = tipo === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass}">
+                    <i class="${icon}"></i>
+                    ${mensaje}
+                </div>
+            `;
+
+            // Auto-ocultar después de 5 segundos
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error en logout:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        function formatearPrecio(precio) {
+            return precio.toLocaleString('es-CL');
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('productoForm').addEventListener('submit', guardarProducto);
+
+        // Cerrar modal con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarModal();
+            }
+        });
+    </script>
+</body>
+</html>

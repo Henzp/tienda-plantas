@@ -1,7 +1,7 @@
 {
-  "name": "tienda-plantas",
+  "name": "entre-hojas-amigas",
   "version": "1.0.0",
-  "description": "Tienda de plantas profesional con MongoDB y panel de administración",
+  "description": "Entre Hojas y Amigas - Tienda de plantas con MongoDB y panel de administración",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,13 +9,10 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "mongoose": "^7.6.3",
+    "mongoose": "^8.0.0",
     "dotenv": "^16.3.1",
     "cors": "^2.8.5",
-    "multer": "^1.4.5",
-    "bcryptjs": "^2.4.3",
-    "express-session": "^1.17.3",
-    "path": "^0.12.7"
+    "express-session": "^1.17.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
@@ -26,12 +23,13 @@
     "ecommerce",
     "mongodb",
     "nodejs",
-    "express"
+    "express",
+    "entre-hojas-amigas"
   ],
   "author": "Tu Nombre",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tu-usuario/tienda-plantas"
+    "url": "https://github.com/tu-usuario/entre-hojas-amigas"
   }
 }

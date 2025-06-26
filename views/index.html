@@ -3,588 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌱 Verde Vida - Tienda de Plantas</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
-            color: #2d5a2d;
-            line-height: 1.6;
-        }
-
-        /* Header */
-        header {
-            background: linear-gradient(135deg, #2d5a2d 0%, #4a7c59 100%);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
-        }
-
-        nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            color: #90ee90;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(45, 90, 45, 0.7), rgba(74, 124, 89, 0.7)), 
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23228B22" width="1200" height="600"/><circle fill="%2332CD32" cx="200" cy="150" r="50" opacity="0.3"/><circle fill="%2390EE90" cx="800" cy="200" r="70" opacity="0.2"/><circle fill="%2398FB98" cx="1000" cy="400" r="90" opacity="0.3"/></svg>');
-            color: white;
-            text-align: center;
-            padding: 4rem 2rem;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta-button {
-            background: linear-gradient(135deg, #90ee90 0%, #98fb98 100%);
-            color: #2d5a2d;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(144, 238, 144, 0.4);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(144, 238, 144, 0.6);
-        }
-
-        /* Productos */
-        .productos {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 2rem;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: #2d5a2d;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(135deg, #90ee90, #98fb98);
-            border-radius: 2px;
-        }
-
-        .productos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .producto-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(45, 90, 45, 0.1);
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .producto-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(45, 90, 45, 0.2);
-            border-color: #90ee90;
-        }
-
-        .producto-images {
-            position: relative;
-            height: 250px;
-            overflow: hidden;
-        }
-
-        .producto-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.5s ease;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .producto-image:not(.active) {
-            opacity: 0;
-        }
-
-        .image-dots {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .dot.active {
-            background: white;
-        }
-
-        .producto-info {
-            padding: 1.5rem;
-        }
-
-        .producto-nombre {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #2d5a2d;
-            margin-bottom: 0.5rem;
-        }
-
-        .producto-descripcion {
-            color: #666;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .producto-precio {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #4a7c59;
-            margin-bottom: 1rem;
-        }
-
-        .producto-botones {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-comprar, .btn-carrito {
-            flex: 1;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-comprar {
-            background: linear-gradient(135deg, #2d5a2d, #4a7c59);
-            color: white;
-        }
-
-        .btn-carrito {
-            background: linear-gradient(135deg, #90ee90, #98fb98);
-            color: #2d5a2d;
-        }
-
-        .btn-comprar:hover, .btn-carrito:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Carrito */
-        .carrito {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 15px;
-            padding: 1rem;
-            box-shadow: 0 8px 25px rgba(45, 90, 45, 0.15);
-            min-width: 200px;
-            border: 2px solid #90ee90;
-        }
-
-        .carrito h3 {
-            color: #2d5a2d;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .carrito-items {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .carrito-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .carrito-total {
-            font-weight: bold;
-            text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid #90ee90;
-            color: #2d5a2d;
-        }
-
-        /* Footer */
-        footer {
-            background: #2d5a2d;
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 4rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .productos-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .carrito {
-                position: relative;
-                margin: 2rem auto;
-                top: auto;
-                right: auto;
-            }
-        }
-    </style>
+    <title>🌱 Entre Hojas y Amigas - Plantas de interior y exterior a domicilio</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
-    <header>
-        <nav>
-            <div class="logo">
-                🌱 Verde Vida
+    <header class="header">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="container">
+                <div class="logo-container">
+                    <div class="logo">
+                        <img src="/images/logo-entre-hojas-amigas.png" alt="Entre Hojas y Amigas" class="logo-img">
+                        <h1>🌿 Entre Hojas y Amigas</h1>
+                    </div>
+                    <div class="nav-actions">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="cart-btn" onclick="toggleCarrito()">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count" id="cartCount">0</span>
+                        </button>
+                        <a href="/admin" class="admin-link">Admin</a>
+                    </div>
+                </div>
             </div>
-            <ul class="nav-links">
-                <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#productos">Plantas</a></li>
-                <li><a href="#contacto">Contacto</a></li>
-            </ul>
+        </div>
+        
+        <!-- Navigation Section -->
+        <nav class="navbar">
+            <div class="container">
+                <ul class="nav-menu">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li class="dropdown">
+                        <a href="#productos">Plantas <i class="fas fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-categoria="Interior">Interior</a></li>
+                            <li><a href="#" data-categoria="Exterior">Exterior</a></li>
+                            <li><a href="#" data-categoria="Pet Friendly">Pet Friendly</a></li>
+                            <li><a href="#" data-categoria="Fácil Cuidado">Fácil Cuidado</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#maceteros">Maceteros</a></li>
+                    <li><a href="#regalos">Regalos</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+                
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <section class="hero" id="inicio">
-        <h1>🌿 Transforma tu hogar con nuestras plantas</h1>
-        <p>Descubre nuestra colección de plantas perfectas para darle vida y color a tu espacio. Desde plantas de interior hasta jardines exteriores.</p>
-        <button class="cta-button" onclick="document.getElementById('productos').scrollIntoView()">
-            Ver Plantas 🌱
-        </button>
+        <div class="hero-content">
+            <h1>Plantas de interior y exterior a domicilio</h1>
+            <p>Encuentra una gran variedad de plantas de interior y exterior a domicilio. Elige la tuya con macetero autorregante, te asesoramos en el cuidado de las plantas.</p>
+            <button class="cta-button" onclick="document.getElementById('productos').scrollIntoView()">
+                Ver Plantas
+            </button>
+        </div>
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800" alt="Plantas hermosas">
+        </div>
     </section>
 
-    <!-- Carrito -->
-    <div class="carrito">
-        <h3>🛒 Mi Carrito</h3>
-        <div class="carrito-items" id="carritoItems">
-            <p style="text-align: center; color: #666;">Carrito vacío</p>
+    <!-- Categorías destacadas -->
+    <section class="categorias-destacadas">
+        <div class="container">
+            <h2>Colecciones destacadas</h2>
+            <div class="categorias-grid">
+                <div class="categoria-card" data-categoria="Interior Grande">
+                    <img src="https://images.unsplash.com/photo-1493606278519-11aa9a6b8453?w=400" alt="Plantas Grandes">
+                    <div class="categoria-overlay">
+                        <h3>Plantas Grandes</h3>
+                        <p>Plantas de interior sobre 1 metro</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Pet Friendly">
+                    <img src="https://images.unsplash.com/photo-1544568100-847a948585b9?w=400" alt="Pet Friendly">
+                    <div class="categoria-overlay">
+                        <h3>Pet Friendly</h3>
+                        <p>Plantas que puedes tener con mascotas</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Autorregante">
+                    <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400" alt="Autorregantes">
+                    <div class="categoria-overlay">
+                        <h3>Autorregantes</h3>
+                        <p>Maceteros Autorregantes</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Fácil Cuidado">
+                    <img src="https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=400" alt="Fácil Cuidado">
+                    <div class="categoria-overlay">
+                        <h3>Fácil Cuidado</h3>
+                        <p>Ideales para comenzar</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Regalo">
+                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400" alt="Para Regalo">
+                    <div class="categoria-overlay">
+                        <h3>Para Regalo</h3>
+                        <p>Plantas con Macetero para regalo</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="carrito-total" id="carritoTotal">
-            Total: $0
+    </section>
+
+    <!-- Productos -->
+    <section class="productos-section" id="productos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nuestras Plantas</h2>
+                <div class="filtros">
+                    <button class="filtro-btn active" data-categoria="todas">Todas</button>
+                    <button class="filtro-btn" data-categoria="Interior">Interior</button>
+                    <button class="filtro-btn" data-categoria="Exterior">Exterior</button>
+                    <button class="filtro-btn" data-categoria="Pet Friendly">Pet Friendly</button>
+                    <button class="filtro-btn" data-categoria="Fácil Cuidado">Fácil Cuidado</button>
+                </div>
+            </div>
+            
+            <div class="productos-grid" id="productosGrid">
+                <!-- Los productos se cargarán dinámicamente desde la base de datos -->
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando plantas...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Misión - NUEVO TEXTO -->
+    <section class="mision">
+        <div class="container">
+            <div class="mision-content">
+                <h2>Compartiendo una conexión especial con la naturaleza, entregando alegría, pero en macetas</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- Carrito Sidebar -->
+    <div class="carrito-sidebar" id="carritoSidebar">
+        <div class="carrito-header">
+            <h3><i class="fas fa-shopping-cart"></i> Mi Carrito</h3>
+            <button class="close-carrito" onclick="toggleCarrito()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="carrito-items" id="carritoItems">
+            <div class="carrito-vacio">
+                <i class="fas fa-leaf"></i>
+                <p>Tu carrito está vacío</p>
+                <small>¡Agrega algunas plantas hermosas!</small>
+            </div>
+        </div>
+        <div class="carrito-footer">
+            <div class="carrito-total">
+                <strong>Total: $<span id="carritoTotal">0</span></strong>
+            </div>
+            <button class="btn-comprar-carrito" onclick="procesarCompra()">
+                Procesar Compra
+            </button>
         </div>
     </div>
 
-    <!-- Productos -->
-    <section class="productos" id="productos">
-        <h2 class="section-title">🌱 Nuestras Plantas</h2>
-        <div class="productos-grid">
-            
-            <!-- Producto 1: Monstera -->
-            <div class="producto-card">
-                <div class="producto-images">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23228B22' width='400' height='300'/><circle fill='%2332CD32' cx='200' cy='150' r='80'/><text x='200' y='160' text-anchor='middle' fill='white' font-size='24' font-family='Arial'>Monstera 1</text></svg>" 
-                         alt="Monstera Deliciosa 1" class="producto-image active">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23006400' width='400' height='300'/><circle fill='%2390EE90' cx='200' cy='150' r='80'/><text x='200' y='160' text-anchor='middle' fill='%23333' font-size='24' font-family='Arial'>Monstera 2</text></svg>" 
-                         alt="Monstera Deliciosa 2" class="producto-image">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23556B2F' width='400' height='300'/><circle fill='%2398FB98' cx='200' cy='150' r='80'/><text x='200' y='160' text-anchor='middle' fill='%23333' font-size='24' font-family='Arial'>Monstera 3</text></svg>" 
-                         alt="Monstera Deliciosa 3" class="producto-image">
-                    <div class="image-dots">
-                        <span class="dot active" onclick="cambiarImagen(this, 0)"></span>
-                        <span class="dot" onclick="cambiarImagen(this, 1)"></span>
-                        <span class="dot" onclick="cambiarImagen(this, 2)"></span>
-                    </div>
-                </div>
-                <div class="producto-info">
-                    <h3 class="producto-nombre">🍃 Monstera Deliciosa</h3>
-                    <p class="producto-descripcion">Planta tropical perfecta para interiores. Sus hojas grandes y fenestradas la convierten en la favorita de los amantes de las plantas.</p>
-                    <div class="producto-precio">$25.990</div>
-                    <div class="producto-botones">
-                        <button class="btn-comprar" onclick="comprarAhora('Monstera Deliciosa', 25990)">Comprar</button>
-                        <button class="btn-carrito" onclick="agregarCarrito('Monstera Deliciosa', 25990)">+ Carrito</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 2: Pothos -->
-            <div class="producto-card">
-                <div class="producto-images">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23228B22' width='400' height='300'/><ellipse fill='%2332CD32' cx='200' cy='150' rx='100' ry='60'/><text x='200' y='160' text-anchor='middle' fill='white' font-size='24' font-family='Arial'>Pothos 1</text></svg>" 
-                         alt="Pothos 1" class="producto-image active">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23006400' width='400' height='300'/><ellipse fill='%2390EE90' cx='200' cy='150' rx='100' ry='60'/><text x='200' y='160' text-anchor='middle' fill='%23333' font-size='24' font-family='Arial'>Pothos 2</text></svg>" 
-                         alt="Pothos 2" class="producto-image">
-                    <div class="image-dots">
-                        <span class="dot active" onclick="cambiarImagen(this, 0)"></span>
-                        <span class="dot" onclick="cambiarImagen(this, 1)"></span>
-                    </div>
-                </div>
-                <div class="producto-info">
-                    <h3 class="producto-nombre">🌿 Pothos Dorado</h3>
-                    <p class="producto-descripcion">Perfecta para principiantes. Crece rápido y es muy resistente. Ideal para colgar o como planta rastrera.</p>
-                    <div class="producto-precio">$12.990</div>
-                    <div class="producto-botones">
-                        <button class="btn-comprar" onclick="comprarAhora('Pothos Dorado', 12990)">Comprar</button>
-                        <button class="btn-carrito" onclick="agregarCarrito('Pothos Dorado', 12990)">+ Carrito</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 3: Sansevieria -->
-            <div class="producto-card">
-                <div class="producto-images">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23228B22' width='400' height='300'/><rect fill='%2332CD32' x='150' y='50' width='20' height='200'/><rect fill='%2332CD32' x='180' y='60' width='20' height='180'/><rect fill='%2332CD32' x='210' y='70' width='20' height='160'/><text x='200' y='280' text-anchor='middle' fill='white' font-size='18' font-family='Arial'>Sansevieria 1</text></svg>" 
-                         alt="Sansevieria 1" class="producto-image active">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23006400' width='400' height='300'/><rect fill='%2390EE90' x='150' y='50' width='20' height='200'/><rect fill='%2390EE90' x='180' y='60' width='20' height='180'/><rect fill='%2390EE90' x='210' y='70' width='20' height='160'/><text x='200' y='280' text-anchor='middle' fill='%23333' font-size='18' font-family='Arial'>Sansevieria 2</text></svg>" 
-                         alt="Sansevieria 2" class="producto-image">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23556B2F' width='400' height='300'/><rect fill='%2398FB98' x='150' y='50' width='20' height='200'/><rect fill='%2398FB98' x='180' y='60' width='20' height='180'/><rect fill='%2398FB98' x='210' y='70' width='20' height='160'/><text x='200' y='280' text-anchor='middle' fill='%23333' font-size='18' font-family='Arial'>Sansevieria 3</text></svg>" 
-                         alt="Sansevieria 3" class="producto-image">
-                    <div class="image-dots">
-                        <span class="dot active" onclick="cambiarImagen(this, 0)"></span>
-                        <span class="dot" onclick="cambiarImagen(this, 1)"></span>
-                        <span class="dot" onclick="cambiarImagen(this, 2)"></span>
-                    </div>
-                </div>
-                <div class="producto-info">
-                    <h3 class="producto-nombre">🗡️ Sansevieria (Lengua de Suegra)</h3>
-                    <p class="producto-descripcion">Purifica el aire y requiere muy poco cuidado. Perfecta para oficinas y dormitorios.</p>
-                    <div class="producto-precio">$18.990</div>
-                    <div class="producto-botones">
-                        <button class="btn-comprar" onclick="comprarAhora('Sansevieria', 18990)">Comprar</button>
-                        <button class="btn-carrito" onclick="agregarCarrito('Sansevieria', 18990)">+ Carrito</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 4: Ficus Lyrata -->
-            <div class="producto-card">
-                <div class="producto-images">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23228B22' width='400' height='300'/><circle fill='%2332CD32' cx='180' cy='100' r='40'/><circle fill='%2332CD32' cx='220' cy='130' r='35'/><circle fill='%2332CD32' cx='160' cy='160' r='30'/><rect fill='%238B4513' x='195' y='200' width='10' height='100'/><text x='200' y='280' text-anchor='middle' fill='white' font-size='18' font-family='Arial'>Ficus 1</text></svg>" 
-                         alt="Ficus Lyrata 1" class="producto-image active">
-                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect fill='%23006400' width='400' height='300'/><circle fill='%2390EE90' cx='180' cy='100' r='40'/><circle fill='%2390EE90' cx='220' cy='130' r='35'/><circle fill='%2390EE90' cx='160' cy='160' r='30'/><rect fill='%238B4513' x='195' y='200' width='10' height='100'/><text x='200' y='280' text-anchor='middle' fill='%23333' font-size='18' font-family='Arial'>Ficus 2</text></svg>" 
-                         alt="Ficus Lyrata 2" class="producto-image">
-                    <div class="image-dots">
-                        <span class="dot active" onclick="cambiarImagen(this, 0)"></span>
-                        <span class="dot" onclick="cambiarImagen(this, 1)"></span>
-                    </div>
-                </div>
-                <div class="producto-info">
-                    <h3 class="producto-nombre">🌳 Ficus Lyrata (Hoja de Violín)</h3>
-                    <p class="producto-descripcion">Planta de gran porte con hojas en forma de violín. Perfecta como árbol de interior para dar altura a tu decoración.</p>
-                    <div class="producto-precio">$45.990</div>
-                    <div class="producto-botones">
-                        <button class="btn-comprar" onclick="comprarAhora('Ficus Lyrata', 45990)">Comprar</button>
-                        <button class="btn-carrito" onclick="agregarCarrito('Ficus Lyrata', 45990)">+ Carrito</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleCarrito()"></div>
 
     <!-- Footer -->
-    <footer id="contacto">
-        <h3>🌱 Verde Vida - Tu tienda de plantas de confianza</h3>
-        <p>📧 contacto@verdevida.com | 📱 +56 9 1234 5678</p>
-        <p>🏠 Av. Las Plantas 123, Santiago, Chile</p>
-        <p style="margin-top: 1rem;">© 2024 Verde Vida. Todos los derechos reservados.</p>
+    <footer class="footer" id="contacto">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🌿 Entre Hojas y Amigas</h3>
+                    <p>Tu tienda de plantas de confianza</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contacto</h4>
+                    <p><i class="fas fa-envelope"></i> contacto@entrehojas.cl</p>
+                    <p><i class="fas fa-phone"></i> +56 9 1234 5678</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Santiago, Chile</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Horarios</h4>
+                    <p>Lun - Vie: 9:00am - 19:00pm</p>
+                    <p>Sábado: 10:00 - 16:00</p>
+                    <p>Domingo: 10:30 - 16:00</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Categorías</h4>
+                    <a href="#">Plantas de Interior</a>
+                    <a href="#">Plantas de Exterior</a>
+                    <a href="#">Maceteros</a>
+                    <a href="#">Pet Friendly</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Entre Hojas y Amigas. Todos los derechos reservados.</p>
+            </div>
+        </div>
     </footer>
 
-    <script>
-        // Variables globales
-        let carrito = [];
-        let total = 0;
-
-        // Función para cambiar imágenes
-        function cambiarImagen(dot, indice) {
-            const card = dot.closest('.producto-card');
-            const imagenes = card.querySelectorAll('.producto-image');
-            const dots = card.querySelectorAll('.dot');
-            
-            // Ocultar todas las imágenes
-            imagenes.forEach(img => img.classList.remove('active'));
-            dots.forEach(d => d.classList.remove('active'));
-            
-            // Mostrar la imagen seleccionada
-            imagenes[indice].classList.add('active');
-            dot.classList.add('active');
-        }
-
-        // Función para agregar al carrito
-        function agregarCarrito(nombre, precio) {
-            carrito.push({ nombre, precio });
-            total += precio;
-            actualizarCarrito();
-            
-            // Mostrar mensaje de confirmación
-            mostrarMensaje(`¡${nombre} agregada al carrito! 🌱`);
-        }
-
-        // Función para comprar ahora
-        function comprarAhora(nombre, precio) {
-            mostrarMensaje(`¡Procesando compra de ${nombre}! 💳`, 'compra');
-            // Aquí podrías redirigir a una página de pago
-        }
-
-        // Función para actualizar el carrito
-        function actualizarCarrito() {
-            const carritoItems = document.getElementById('carritoItems');
-            const carritoTotal = document.getElementById('carritoTotal');
-            
-            if (carrito.length === 0) {
-                carritoItems.innerHTML = '<p style="text-align: center; color: #666;">Carrito vacío</p>';
-            } else {
-                carritoItems.innerHTML = carrito.map((item, index) => `
-                    <div class="carrito-item">
-                        <span>${item.nombre}</span>
-                        <span>$${item.precio.toLocaleString()}</span>
-                        <button onclick="eliminarDelCarrito(${index})" style="background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
-                    </div>
-                `).join('');
-            }
-            
-            carritoTotal.innerHTML = `Total: $${total.toLocaleString()}`;
-        }
-
-        // Función para eliminar del carrito
-        function eliminarDelCarrito(indice) {
-            total -= carrito[indice].precio;
-            carrito.splice(indice, 1);
-            actualizarCarrito();
-            mostrarMensaje('Producto eliminado del carrito', 'eliminar');
-        }
-
-        // Función para mostrar mensajes
-        function mostrarMensaje(mensaje, tipo = 'success') {
-            const div = document.createElement('div');
-            div.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: ${tipo === 'compra' ? '#4CAF50' : tipo === 'eliminar' ? '#ff6b6b' : '#90ee90'};
-                color: ${tipo === 'eliminar' ? 'white' : '#2d5a2d'};
-                padding: 1rem 2rem;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                font-weight: bold;
-                animation: fadeInOut 2s ease-in-out;
-            `;
-            div.textContent = mensaje;
-            document.body.appendChild(div);
-            
-            setTimeout(() => div.remove(), 2000);
-        }
-
-        // Agregar animaciones CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-                50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Auto-cambio de imágenes cada 3 segundos
-        setInterval(() => {
-            const cards = document.querySelectorAll('.producto-card');
-            cards.forEach(card => {
-                const imagenes = card.querySelectorAll('.producto-image');
-                const dots = card.querySelectorAll('.dot');
-                const activa = card.querySelector('.producto-image.active');
-                const activaIndex = Array.from(imagenes).indexOf(activa);
-                const siguienteIndex = (activaIndex + 1) % imagenes.length;
-                
-                imagenes.forEach(img => img.classList.remove('active'));
-                dots.forEach(dot => dot.classList.remove('active'));
-                
-                imagenes[siguienteIndex].classList.add('active');
-                dots[siguienteIndex].classList.add('active');
-            });
-        }, 5000);
-    </script>
+    <!-- Scripts -->
+    <script src="/js/main.js"></script>
 </body>
 </html>
