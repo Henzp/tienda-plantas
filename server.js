@@ -14,12 +14,46 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+// ============================================
+// CONFIGURACIÓN DE SESIONES MEJORADA
+// ============================================
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'plantme-secret-key',
+    secret: process.env.SESSION_SECRET || 'entre-hojas-amigas-super-secret-key-2024',
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
+    saveUninitialized: false, // Cambiado a false para mejor seguridad
+    name: 'plantme.sid', // Nombre específico para la cookie
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production' ? 'auto' : false, // Auto en producción
+        httpOnly: true, // Más seguro
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas en milisegundos
+        sameSite: 'lax' // Previene problemas de CSRF
+    },
+    rolling: true // Renueva la sesión en cada request
 }));
+
+// ============================================
+// MIDDLEWARE DE DEBUG DE SESIONES
+// ============================================
+app.use((req, res, next) => {
+    const timestamp = new Date().toISOString();
+    const sessionInfo = {
+        path: req.path,
+        method: req.method,
+        sessionExists: !!req.session,
+        sessionId: req.sessionID,
+        isLoggedIn: req.session?.isLoggedIn || false,
+        userType: req.session?.userType || 'none',
+        userName: req.session?.userName || 'none'
+    };
+    
+    // Solo loggear rutas importantes
+    if (req.path.includes('/api/') || req.path === '/' || req.path === '/perfil') {
+        console.log(`🔍 [${timestamp}] SESSION DEBUG:`, JSON.stringify(sessionInfo, null, 2));
+    }
+    
+    next();
+});
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/plantme', {
@@ -105,6 +139,50 @@ app.get('/perfil', (req, res) => {
 // NUEVO: Páginas de cuidados dinámicas
 app.get('/cuidados/:tipoPlanta', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'cuidados.html'));
+});
+
+// ============================================
+// RUTAS DE DEBUG ESPECÍFICAS PARA SESIONES
+// ============================================
+
+// TESTING: Ver estado de sesión actual
+app.get('/api/debug/session', (req, res) => {
+    const sessionInfo = {
+        timestamp: new Date().toISOString(),
+        sessionExists: !!req.session,
+        sessionId: req.sessionID,
+        sessionData: {
+            isLoggedIn: req.session?.isLoggedIn || false,
+            isAdmin: req.session?.isAdmin || false,
+            userType: req.session?.userType || 'none',
+            userName: req.session?.userName || 'none',
+            userId: req.session?.userId || 'none'
+        },
+        cookies: req.headers.cookie,
+        userAgent: req.headers['user-agent']
+    };
+    
+    res.json({
+        mensaje: '🔍 Estado de Sesión Actual',
+        ...sessionInfo
+    });
+});
+
+// TESTING: Verificar si la sesión persiste entre páginas
+app.get('/api/debug/test-session-persistence', (req, res) => {
+    if (!req.session.testCounter) {
+        req.session.testCounter = 1;
+    } else {
+        req.session.testCounter++;
+    }
+    
+    res.json({
+        mensaje: '🧪 Test de Persistencia de Sesión',
+        contador: req.session.testCounter,
+        sessionId: req.sessionID,
+        timestamp: new Date().toISOString(),
+        advice: 'Si el contador no aumenta, las sesiones no persisten'
+    });
 });
 
 // API Routes
@@ -205,9 +283,12 @@ app.post('/api/register', async (req, res) => {
     try {
         const { nombre, apellido, email, password, telefono, direccion } = req.body;
         
+        console.log('🔐 [REGISTER] Iniciando registro para:', email);
+        
         // Verificar si el email ya existe
         const usuarioExistente = await Usuario.findOne({ email });
         if (usuarioExistente) {
+            console.log('❌ [REGISTER] Email ya registrado:', email);
             return res.status(400).json({ success: false, message: 'El email ya está registrado' });
         }
         
@@ -226,12 +307,19 @@ app.post('/api/register', async (req, res) => {
         });
         
         const usuarioGuardado = await nuevoUsuario.save();
+        console.log('✅ [REGISTER] Usuario guardado en DB:', usuarioGuardado._id);
         
         // Crear sesión automáticamente
         req.session.isLoggedIn = true;
         req.session.userId = usuarioGuardado._id;
         req.session.userType = 'cliente';
         req.session.userName = `${usuarioGuardado.nombre} ${usuarioGuardado.apellido}`;
+        
+        console.log('🔑 [REGISTER] Sesión creada:', {
+            sessionId: req.sessionID,
+            userId: req.session.userId,
+            userName: req.session.userName
+        });
         
         res.json({ 
             success: true, 
@@ -244,6 +332,7 @@ app.post('/api/register', async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('❌ [REGISTER] Error:', error);
         res.status(500).json({ success: false, message: 'Error al registrar usuario: ' + error.message });
     }
 });
@@ -252,6 +341,8 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+        
+        console.log('🔐 [LOGIN] Intento de login para:', email);
         
         // Verificar credenciales de admin primero
         const adminUsername = process.env.ADMIN_USERNAME || 'tamypau';
@@ -262,6 +353,11 @@ app.post('/api/login', async (req, res) => {
             req.session.isAdmin = true;
             req.session.userType = 'admin';
             req.session.userName = 'Administrador';
+            
+            console.log('👑 [LOGIN] Admin login exitoso:', {
+                sessionId: req.sessionID,
+                userType: req.session.userType
+            });
             
             return res.json({ 
                 success: true, 
@@ -274,12 +370,14 @@ app.post('/api/login', async (req, res) => {
         // Buscar usuario en la base de datos
         const usuario = await Usuario.findOne({ email, activo: true });
         if (!usuario) {
+            console.log('❌ [LOGIN] Usuario no encontrado:', email);
             return res.status(401).json({ success: false, message: 'Email o contraseña incorrectos' });
         }
         
         // Verificar contraseña
         const passwordValida = await bcrypt.compare(password, usuario.password);
         if (!passwordValida) {
+            console.log('❌ [LOGIN] Contraseña incorrecta para:', email);
             return res.status(401).json({ success: false, message: 'Email o contraseña incorrectos' });
         }
         
@@ -288,6 +386,12 @@ app.post('/api/login', async (req, res) => {
         req.session.userId = usuario._id;
         req.session.userType = 'cliente';
         req.session.userName = `${usuario.nombre} ${usuario.apellido}`;
+        
+        console.log('✅ [LOGIN] Usuario login exitoso:', {
+            sessionId: req.sessionID,
+            userId: req.session.userId,
+            userName: req.session.userName
+        });
         
         res.json({ 
             success: true, 
@@ -303,12 +407,19 @@ app.post('/api/login', async (req, res) => {
         });
         
     } catch (error) {
+        console.error('❌ [LOGIN] Error:', error);
         res.status(500).json({ success: false, message: 'Error en el servidor: ' + error.message });
     }
 });
 
 // NUEVO: Verificar estado de sesión
 app.get('/api/session-status', (req, res) => {
+    console.log('🔍 [SESSION-STATUS] Verificando sesión:', {
+        sessionId: req.sessionID,
+        isLoggedIn: req.session?.isLoggedIn || false,
+        userType: req.session?.userType || 'none'
+    });
+    
     if (req.session.isLoggedIn) {
         res.json({
             isLoggedIn: true,
@@ -326,7 +437,14 @@ app.get('/api/session-status', (req, res) => {
 // NUEVO: Obtener datos del usuario logueado
 app.get('/api/user-profile', async (req, res) => {
     try {
+        console.log('👤 [USER-PROFILE] Solicitud de perfil:', {
+            sessionId: req.sessionID,
+            isLoggedIn: req.session?.isLoggedIn,
+            userId: req.session?.userId
+        });
+        
         if (!req.session.isLoggedIn) {
+            console.log('❌ [USER-PROFILE] No autorizado');
             return res.status(401).json({ error: 'No autorizado' });
         }
         
@@ -340,14 +458,17 @@ app.get('/api/user-profile', async (req, res) => {
         
         const usuario = await Usuario.findById(req.session.userId).select('-password');
         if (!usuario) {
+            console.log('❌ [USER-PROFILE] Usuario no encontrado en DB:', req.session.userId);
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }
         
+        console.log('✅ [USER-PROFILE] Perfil encontrado:', usuario.email);
         res.json({
             tipo: 'cliente',
             ...usuario.toObject()
         });
     } catch (error) {
+        console.error('❌ [USER-PROFILE] Error:', error);
         res.status(500).json({ error: 'Error al obtener perfil' });
     }
 });
@@ -369,8 +490,10 @@ app.put('/api/user-profile', async (req, res) => {
         
         req.session.userName = `${usuarioActualizado.nombre} ${usuarioActualizado.apellido}`;
         
+        console.log('✅ [UPDATE-PROFILE] Perfil actualizado:', usuarioActualizado.email);
         res.json({ success: true, user: usuarioActualizado });
     } catch (error) {
+        console.error('❌ [UPDATE-PROFILE] Error:', error);
         res.status(500).json({ error: 'Error al actualizar perfil' });
     }
 });
@@ -500,8 +623,17 @@ app.get('/api/cuidados/:tipoPlanta', (req, res) => {
 
 // Logout
 app.post('/api/logout', (req, res) => {
-    req.session.destroy();
-    res.json({ success: true, message: 'Logout exitoso' });
+    const sessionId = req.sessionID;
+    console.log('🚪 [LOGOUT] Destruyendo sesión:', sessionId);
+    
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('❌ [LOGOUT] Error destruyendo sesión:', err);
+            return res.status(500).json({ success: false, message: 'Error al cerrar sesión' });
+        }
+        console.log('✅ [LOGOUT] Sesión destruida exitosamente');
+        res.json({ success: true, message: 'Logout exitoso' });
+    });
 });
 
 // Middleware para verificar admin
@@ -618,7 +750,6 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-// Para Vercel - exportar la app
 // ============================================
 // RUTAS DE TESTING PARA VERIFICAR MONGODB
 // ============================================
@@ -686,4 +817,6 @@ app.get('/api/test/usuarios', async (req, res) => {
         });
     }
 });
+
+// Para Vercel - exportar la app
 module.exports = app;
