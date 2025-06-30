@@ -4,8 +4,6 @@ const cors = require('cors');
 const path = require('path');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
-const multer = require('multer'); // NUEVO: Para subir imágenes
-const fs = require('fs'); // NUEVO: Para manejo de archivos
 require('dotenv').config();
 
 const app = express();
@@ -33,45 +31,6 @@ app.use(session({
     },
     rolling: true
 }));
-
-// ============================================
-// CONFIGURACIÓN DE MULTER PARA SUBIR IMÁGENES
-// ============================================
-const uploadsDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-    console.log('📁 Directorio de uploads creado:', uploadsDir);
-}
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        cb(null, 'planta-' + uniqueSuffix + extension);
-    }
-});
-
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    
-    if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('Solo se permiten archivos de imagen (JPEG, PNG, GIF, WebP)'), false);
-    }
-};
-
-const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
-    limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB máximo
-        files: 5 // Máximo 5 archivos
-    }
-});
 
 // ============================================
 // MIDDLEWARE DE DEBUG DE SESIONES
@@ -220,83 +179,36 @@ app.get('/api/debug/test-session-persistence', (req, res) => {
 });
 
 // ============================================
-// RUTAS DE MANEJO DE IMÁGENES
+// RUTAS DE MANEJO DE IMÁGENES (SOLO URLs EXTERNAS PARA VERCEL)
 // ============================================
-app.post('/api/upload-images', upload.array('images', 5), (req, res) => {
-    try {
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: 'No se subieron archivos' });
-        }
-        
-        const imageUrls = req.files.map(file => {
-            return `/uploads/${file.filename}`;
-        });
-        
-        console.log('📸 [UPLOAD] Imágenes subidas:', imageUrls);
-        
-        res.json({
-            success: true,
-            message: `${req.files.length} imagen(es) subida(s) exitosamente`,
-            images: imageUrls,
-            files: req.files.map(file => ({
-                originalName: file.originalname,
-                filename: file.filename,
-                size: file.size,
-                url: `/uploads/${file.filename}`
-            }))
-        });
-    } catch (error) {
-        console.error('❌ [UPLOAD] Error:', error);
-        res.status(500).json({ error: 'Error al subir imágenes: ' + error.message });
-    }
+app.post('/api/upload-images', (req, res) => {
+    // En Vercel, no podemos subir archivos al sistema de archivos
+    // Solo devolvemos un mensaje explicativo
+    res.status(501).json({
+        success: false,
+        message: 'Upload de archivos no disponible en Vercel. Use URLs externas.',
+        error: 'VERCEL_NO_FILE_UPLOAD',
+        suggestion: 'Agregue las imágenes usando URLs externas en su lugar'
+    });
 });
 
 app.delete('/api/delete-image/:filename', (req, res) => {
-    try {
-        const filename = req.params.filename;
-        const filePath = path.join(uploadsDir, filename);
-        
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: 'Imagen no encontrada' });
-        }
-        
-        fs.unlinkSync(filePath);
-        console.log('🗑️ [DELETE] Imagen eliminada:', filename);
-        
-        res.json({
-            success: true,
-            message: 'Imagen eliminada exitosamente',
-            filename: filename
-        });
-    } catch (error) {
-        console.error('❌ [DELETE] Error:', error);
-        res.status(500).json({ error: 'Error al eliminar imagen: ' + error.message });
-    }
+    // En Vercel, no hay archivos locales que eliminar
+    res.status(501).json({
+        success: false,
+        message: 'Eliminación de archivos no disponible en Vercel',
+        error: 'VERCEL_NO_FILE_DELETE'
+    });
 });
 
 app.get('/api/uploaded-images', (req, res) => {
-    try {
-        const files = fs.readdirSync(uploadsDir);
-        const imageFiles = files.filter(file => {
-            const ext = path.extname(file).toLowerCase();
-            return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
-        });
-        
-        const images = imageFiles.map(filename => ({
-            filename: filename,
-            url: `/uploads/${filename}`,
-            uploadDate: fs.statSync(path.join(uploadsDir, filename)).mtime
-        }));
-        
-        res.json({
-            success: true,
-            totalImages: images.length,
-            images: images
-        });
-    } catch (error) {
-        console.error('❌ [LIST] Error:', error);
-        res.status(500).json({ error: 'Error al listar imágenes: ' + error.message });
-    }
+    // En Vercel, devolvemos un array vacío ya que no hay uploads locales
+    res.json({
+        success: true,
+        totalImages: 0,
+        images: [],
+        message: 'No hay imágenes locales en Vercel. Use URLs externas.'
+    });
 });
 
 // ============================================
@@ -1057,6 +969,17 @@ app.get('/api/seed', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Error al crear productos de ejemplo: ' + error.message });
     }
+});
+
+// Manejo de errores global
+app.use((error, req, res, next) => {
+    console.error('Error global:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+// Ruta 404
+app.get('*', (req, res) => {
+    res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
 // Para desarrollo local
