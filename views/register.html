@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Entre Hojas y Amigas</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            padding: 2rem;
+        }
+        
+        .register-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid rgba(144, 238, 144, 0.3);
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .register-header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(45, 80, 22, 0.1);
+        }
+        
+        .register-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d5016;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2d5016;
+            box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+        }
+        
+        .register-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Satisfy', cursive;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+        }
+        
+        .register-btn:hover {
+            background: linear-gradient(135deg, #1a3009 0%, #2d5016 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.3);
+        }
+        
+        .register-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .login-link a {
+            color: #2d5016;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: #1a3009;
+        }
+        
+        .back-home {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d5016;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .back-home:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .success-message {
+            color: #27ae60;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .register-container {
+                padding: 1rem;
+            }
+            
+            .register-form {
+                padding: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-home {
+                position: static;
+                display: inline-block;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-home">
+        <i class="fas fa-home"></i> Volver al Inicio
+    </a>
+    
+    <div class="register-container">
+        <form class="register-form" id="registerForm">
+            <div class="register-header">
+                <h1>¡Únete a Nosotras! 🌱</h1>
+                <p>Crea tu cuenta y comienza tu viaje verde</p>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                    <div class="error-message" id="nombreError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" required>
+                    <div class="error-message" id="apellidoError"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo Electrónico</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error-message" id="emailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required minlength="6">
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono (opcional)</label>
+                <input type="tel" id="telefono" name="telefono">
+            </div>
+            
+            <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" name="direccion" placeholder="Calle y número">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="ciudad">Ciudad</label>
+                    <input type="text" id="ciudad" name="ciudad">
+                </div>
+                
+                <div class="form-group">
+                    <label for="region">Región</label>
+                    <input type="text" id="region" name="region">
+                </div>
+            </div>
+            
+            <button type="submit" class="register-btn" id="registerBtn">
+                Crear Mi Cuenta
+            </button>
+            
+            <div class="success-message" id="successMessage"></div>
+            <div class="error-message" id="generalError"></div>
+            
+            <div class="login-link">
+                ¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const registerBtn = document.getElementById('registerBtn');
+            const generalError = document.getElementById('generalError');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Limpiar mensajes anteriores
+            generalError.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Deshabilitar botón
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Creando cuenta...';
+            
+            try {
+                const formData = new FormData(this);
+                const userData = {
+                    nombre: formData.get('nombre'),
+                    apellido: formData.get('apellido'),
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    telefono: formData.get('telefono'),
+                    direccion: {
+                        calle: formData.get('direccion'),
+                        ciudad: formData.get('ciudad'),
+                        region: formData.get('region')
+                    }
+                };
+                
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successMessage.textContent = '¡Cuenta creada exitosamente! Redirigiendo...';
+                    successMessage.style.display = 'block';
+                    
+                    // Redirigir después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/perfil';
+                    }, 2000);
+                } else {
+                    generalError.textContent = result.message || 'Error al crear la cuenta';
+                    generalError.style.display = 'block';
+                }
+            } catch (error) {
+                generalError.textContent = 'Error de conexión. Intenta de nuevo.';
+                generalError.style.display = 'block';
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Crear Mi Cuenta';
+            }
+        });
+        
+        // Validación en tiempo real
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value;
+            const emailError = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                emailError.textContent = 'Por favor ingresa un email válido';
+                emailError.style.display = 'block';
+            } else {
+                emailError.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const passwordError = document.getElementById('passwordError');
+            
+            if (password.length < 6 && password.length > 0) {
+                passwordError.textContent = 'La contraseña debe tener al menos 6 caracteres';
+                passwordError.style.display = 'block';
+            } else {
+                passwordError.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
