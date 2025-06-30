@@ -3,366 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌿 Panel de Administración - Entre Hojas y Amigas</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- NUEVO: Google Fonts cursivas -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Pacifico&family=Great+Vibes&family=Satisfy&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Panel de Administración - Entre Hojas y Amigas</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Pacifico&family=Great+Vibes&family=Satisfy&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-        }
-
-        .admin-header {
-            background: #2d5016;
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        /* NUEVO: Títulos con fuentes cursivas */
-        .admin-header h1 {
-            font-family: 'Dancing Script', cursive;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .admin-nav {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .admin-nav a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            transition: background 0.3s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .admin-nav a:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .container {
+        .admin-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 20px;
         }
-
-        .admin-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0;
+        
+        .form-section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
-
-        .tab-button {
-            font-family: 'Satisfy', cursive;
-            background: none;
-            border: none;
-            padding: 1rem 2rem;
-            cursor: pointer;
-            font-size: 1.1rem;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .tab-button.active {
-            color: #2d5016;
-            border-bottom-color: #2d5016;
-            font-weight: 600;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .card-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-header h3 {
+        
+        .section-title {
             font-family: 'Dancing Script', cursive;
-            color: #2d5016;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.6rem;
-            font-weight: 600;
+            font-size: 2.5rem;
+            color: #2d5a27;
+            margin-bottom: 20px;
+            text-align: center;
         }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
+        
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
+        
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d5a27;
+            font-family: 'Satisfy', cursive;
+            font-size: 1.2rem;
         }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            font-family: 'Inter', sans-serif;
+        
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
-            padding: 0.8rem;
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
             outline: none;
-            border-color: #2d5016;
+            border-color: #4CAF50;
         }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* NUEVO: Sección mejorada de imágenes */
-        .images-section {
-            border: 2px dashed #2d5016;
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 1.5rem 0;
-            background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
-        }
-
-        .images-section h4 {
-            font-family: 'Dancing Script', cursive;
-            color: #2d5016;
-            font-size: 1.4rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .upload-section {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: white;
+        
+        /* Sistema de Imágenes */
+        .image-section {
+            border: 2px dashed #4CAF50;
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin: 20px 0;
+            background: #f9f9f9;
         }
-
-        .upload-section h5 {
-            font-family: 'Satisfy', cursive;
-            color: #2d5016;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
+        
+        .image-upload-area {
+            text-align: center;
+            padding: 40px 20px;
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
-
-        .file-upload-container {
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-wrapper {
             position: relative;
-            margin-bottom: 1rem;
+            display: inline-block;
+            margin: 10px;
         }
-
-        .file-upload-input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px dashed #2d5016;
-            border-radius: 8px;
-            background: #f8fff8;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        
+        .file-input {
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
         }
-
-        .file-upload-input:hover {
-            background: #f0f8f0;
-            border-color: #1a3009;
-        }
-
-        .upload-btn {
-            font-family: 'Satisfy', cursive;
-            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+        
+        .file-input-button {
+            background: #4CAF50;
             color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 1rem;
+            font-family: 'Satisfy', cursive;
+            font-size: 1.1rem;
+            border: none;
+            transition: all 0.3s;
         }
-
-        .upload-btn:hover {
-            background: linear-gradient(135deg, #1a3009 0%, #2d5016 100%);
+        
+        .file-input-button:hover {
+            background: #45a049;
             transform: translateY(-2px);
         }
-
-        .upload-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .separator {
-            text-align: center;
-            margin: 1.5rem 0;
-            font-weight: bold;
-            color: #666;
-            position: relative;
-            font-family: 'Satisfy', cursive;
-            font-size: 1.1rem;
-        }
-
-        .separator::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #ddd;
-            z-index: 1;
-        }
-
-        .separator span {
-            background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
-            padding: 0 1rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .url-section {
-            padding: 1.5rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .url-section h5 {
-            font-family: 'Satisfy', cursive;
-            color: #2d5016;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-        }
-
+        
         .url-input-group {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
+            gap: 10px;
+            margin: 15px 0;
         }
-
+        
         .url-input {
             flex: 1;
-            padding: 0.8rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
         }
-
+        
         .add-url-btn {
-            font-family: 'Inter', sans-serif;
-            background: #4a7c59;
+            background: #2196F3;
             color: white;
             border: none;
-            padding: 0.8rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
-
-        .add-url-btn:hover {
-            background: #2d5016;
-        }
-
-        .preview-section {
-            margin-top: 1.5rem;
-        }
-
-        .preview-section h5 {
-            font-family: 'Satisfy', cursive;
-            color: #2d5016;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-        }
-
-        .preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-        }
-
-        .preview-item {
-            position: relative;
+            padding: 12px 20px;
             border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Satisfy', cursive;
+        }
+        
+        /* Preview de Imágenes */
+        .image-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .image-preview {
+            position: relative;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-
-        .preview-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .preview-item img {
+        
+        .image-preview img {
             width: 100%;
             height: 120px;
             object-fit: cover;
         }
-
-        .remove-btn {
+        
+        .image-remove {
             position: absolute;
             top: 5px;
             right: 5px;
-            background: #e74c3c;
+            background: #ff4444;
             color: white;
             border: none;
             border-radius: 50%;
@@ -370,795 +161,403 @@
             height: 25px;
             cursor: pointer;
             font-size: 12px;
-            transition: background 0.3s ease;
         }
-
-        .remove-btn:hover {
-            background: #c0392b;
+        
+        .image-remove:hover {
+            background: #cc0000;
         }
-
-        .upload-info {
-            color: #666;
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem;
-            font-family: 'Inter', sans-serif;
+        
+        /* Galería de Imágenes Subidas */
+        .uploaded-gallery {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
         }
-
-        .upload-progress {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .upload-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #2d5016, #4a7c59);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .btn {
-            font-family: 'Satisfy', cursive;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #2d5016, #4a7c59);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #1a3009, #2d5016);
-            transform: translateY(-1px);
-        }
-
-        .btn-success {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #229954;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #545b62;
-        }
-
-        .productos-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .productos-table th,
-        .productos-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .productos-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #2d5016;
-        }
-
-        .productos-table img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-
-        .status-badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-activo {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-inactivo {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .action-btn {
-            padding: 0.3rem 0.8rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .action-btn.edit {
-            background: #3498db;
-            color: white;
-        }
-
-        .action-btn.delete {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #666;
-        }
-
-        .loading i {
-            font-size: 2rem;
-            color: #2d5016;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .stats-grid {
+        
+        .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
         }
-
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .stat-card i {
-            font-size: 2rem;
-            color: #2d5016;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card h3 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 2.2rem;
-            color: #2d5016;
-            margin-bottom: 0.3rem;
-            font-weight: 600;
-        }
-
-        .stat-card p {
-            color: #666;
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .modal-header h3 {
-            font-family: 'Dancing Script', cursive;
-            color: #2d5016;
-            font-size: 1.4rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
+        
+        .gallery-item {
+            position: relative;
             cursor: pointer;
-            color: #666;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
         }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .admin-tabs {
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .productos-table {
-                font-size: 0.8rem;
-            }
-            
-            .actions {
-                flex-direction: column;
-            }
-
-            .preview-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
-
-            .images-section {
-                padding: 1rem;
-            }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+        
+        .gallery-item.selected {
+            border: 3px solid #4CAF50;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-family: 'Dancing Script', cursive;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .file-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="admin-header">
-        <h1><i class="fas fa-leaf"></i> Panel de Administración</h1>
-        <nav class="admin-nav">
-            <a href="/"><i class="fas fa-home"></i> Ver Tienda</a>
-            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-        </nav>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <h1>Entre Hojas y Amigas 🌿</h1>
+                </div>
+                <div class="nav-links">
+                    <span id="userInfo">👑 Administrador</span>
+                    <a href="/admin" class="nav-link">Admin</a>
+                    <button onclick="logout()" class="logout-btn">Cerrar Sesión</button>
+                </div>
+            </nav>
+        </div>
     </header>
 
-    <div class="container">
-        <!-- Estadísticas -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-seedling"></i>
-                <h3 id="totalProductos">0</h3>
-                <p>Total Productos</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-eye"></i>
-                <h3 id="productosActivos">0</h3>
-                <p>Productos Activos</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-eye-slash"></i>
-                <h3 id="productosInactivos">0</h3>
-                <p>Productos Inactivos</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-tags"></i>
-                <h3 id="totalCategorias">0</h3>
-                <p>Categorías</p>
-            </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="admin-tabs">
-            <button class="tab-button active" onclick="cambiarTab('productos')">
-                <i class="fas fa-leaf"></i> Gestionar Productos
-            </button>
-            <button class="tab-button" onclick="cambiarTab('nuevo')">
-                <i class="fas fa-plus"></i> Nuevo Producto
-            </button>
-        </div>
-
-        <!-- Tab: Gestionar Productos -->
-        <div id="tab-productos" class="tab-content active">
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-list"></i> Lista de Productos</h3>
+    <div class="admin-container">
+        <div class="form-section">
+            <h2 class="section-title">🌱 Agregar Nuevo Producto</h2>
+            
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="nombre">Nombre del Producto:</label>
+                    <input type="text" id="nombre" name="nombre" required>
                 </div>
-                <div class="card-body">
-                    <div id="productosContainer">
-                        <div class="loading">
-                            <i class="fas fa-spinner"></i>
-                            <p>Cargando productos...</p>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">Precio (CLP):</label>
+                    <input type="number" id="precio" name="precio" min="0" step="100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="stock">Stock Disponible:</label>
+                    <input type="number" id="stock" name="stock" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Seleccionar categoría</option>
+                        <option value="interior">Plantas de Interior</option>
+                        <option value="exterior">Plantas de Exterior</option>
+                        <option value="suculentas">Suculentas</option>
+                        <option value="cactus">Cactus</option>
+                        <option value="flores">Plantas con Flores</option>
+                        <option value="aromáticas">Plantas Aromáticas</option>
+                    </select>
+                </div>
+
+                <!-- SISTEMA DE IMÁGENES COMPLETO -->
+                <div class="image-section">
+                    <h3 style="font-family: 'Satisfy', cursive; color: #2d5a27; margin-bottom: 15px;">
+                        📸 Imágenes del Producto
+                    </h3>
+                    
+                    <!-- Upload de Archivos Locales -->
+                    <div class="image-upload-area">
+                        <div class="upload-icon">📁</div>
+                        <p style="margin-bottom: 15px; color: #666;">
+                            Sube imágenes desde tu computadora (máximo 5 archivos, 5MB cada uno)
+                        </p>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="imageFiles" class="file-input" multiple accept="image/*">
+                            <label for="imageFiles" class="file-input-button">
+                                Seleccionar Archivos
+                            </label>
+                        </div>
+                        <div class="file-info">
+                            <small>Formatos aceptados: JPG, PNG, GIF, WebP</small>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Tab: Nuevo Producto -->
-        <div id="tab-nuevo" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-plus"></i> <span id="formTitle">Agregar Nuevo Producto</span></h3>
-                </div>
-                <div class="card-body">
-                    <div id="alertContainer"></div>
-                    <form id="productoForm">
-                        <input type="hidden" id="productoId">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="nombre">Nombre de la Planta *</label>
-                                <input type="text" id="nombre" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="precio">Precio (CLP) *</label>
-                                <input type="number" id="precio" min="0" step="10" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="categoria">Categoría *</label>
-                                <select id="categoria" required>
-                                    <option value="">Seleccionar categoría</option>
-                                    <option value="Interior">Interior</option>
-                                    <option value="Exterior">Exterior</option>
-                                    <option value="Interior Grande">Interior Grande</option>
-                                    <option value="Pet Friendly">Pet Friendly</option>
-                                    <option value="Fácil Cuidado">Fácil Cuidado</option>
-                                    <option value="Autorregante">Autorregante</option>
-                                    <option value="Regalo">Para Regalo</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="stock">Stock Disponible *</label>
-                                <input type="number" id="stock" min="0" required>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="descripcion">Descripción *</label>
-                                <textarea id="descripcion" placeholder="Describe las características y cuidados de la planta..." required></textarea>
-                            </div>
-                            
-                            <!-- NUEVA SECCIÓN DE IMÁGENES MEJORADA -->
-                            <div class="form-group full-width">
-                                <div class="images-section">
-                                    <h4>🖼️ Imágenes del Producto</h4>
-                                    
-                                    <!-- Opción 1: Subir archivos -->
-                                    <div class="upload-section">
-                                        <h5>📤 Subir Imágenes desde tu Computador</h5>
-                                        <div class="file-upload-container">
-                                            <input type="file" id="imageFiles" class="file-upload-input" multiple accept="image/*">
-                                            <div class="upload-info">
-                                                • Máximo 5 imágenes • JPG, PNG, GIF, WebP • Máximo 5MB cada una
-                                            </div>
-                                            <div class="upload-progress" id="uploadProgress">
-                                                <div class="upload-progress-bar" id="uploadProgressBar"></div>
-                                            </div>
-                                        </div>
-                                        <button type="button" id="uploadBtn" class="upload-btn">
-                                            <i class="fas fa-upload"></i> Subir Imágenes
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="separator">
-                                        <span>O</span>
-                                    </div>
-                                    
-                                    <!-- Opción 2: URLs -->
-                                    <div class="url-section">
-                                        <h5>🔗 Agregar URLs de Imágenes</h5>
-                                        <div class="url-input-group">
-                                            <input type="url" id="nuevaImagenUrl" class="url-input" placeholder="https://ejemplo.com/imagen.jpg">
-                                            <button type="button" class="add-url-btn" onclick="agregarImagenUrl()">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Preview de imágenes -->
-                                    <div class="preview-section" id="previewSection" style="display: none;">
-                                        <h5>Vista Previa:</h5>
-                                        <div class="preview-grid" id="imagenPreview"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> <span id="btnText">Guardar Producto</span>
-                            </button>
-                            <button type="button" onclick="limpiarFormulario()" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancelar
+                    <!-- URL Externa -->
+                    <div style="text-align: center; margin: 20px 0;">
+                        <strong style="color: #666;">--- O ---</strong>
+                    </div>
+                    
+                    <div>
+                        <p style="margin-bottom: 10px; color: #666; text-align: center;">
+                            🔗 Agregar imagen desde URL externa
+                        </p>
+                        <div class="url-input-group">
+                            <input type="url" id="imageUrl" class="url-input" placeholder="https://ejemplo.com/imagen.jpg">
+                            <button type="button" class="add-url-btn" onclick="addImageFromUrl()">
+                                Agregar URL
                             </button>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+                    </div>
 
-    <!-- Modal de Confirmación -->
-    <div id="confirmModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Confirmar Acción</h3>
-                <button class="modal-close" onclick="cerrarModal()">&times;</button>
-            </div>
-            <p id="confirmMessage"></p>
-            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                <button class="btn btn-danger" id="confirmBtn">Confirmar</button>
-            </div>
+                    <!-- Mensajes -->
+                    <div id="errorMessage" class="error-message"></div>
+                    <div id="successMessage" class="success-message"></div>
+
+                    <!-- Preview de Imágenes Seleccionadas -->
+                    <div id="imagePreviewContainer" class="image-preview-container"></div>
+                </div>
+
+                <!-- Galería de Imágenes Subidas -->
+                <div class="uploaded-gallery">
+                    <h4 style="font-family: 'Satisfy', cursive; color: #2d5a27; margin-bottom: 15px;">
+                        🖼️ Galería de Imágenes Subidas (clic para seleccionar)
+                    </h4>
+                    <div id="uploadedGallery" class="gallery-grid"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">🌿 Agregar Producto</button>
+            </form>
         </div>
     </div>
 
     <script>
-        let productos = [];
-        let imagenesSeleccionadas = [];
-        let productoEditando = null;
+        // Variables globales
+        let selectedImages = [];
+        let uploadedImages = [];
 
-        // Verificar autenticación al cargar
+        // Cargar imágenes subidas al iniciar
         document.addEventListener('DOMContentLoaded', function() {
-            verificarAuth();
-            cargarProductos();
-            setupImageUpload();
+            loadUploadedImages();
         });
 
-        async function verificarAuth() {
-            try {
-                const response = await fetch('/api/session-status');
-                const sessionData = await response.json();
-                
-                if (!sessionData.isLoggedIn || sessionData.userType !== 'admin') {
-                    window.location.href = '/login';
-                    return;
-                }
-                
-                console.log('✅ Admin autenticado');
-            } catch (error) {
-                console.error('Error verificando autenticación:', error);
-                window.location.href = '/login';
-            }
-        }
+        // Manejar selección de archivos
+        document.getElementById('imageFiles').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            uploadFiles(files);
+        });
 
-        // NUEVO: Configurar sistema de upload de imágenes
-        function setupImageUpload() {
-            const uploadBtn = document.getElementById('uploadBtn');
-            const imageFiles = document.getElementById('imageFiles');
-            
-            uploadBtn.addEventListener('click', async function() {
-                const files = imageFiles.files;
-                if (!files || files.length === 0) {
-                    mostrarAlerta('Selecciona al menos una imagen', 'error');
+        // Subir archivos al servidor
+        async function uploadFiles(files) {
+            // Validaciones
+            if (files.length > 5) {
+                showError('Máximo 5 archivos permitidos');
+                return;
+            }
+
+            for (let file of files) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB
+                    showError(`El archivo ${file.name} es muy grande (máximo 5MB)`);
                     return;
                 }
                 
-                if (files.length > 5) {
-                    mostrarAlerta('Máximo 5 imágenes permitidas', 'error');
+                if (!file.type.startsWith('image/')) {
+                    showError(`${file.name} no es una imagen válida`);
                     return;
                 }
+            }
+
+            const formData = new FormData();
+            files.forEach(file => {
+                formData.append('images', file);
+            });
+
+            try {
+                showSuccess('Subiendo imágenes...');
                 
-                uploadBtn.disabled = true;
-                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
-                
-                const progressContainer = document.getElementById('uploadProgress');
-                const progressBar = document.getElementById('uploadProgressBar');
-                progressContainer.style.display = 'block';
-                
-                try {
-                    const formData = new FormData();
-                    for (let file of files) {
-                        if (file.size > 5 * 1024 * 1024) { // 5MB
-                            throw new Error(`La imagen ${file.name} es muy grande (máximo 5MB)`);
-                        }
-                        formData.append('images', file);
-                    }
+                const response = await fetch('/api/upload-images', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showSuccess(`${result.uploadedFiles.length} imagen(es) subida(s) exitosamente`);
                     
-                    // Simular progreso
-                    let progress = 0;
-                    const progressInterval = setInterval(() => {
-                        progress += 10;
-                        progressBar.style.width = progress + '%';
-                        if (progress >= 90) {
-                            clearInterval(progressInterval);
+                    // Agregar a imágenes seleccionadas
+                    result.uploadedFiles.forEach(filename => {
+                        const imageUrl = `/uploads/${filename}`;
+                        if (!selectedImages.includes(imageUrl)) {
+                            selectedImages.push(imageUrl);
                         }
-                    }, 100);
-                    
-                    const response = await fetch('/api/upload-images', {
-                        method: 'POST',
-                        body: formData
                     });
                     
-                    clearInterval(progressInterval);
-                    progressBar.style.width = '100%';
+                    updateImagePreview();
+                    loadUploadedImages();
                     
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        // Agregar las imágenes subidas al array
-                        result.images.forEach(imageUrl => {
-                            imagenesSeleccionadas.push({
-                                url: imageUrl,
-                                type: 'uploaded'
-                            });
-                        });
-                        
-                        updatePreview();
-                        imageFiles.value = ''; // Limpiar input
-                        mostrarAlerta(`${result.images.length} imagen(es) subida(s) exitosamente`, 'success');
-                    } else {
-                        throw new Error(result.error);
-                    }
-                } catch (error) {
-                    console.error('Error al subir imágenes:', error);
-                    mostrarAlerta('Error al subir imágenes: ' + error.message, 'error');
-                } finally {
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Imágenes';
-                    progressContainer.style.display = 'none';
-                    progressBar.style.width = '0%';
+                    // Limpiar input
+                    document.getElementById('imageFiles').value = '';
+                } else {
+                    showError(result.error || 'Error al subir imágenes');
                 }
-            });
-            
-            // Enter key en input de URL
-            document.getElementById('nuevaImagenUrl').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    agregarImagenUrl();
-                }
-            });
-        }
-
-        // NUEVO: Agregar imagen por URL
-        function agregarImagenUrl() {
-            const input = document.getElementById('nuevaImagenUrl');
-            const url = input.value.trim();
-
-            if (!url) {
-                mostrarAlerta('Por favor ingresa una URL válida', 'error');
-                return;
-            }
-
-            if (!isValidUrl(url)) {
-                mostrarAlerta('La URL no es válida', 'error');
-                return;
-            }
-
-            imagenesSeleccionadas.push({
-                url: url,
-                type: 'url'
-            });
-
-            input.value = '';
-            updatePreview();
-            mostrarAlerta('URL agregada exitosamente', 'success');
-        }
-
-        // NUEVO: Actualizar preview de imágenes
-        function updatePreview() {
-            const container = document.getElementById('imagenPreview');
-            const previewSection = document.getElementById('previewSection');
-            
-            if (imagenesSeleccionadas.length === 0) {
-                previewSection.style.display = 'none';
-                return;
-            }
-            
-            previewSection.style.display = 'block';
-            container.innerHTML = imagenesSeleccionadas.map((image, index) => `
-                <div class="preview-item">
-                    <img src="${image.url}" alt="Preview ${index + 1}" onerror="this.src='https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100'">
-                    <button type="button" class="remove-btn" onclick="eliminarImagen(${index})" title="Eliminar imagen">×</button>
-                </div>
-            `).join('');
-        }
-
-        // NUEVO: Eliminar imagen del preview
-        function eliminarImagen(index) {
-            imagenesSeleccionadas.splice(index, 1);
-            updatePreview();
-        }
-
-        async function cargarProductos() {
-            try {
-                const response = await fetch('/api/admin/productos');
-                
-                if (response.status === 401) {
-                    window.location.href = '/login';
-                    return;
-                }
-                
-                productos = await response.json();
-                mostrarProductos();
-                actualizarEstadisticas();
             } catch (error) {
                 console.error('Error:', error);
-                mostrarAlerta('Error al cargar productos', 'error');
+                showError('Error de conexión al subir imágenes');
             }
         }
 
-        function mostrarProductos() {
-            const container = document.getElementById('productosContainer');
+        // Agregar imagen desde URL
+        function addImageFromUrl() {
+            const url = document.getElementById('imageUrl').value.trim();
             
-            if (productos.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #666;">
-                        <i class="fas fa-seedling" style="font-size: 3rem; margin-bottom: 1rem; color: #2d5016;"></i>
-                        <h3 style="font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: #2d5016;">No hay productos registrados</h3>
-                        <p>Comienza agregando tu primera planta</p>
-                        <button onclick="cambiarTab('nuevo')" class="btn btn-primary" style="margin-top: 1rem;">
-                            <i class="fas fa-plus"></i> Agregar Producto
-                        </button>
-                    </div>
-                `;
+            if (!url) {
+                showError('Por favor ingresa una URL');
                 return;
             }
 
-            container.innerHTML = `
-                <table class="productos-table">
-                    <thead>
-                        <tr>
-                            <th>Imagen</th>
-                            <th>Nombre</th>
-                            <th>Categoría</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${productos.map(producto => `
-                            <tr>
-                                <td>
-                                    <img src="${producto.imagenes[0] || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100'}" 
-                                         alt="${producto.nombre}" 
-                                         onerror="this.src='https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100'">
-                                </td>
-                                <td><strong>${producto.nombre}</strong></td>
-                                <td>${producto.categoria}</td>
-                                <td>$${formatearPrecio(producto.precio)}</td>
-                                <td>
-                                    <strong style="color: ${producto.stock > 0 ? '#27ae60' : '#e74c3c'}">
-                                        ${producto.stock}
-                                    </strong>
-                                </td>
-                                <td>
-                                    <span class="status-badge ${producto.activo ? 'status-activo' : 'status-inactivo'}">
-                                        ${producto.activo ? 'Activo' : 'Inactivo'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="actions">
-                                        <button class="action-btn edit" onclick="editarProducto('${producto._id}')">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
-                                        <button class="action-btn delete" onclick="confirmarEliminar('${producto._id}', '${producto.nombre}')">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+            if (!isValidImageUrl(url)) {
+                showError('URL no válida. Debe ser una imagen (jpg, png, gif, webp)');
+                return;
+            }
+
+            if (selectedImages.includes(url)) {
+                showError('Esta imagen ya está seleccionada');
+                return;
+            }
+
+            if (selectedImages.length >= 5) {
+                showError('Máximo 5 imágenes permitidas');
+                return;
+            }
+
+            selectedImages.push(url);
+            updateImagePreview();
+            document.getElementById('imageUrl').value = '';
+            showSuccess('Imagen agregada desde URL');
         }
 
-        function actualizarEstadisticas() {
-            const total = productos.length;
-            const activos = productos.filter(p => p.activo).length;
-            const inactivos = total - activos;
-            const categorias = [...new Set(productos.map(p => p.categoria))].length;
-
-            document.getElementById('totalProductos').textContent = total;
-            document.getElementById('productosActivos').textContent = activos;
-            document.getElementById('productosInactivos').textContent = inactivos;
-            document.getElementById('totalCategorias').textContent = categorias;
-        }
-
-        function cambiarTab(tab) {
-            // Ocultar todos los tabs
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Mostrar tab seleccionado
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            event.target.classList.add('active');
-
-            // Limpiar formulario si vamos a nuevo producto
-            if (tab === 'nuevo') {
-                limpiarFormulario();
+        // Validar URL de imagen
+        function isValidImageUrl(url) {
+            try {
+                const urlObj = new URL(url);
+                const path = urlObj.pathname.toLowerCase();
+                return /\.(jpg|jpeg|png|gif|webp)$/i.test(path) || url.includes('blob:');
+            } catch {
+                return false;
             }
         }
 
-        async function guardarProducto(event) {
-            event.preventDefault();
+        // Actualizar preview de imágenes
+        function updateImagePreview() {
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
 
-            if (imagenesSeleccionadas.length === 0) {
-                mostrarAlerta('Agrega al menos una imagen al producto', 'error');
+            selectedImages.forEach((url, index) => {
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'image-preview';
+                previewDiv.innerHTML = `
+                    <img src="${url}" alt="Preview ${index + 1}" onerror="this.style.display='none'">
+                    <button type="button" class="image-remove" onclick="removeSelectedImage(${index})">×</button>
+                `;
+                container.appendChild(previewDiv);
+            });
+        }
+
+        // Remover imagen seleccionada
+        function removeSelectedImage(index) {
+            selectedImages.splice(index, 1);
+            updateImagePreview();
+        }
+
+        // Cargar galería de imágenes subidas
+        async function loadUploadedImages() {
+            try {
+                const response = await fetch('/api/uploaded-images');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    uploadedImages = data.images;
+                    updateUploadedGallery();
+                }
+            } catch (error) {
+                console.error('Error loading uploaded images:', error);
+            }
+        }
+
+        // Actualizar galería de imágenes subidas
+        function updateUploadedGallery() {
+            const gallery = document.getElementById('uploadedGallery');
+            gallery.innerHTML = '';
+
+            uploadedImages.forEach(filename => {
+                const imageUrl = `/uploads/${filename}`;
+                const isSelected = selectedImages.includes(imageUrl);
+                
+                const item = document.createElement('div');
+                item.className = `gallery-item ${isSelected ? 'selected' : ''}`;
+                item.innerHTML = `<img src="${imageUrl}" alt="${filename}">`;
+                item.onclick = () => toggleGalleryImage(imageUrl);
+                
+                gallery.appendChild(item);
+            });
+        }
+
+        // Toggle selección de imagen de galería
+        function toggleGalleryImage(imageUrl) {
+            const index = selectedImages.indexOf(imageUrl);
+            
+            if (index === -1) {
+                if (selectedImages.length >= 5) {
+                    showError('Máximo 5 imágenes permitidas');
+                    return;
+                }
+                selectedImages.push(imageUrl);
+            } else {
+                selectedImages.splice(index, 1);
+            }
+            
+            updateImagePreview();
+            updateUploadedGallery();
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (selectedImages.length === 0) {
+                showError('Debes seleccionar al menos una imagen');
                 return;
             }
 
@@ -1166,164 +565,77 @@
                 nombre: document.getElementById('nombre').value,
                 descripcion: document.getElementById('descripcion').value,
                 precio: parseFloat(document.getElementById('precio').value),
-                categoria: document.getElementById('categoria').value,
                 stock: parseInt(document.getElementById('stock').value),
-                imagenes: imagenesSeleccionadas.map(img => img.url)
+                categoria: document.getElementById('categoria').value,
+                imagenes: selectedImages
             };
 
             try {
-                let response;
-                const productoId = document.getElementById('productoId').value;
-
-                if (productoId) {
-                    // Actualizar producto existente
-                    response = await fetch(`/api/productos/${productoId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formData)
-                    });
-                } else {
-                    // Crear nuevo producto
-                    response = await fetch('/api/productos', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formData)
-                    });
-                }
-
-                if (response.ok) {
-                    mostrarAlerta(`Producto ${productoId ? 'actualizado' : 'creado'} exitosamente`, 'success');
-                    limpiarFormulario();
-                    cargarProductos();
-                    cambiarTab('productos');
-                } else {
-                    const error = await response.json();
-                    mostrarAlerta(error.error || 'Error al guardar producto', 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarAlerta('Error de conexión', 'error');
-            }
-        }
-
-        function editarProducto(id) {
-            const producto = productos.find(p => p._id === id);
-            if (!producto) return;
-
-            productoEditando = producto;
-            imagenesSeleccionadas = producto.imagenes.map(url => ({
-                url: url,
-                type: url.startsWith('/uploads/') ? 'uploaded' : 'url'
-            }));
-
-            // Llenar formulario
-            document.getElementById('productoId').value = producto._id;
-            document.getElementById('nombre').value = producto.nombre;
-            document.getElementById('descripcion').value = producto.descripcion;
-            document.getElementById('precio').value = producto.precio;
-            document.getElementById('categoria').value = producto.categoria;
-            document.getElementById('stock').value = producto.stock;
-
-            // Actualizar UI
-            document.getElementById('formTitle').textContent = 'Editar Producto';
-            document.getElementById('btnText').textContent = 'Actualizar Producto';
-            updatePreview();
-            cambiarTab('nuevo');
-        }
-
-        function confirmarEliminar(id, nombre) {
-            document.getElementById('confirmMessage').textContent = 
-                `¿Estás seguro de que deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`;
-            document.getElementById('confirmBtn').onclick = () => eliminarProducto(id);
-            document.getElementById('confirmModal').classList.add('active');
-        }
-
-        async function eliminarProducto(id) {
-            try {
-                const response = await fetch(`/api/productos/${id}`, {
-                    method: 'DELETE'
+                const response = await fetch('/api/productos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
                 });
 
+                const result = await response.json();
+
                 if (response.ok) {
-                    mostrarAlerta('Producto eliminado exitosamente', 'success');
-                    cargarProductos();
-                    cerrarModal();
+                    showSuccess('Producto agregado exitosamente');
+                    document.getElementById('productForm').reset();
+                    selectedImages = [];
+                    updateImagePreview();
+                    updateUploadedGallery();
                 } else {
-                    const error = await response.json();
-                    mostrarAlerta(error.error || 'Error al eliminar producto', 'error');
+                    showError(result.error || 'Error al agregar producto');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                mostrarAlerta('Error de conexión', 'error');
+                showError('Error de conexión');
             }
-        }
+        });
 
-        function limpiarFormulario() {
-            document.getElementById('productoForm').reset();
-            document.getElementById('productoId').value = '';
-            imagenesSeleccionadas = [];
-            productoEditando = null;
+        // Funciones de mensajes
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
             
-            document.getElementById('formTitle').textContent = 'Agregar Nuevo Producto';
-            document.getElementById('btnText').textContent = 'Guardar Producto';
-            updatePreview();
-            document.getElementById('alertContainer').innerHTML = '';
-        }
-
-        function cerrarModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-        }
-
-        function mostrarAlerta(mensaje, tipo) {
-            const alertContainer = document.getElementById('alertContainer');
-            const alertClass = tipo === 'success' ? 'alert-success' : 'alert-error';
-            const icon = tipo === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-            
-            alertContainer.innerHTML = `
-                <div class="alert ${alertClass}">
-                    <i class="${icon}"></i>
-                    ${mensaje}
-                </div>
-            `;
-
-            // Auto-ocultar después de 5 segundos
             setTimeout(() => {
-                alertContainer.innerHTML = '';
+                errorDiv.style.display = 'none';
             }, 5000);
         }
 
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Función de logout
         async function logout() {
             try {
-                await fetch('/api/logout', { method: 'POST' });
-                window.location.href = '/login';
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    alert('Error al cerrar sesión');
+                }
             } catch (error) {
-                console.error('Error en logout:', error);
-                window.location.href = '/login';
+                console.error('Error:', error);
+                alert('Error de conexión');
             }
         }
-
-        function formatearPrecio(precio) {
-            return precio.toLocaleString('es-CL');
-        }
-
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
-        // Event listeners
-        document.getElementById('productoForm').addEventListener('submit', guardarProducto);
-
-        // Cerrar modal con ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                cerrarModal();
-            }
-        });
     </script>
 </body>
 </html>
