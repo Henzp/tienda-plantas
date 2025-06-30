@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const session = require('express-session');
-const bcrypt = require('bcrypt'); // NUEVO: Para encriptar contraseñas
+const bcrypt = require('bcrypt');
+const multer = require('multer'); // NUEVO: Para subir imágenes
+const fs = require('fs'); // NUEVO: Para manejo de archivos
 require('dotenv').config();
 
 const app = express();
@@ -21,16 +23,55 @@ app.use(express.static('public'));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'entre-hojas-amigas-super-secret-key-2024',
     resave: false,
-    saveUninitialized: false, // Cambiado a false para mejor seguridad
-    name: 'plantme.sid', // Nombre específico para la cookie
+    saveUninitialized: false,
+    name: 'plantme.sid',
     cookie: { 
-        secure: process.env.NODE_ENV === 'production' ? 'auto' : false, // Auto en producción
-        httpOnly: true, // Más seguro
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas en milisegundos
-        sameSite: 'lax' // Previene problemas de CSRF
+        secure: process.env.NODE_ENV === 'production' ? 'auto' : false,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        sameSite: 'lax'
     },
-    rolling: true // Renueva la sesión en cada request
+    rolling: true
 }));
+
+// ============================================
+// CONFIGURACIÓN DE MULTER PARA SUBIR IMÁGENES
+// ============================================
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('📁 Directorio de uploads creado:', uploadsDir);
+}
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadsDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        cb(null, 'planta-' + uniqueSuffix + extension);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Solo se permiten archivos de imagen (JPEG, PNG, GIF, WebP)'), false);
+    }
+};
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB máximo
+        files: 5 // Máximo 5 archivos
+    }
+});
 
 // ============================================
 // MIDDLEWARE DE DEBUG DE SESIONES
@@ -47,7 +88,6 @@ app.use((req, res, next) => {
         userName: req.session?.userName || 'none'
     };
     
-    // Solo loggear rutas importantes
     if (req.path.includes('/api/') || req.path === '/' || req.path === '/perfil') {
         console.log(`🔍 [${timestamp}] SESSION DEBUG:`, JSON.stringify(sessionInfo, null, 2));
     }
@@ -63,7 +103,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/plantme',
 .then(() => console.log('✅ Conectado a MongoDB'))
 .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
-// NUEVO: Modelo de Usuario
+// MODELOS DE BASE DE DATOS
 const usuarioSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     apellido: { type: String, required: true },
@@ -83,7 +123,6 @@ const usuarioSchema = new mongoose.Schema({
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
-// Modelo de Producto (existente)
 const productoSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     descripcion: { type: String, required: true },
@@ -97,7 +136,6 @@ const productoSchema = new mongoose.Schema({
 
 const Producto = mongoose.model('Producto', productoSchema);
 
-// NUEVO: Modelo de Venta (para códigos QR)
 const ventaSchema = new mongoose.Schema({
     usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
     productos: [{
@@ -106,14 +144,16 @@ const ventaSchema = new mongoose.Schema({
         precioUnitario: Number
     }],
     total: { type: Number, required: true },
-    codigoQR: { type: String, unique: true }, // Para generar QR único
+    codigoQR: { type: String, unique: true },
     fechaVenta: { type: Date, default: Date.now },
     estado: { type: String, enum: ['pendiente', 'completada', 'cancelada'], default: 'completada' }
 });
 
 const Venta = mongoose.model('Venta', ventaSchema);
 
-// Rutas principales
+// ============================================
+// RUTAS PRINCIPALES
+// ============================================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
@@ -126,26 +166,21 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
-// NUEVO: Página de registro
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
-// NUEVO: Página de perfil de usuario
 app.get('/perfil', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'perfil.html'));
 });
 
-// NUEVO: Páginas de cuidados dinámicas
 app.get('/cuidados/:tipoPlanta', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'cuidados.html'));
 });
 
 // ============================================
-// RUTAS DE DEBUG ESPECÍFICAS PARA SESIONES
+// RUTAS DE DEBUG DE SESIONES
 // ============================================
-
-// TESTING: Ver estado de sesión actual
 app.get('/api/debug/session', (req, res) => {
     const sessionInfo = {
         timestamp: new Date().toISOString(),
@@ -168,7 +203,6 @@ app.get('/api/debug/session', (req, res) => {
     });
 });
 
-// TESTING: Verificar si la sesión persiste entre páginas
 app.get('/api/debug/test-session-persistence', (req, res) => {
     if (!req.session.testCounter) {
         req.session.testCounter = 1;
@@ -185,9 +219,89 @@ app.get('/api/debug/test-session-persistence', (req, res) => {
     });
 });
 
-// API Routes
+// ============================================
+// RUTAS DE MANEJO DE IMÁGENES
+// ============================================
+app.post('/api/upload-images', upload.array('images', 5), (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: 'No se subieron archivos' });
+        }
+        
+        const imageUrls = req.files.map(file => {
+            return `/uploads/${file.filename}`;
+        });
+        
+        console.log('📸 [UPLOAD] Imágenes subidas:', imageUrls);
+        
+        res.json({
+            success: true,
+            message: `${req.files.length} imagen(es) subida(s) exitosamente`,
+            images: imageUrls,
+            files: req.files.map(file => ({
+                originalName: file.originalname,
+                filename: file.filename,
+                size: file.size,
+                url: `/uploads/${file.filename}`
+            }))
+        });
+    } catch (error) {
+        console.error('❌ [UPLOAD] Error:', error);
+        res.status(500).json({ error: 'Error al subir imágenes: ' + error.message });
+    }
+});
 
-// Obtener todos los productos
+app.delete('/api/delete-image/:filename', (req, res) => {
+    try {
+        const filename = req.params.filename;
+        const filePath = path.join(uploadsDir, filename);
+        
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: 'Imagen no encontrada' });
+        }
+        
+        fs.unlinkSync(filePath);
+        console.log('🗑️ [DELETE] Imagen eliminada:', filename);
+        
+        res.json({
+            success: true,
+            message: 'Imagen eliminada exitosamente',
+            filename: filename
+        });
+    } catch (error) {
+        console.error('❌ [DELETE] Error:', error);
+        res.status(500).json({ error: 'Error al eliminar imagen: ' + error.message });
+    }
+});
+
+app.get('/api/uploaded-images', (req, res) => {
+    try {
+        const files = fs.readdirSync(uploadsDir);
+        const imageFiles = files.filter(file => {
+            const ext = path.extname(file).toLowerCase();
+            return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
+        });
+        
+        const images = imageFiles.map(filename => ({
+            filename: filename,
+            url: `/uploads/${filename}`,
+            uploadDate: fs.statSync(path.join(uploadsDir, filename)).mtime
+        }));
+        
+        res.json({
+            success: true,
+            totalImages: images.length,
+            images: images
+        });
+    } catch (error) {
+        console.error('❌ [LIST] Error:', error);
+        res.status(500).json({ error: 'Error al listar imágenes: ' + error.message });
+    }
+});
+
+// ============================================
+// API ROUTES - PRODUCTOS
+// ============================================
 app.get('/api/productos', async (req, res) => {
     try {
         const productos = await Producto.find({ activo: true });
@@ -197,7 +311,6 @@ app.get('/api/productos', async (req, res) => {
     }
 });
 
-// Obtener producto por ID
 app.get('/api/productos/:id', async (req, res) => {
     try {
         const producto = await Producto.findById(req.params.id);
@@ -210,28 +323,47 @@ app.get('/api/productos/:id', async (req, res) => {
     }
 });
 
-// Crear nuevo producto
 app.post('/api/productos', async (req, res) => {
     try {
         const { nombre, descripcion, precio, categoria, imagenes, stock } = req.body;
         
+        console.log('🌱 [PRODUCTO] Creando producto:', { nombre, imagenes });
+        
+        if (!nombre || !descripcion || !precio || !categoria) {
+            return res.status(400).json({ error: 'Faltan campos requeridos' });
+        }
+        
+        let imagenesFinales = [];
+        if (imagenes && Array.isArray(imagenes)) {
+            imagenesFinales = imagenes.filter(img => img && img.trim() !== '');
+        } else if (imagenes && typeof imagenes === 'string') {
+            imagenesFinales = [imagenes.trim()];
+        }
+        
         const nuevoProducto = new Producto({
-            nombre,
-            descripcion,
+            nombre: nombre.trim(),
+            descripcion: descripcion.trim(),
             precio: parseFloat(precio),
-            categoria,
-            imagenes: imagenes || [],
+            categoria: categoria.trim(),
+            imagenes: imagenesFinales,
             stock: parseInt(stock) || 0
         });
 
         const productoGuardado = await nuevoProducto.save();
+        
+        console.log('✅ [PRODUCTO] Producto creado:', {
+            id: productoGuardado._id,
+            nombre: productoGuardado.nombre,
+            imagenes: productoGuardado.imagenes
+        });
+        
         res.status(201).json(productoGuardado);
     } catch (error) {
+        console.error('❌ [PRODUCTO] Error:', error);
         res.status(400).json({ error: 'Error al crear producto: ' + error.message });
     }
 });
 
-// Actualizar producto
 app.put('/api/productos/:id', async (req, res) => {
     try {
         const { nombre, descripcion, precio, categoria, imagenes, stock } = req.body;
@@ -259,7 +391,6 @@ app.put('/api/productos/:id', async (req, res) => {
     }
 });
 
-// Eliminar producto (soft delete)
 app.delete('/api/productos/:id', async (req, res) => {
     try {
         const producto = await Producto.findByIdAndUpdate(
@@ -278,25 +409,43 @@ app.delete('/api/productos/:id', async (req, res) => {
     }
 });
 
-// NUEVO: Registro de usuarios
+app.get('/api/productos/:id/stock', async (req, res) => {
+    try {
+        const producto = await Producto.findById(req.params.id);
+        if (!producto) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+        
+        res.json({
+            productoId: producto._id,
+            nombre: producto.nombre,
+            stock: producto.stock,
+            precio: producto.precio,
+            activo: producto.activo
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al verificar stock' });
+    }
+});
+
+// ============================================
+// API ROUTES - USUARIOS
+// ============================================
 app.post('/api/register', async (req, res) => {
     try {
         const { nombre, apellido, email, password, telefono, direccion } = req.body;
         
         console.log('🔐 [REGISTER] Iniciando registro para:', email);
         
-        // Verificar si el email ya existe
         const usuarioExistente = await Usuario.findOne({ email });
         if (usuarioExistente) {
             console.log('❌ [REGISTER] Email ya registrado:', email);
             return res.status(400).json({ success: false, message: 'El email ya está registrado' });
         }
         
-        // Encriptar contraseña
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         
-        // Crear nuevo usuario
         const nuevoUsuario = new Usuario({
             nombre,
             apellido,
@@ -309,7 +458,6 @@ app.post('/api/register', async (req, res) => {
         const usuarioGuardado = await nuevoUsuario.save();
         console.log('✅ [REGISTER] Usuario guardado en DB:', usuarioGuardado._id);
         
-        // Crear sesión automáticamente
         req.session.isLoggedIn = true;
         req.session.userId = usuarioGuardado._id;
         req.session.userType = 'cliente';
@@ -337,14 +485,12 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// MODIFICADO: Login mejorado - detecta admin automáticamente
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         
         console.log('🔐 [LOGIN] Intento de login para:', email);
         
-        // Verificar credenciales de admin primero
         const adminUsername = process.env.ADMIN_USERNAME || 'tamypau';
         const adminPassword = process.env.ADMIN_PASSWORD || 'Isii2607';
         
@@ -367,21 +513,18 @@ app.post('/api/login', async (req, res) => {
             });
         }
         
-        // Buscar usuario en la base de datos
         const usuario = await Usuario.findOne({ email, activo: true });
         if (!usuario) {
             console.log('❌ [LOGIN] Usuario no encontrado:', email);
             return res.status(401).json({ success: false, message: 'Email o contraseña incorrectos' });
         }
         
-        // Verificar contraseña
         const passwordValida = await bcrypt.compare(password, usuario.password);
         if (!passwordValida) {
             console.log('❌ [LOGIN] Contraseña incorrecta para:', email);
             return res.status(401).json({ success: false, message: 'Email o contraseña incorrectos' });
         }
         
-        // Crear sesión de usuario
         req.session.isLoggedIn = true;
         req.session.userId = usuario._id;
         req.session.userType = 'cliente';
@@ -412,7 +555,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// NUEVO: Verificar estado de sesión
 app.get('/api/session-status', (req, res) => {
     console.log('🔍 [SESSION-STATUS] Verificando sesión:', {
         sessionId: req.sessionID,
@@ -434,7 +576,6 @@ app.get('/api/session-status', (req, res) => {
     }
 });
 
-// NUEVO: Obtener datos del usuario logueado
 app.get('/api/user-profile', async (req, res) => {
     try {
         console.log('👤 [USER-PROFILE] Solicitud de perfil:', {
@@ -473,7 +614,6 @@ app.get('/api/user-profile', async (req, res) => {
     }
 });
 
-// NUEVO: Actualizar perfil de usuario
 app.put('/api/user-profile', async (req, res) => {
     try {
         if (!req.session.isLoggedIn || req.session.isAdmin) {
@@ -498,39 +638,115 @@ app.put('/api/user-profile', async (req, res) => {
     }
 });
 
-// NUEVO: Procesar compra y generar código QR
+app.post('/api/logout', (req, res) => {
+    const sessionId = req.sessionID;
+    console.log('🚪 [LOGOUT] Destruyendo sesión:', sessionId);
+    
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('❌ [LOGOUT] Error destruyendo sesión:', err);
+            return res.status(500).json({ success: false, message: 'Error al cerrar sesión' });
+        }
+        console.log('✅ [LOGOUT] Sesión destruida exitosamente');
+        res.json({ success: true, message: 'Logout exitoso' });
+    });
+});
+
+// ============================================
+// API ROUTES - COMPRAS Y VENTAS (CON STOCK CORREGIDO)
+// ============================================
 app.post('/api/procesar-compra', async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
     try {
         if (!req.session.isLoggedIn) {
             return res.status(401).json({ error: 'Debes estar logueado para comprar' });
         }
         
         const { productos, total } = req.body;
+        console.log('🛒 [COMPRA] Iniciando procesamiento:', { productos, total });
         
-        // Generar código QR único
+        if (!productos || productos.length === 0) {
+            return res.status(400).json({ error: 'No hay productos en el carrito' });
+        }
+        
+        const productosActualizados = [];
+        
+        for (const item of productos) {
+            const { producto: productoId, cantidad } = item;
+            
+            const producto = await Producto.findById(productoId).session(session);
+            if (!producto) {
+                throw new Error(`Producto ${productoId} no encontrado`);
+            }
+            
+            if (producto.stock < cantidad) {
+                throw new Error(`Stock insuficiente para ${producto.nombre}. Stock disponible: ${producto.stock}, solicitado: ${cantidad}`);
+            }
+            
+            const nuevoStock = producto.stock - cantidad;
+            await Producto.findByIdAndUpdate(
+                productoId, 
+                { stock: nuevoStock },
+                { session, new: true }
+            );
+            
+            console.log(`📦 [STOCK] ${producto.nombre}: ${producto.stock} → ${nuevoStock}`);
+            
+            productosActualizados.push({
+                producto: productoId,
+                nombre: producto.nombre,
+                cantidad: cantidad,
+                precioUnitario: producto.precio,
+                stockAnterior: producto.stock,
+                stockNuevo: nuevoStock
+            });
+        }
+        
         const codigoQR = 'QR-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
         
         const nuevaVenta = new Venta({
             usuario: req.session.userId,
-            productos,
+            productos: productos.map(item => ({
+                producto: item.producto,
+                cantidad: item.cantidad,
+                precioUnitario: item.precioUnitario || 0
+            })),
             total,
             codigoQR
         });
         
-        const ventaGuardada = await nuevaVenta.save();
+        const ventaGuardada = await nuevaVenta.save({ session });
+        
+        await session.commitTransaction();
+        console.log('✅ [COMPRA] Transacción completada exitosamente');
         
         res.json({ 
             success: true, 
             ventaId: ventaGuardada._id,
             codigoQR: codigoQR,
-            message: 'Compra procesada exitosamente'
+            message: 'Compra procesada exitosamente',
+            productosActualizados: productosActualizados,
+            stockReducido: true
         });
+        
     } catch (error) {
-        res.status(500).json({ error: 'Error al procesar compra: ' + error.message });
+        await session.abortTransaction();
+        console.error('❌ [COMPRA] Error en transacción:', error);
+        
+        res.status(500).json({ 
+            error: 'Error al procesar compra: ' + error.message,
+            stockReducido: false
+        });
+    } finally {
+        session.endSession();
     }
 });
 
-// NUEVO: Obtener información de cuidados por tipo de planta
+// ============================================
+// API ROUTES - CUIDADOS
+// ============================================
 app.get('/api/cuidados/:tipoPlanta', (req, res) => {
     const { tipoPlanta } = req.params;
     
@@ -621,22 +837,9 @@ app.get('/api/cuidados/:tipoPlanta', (req, res) => {
     res.json(cuidados);
 });
 
-// Logout
-app.post('/api/logout', (req, res) => {
-    const sessionId = req.sessionID;
-    console.log('🚪 [LOGOUT] Destruyendo sesión:', sessionId);
-    
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('❌ [LOGOUT] Error destruyendo sesión:', err);
-            return res.status(500).json({ success: false, message: 'Error al cerrar sesión' });
-        }
-        console.log('✅ [LOGOUT] Sesión destruida exitosamente');
-        res.json({ success: true, message: 'Logout exitoso' });
-    });
-});
-
-// Middleware para verificar admin
+// ============================================
+// MIDDLEWARE Y RUTAS ADMIN
+// ============================================
 function requireAdmin(req, res, next) {
     if (req.session.isAdmin) {
         next();
@@ -645,7 +848,6 @@ function requireAdmin(req, res, next) {
     }
 }
 
-// Ruta protegida para obtener todos los productos (incluidos inactivos)
 app.get('/api/admin/productos', requireAdmin, async (req, res) => {
     try {
         const productos = await Producto.find({});
@@ -655,7 +857,6 @@ app.get('/api/admin/productos', requireAdmin, async (req, res) => {
     }
 });
 
-// NUEVO: Obtener todas las ventas (admin)
 app.get('/api/admin/ventas', requireAdmin, async (req, res) => {
     try {
         const ventas = await Venta.find({})
@@ -668,7 +869,6 @@ app.get('/api/admin/ventas', requireAdmin, async (req, res) => {
     }
 });
 
-// NUEVO: Obtener todos los usuarios (admin)
 app.get('/api/admin/usuarios', requireAdmin, async (req, res) => {
     try {
         const usuarios = await Usuario.find({}).select('-password').sort({ fechaRegistro: -1 });
@@ -678,10 +878,128 @@ app.get('/api/admin/usuarios', requireAdmin, async (req, res) => {
     }
 });
 
-// Crear productos de ejemplo al iniciar
+// ============================================
+// RUTAS DE TESTING
+// ============================================
+app.get('/api/test/estado-db', async (req, res) => {
+    try {
+        const totalUsuarios = await Usuario.countDocuments();
+        const totalProductos = await Producto.countDocuments();
+        const totalVentas = await Venta.countDocuments();
+        
+        const estadoConexion = mongoose.connection.readyState;
+        const estadosConexion = {
+            0: 'Desconectado',
+            1: 'Conectado',
+            2: 'Conectando',
+            3: 'Desconectando'
+        };
+        
+        res.json({
+            mensaje: '📊 Estado General de MongoDB',
+            conexion: {
+                estado: estadosConexion[estadoConexion],
+                baseDatos: mongoose.connection.name,
+                host: mongoose.connection.host
+            },
+            estadisticas: {
+                usuarios: totalUsuarios,
+                productos: totalProductos,
+                ventas: totalVentas
+            },
+            timestamp: new Date()
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error verificando estado de la base de datos',
+            mensaje: error.message
+        });
+    }
+});
+
+app.get('/api/test/usuarios', async (req, res) => {
+    try {
+        const usuarios = await Usuario.find({}).select('-password');
+        const totalUsuarios = await Usuario.countDocuments();
+        
+        res.json({
+            mensaje: 'Conexión a MongoDB exitosa',
+            totalUsuarios: totalUsuarios,
+            usuarios: usuarios.map(user => ({
+                id: user._id,
+                nombre: user.nombre,
+                apellido: user.apellido,
+                email: user.email,
+                fechaRegistro: user.fechaRegistro,
+                activo: user.activo
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error conectando a MongoDB',
+            mensaje: error.message
+        });
+    }
+});
+
+app.get('/api/test/ver-stocks', async (req, res) => {
+    try {
+        const productos = await Producto.find({ activo: true }).select('nombre precio stock categoria');
+        
+        const stockInfo = productos.map(producto => ({
+            id: producto._id,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            stock: producto.stock,
+            categoria: producto.categoria,
+            estado: producto.stock > 0 ? 'Disponible' : 'Agotado'
+        }));
+        
+        const totalStock = productos.reduce((sum, p) => sum + p.stock, 0);
+        const productosAgotados = productos.filter(p => p.stock === 0).length;
+        
+        res.json({
+            mensaje: '📦 Estado Actual de Stocks',
+            resumen: {
+                totalProductos: productos.length,
+                totalStock: totalStock,
+                productosAgotados: productosAgotados,
+                productosDisponibles: productos.length - productosAgotados
+            },
+            productos: stockInfo,
+            timestamp: new Date()
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener stocks: ' + error.message });
+    }
+});
+
+app.post('/api/test/resetear-stock', async (req, res) => {
+    try {
+        const resultado = await Producto.updateMany(
+            {},
+            { 
+                $set: { 
+                    stock: 25
+                } 
+            }
+        );
+        
+        res.json({
+            mensaje: '📦 Stock reseteado para testing',
+            productosActualizados: resultado.modifiedCount,
+            nuevoStock: 25
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al resetear stock' });
+    }
+});
+
+// ============================================
+// DATOS DE EJEMPLO
+// ============================================
 app.get('/api/seed', async (req, res) => {
     try {
-        // Verificar si ya hay productos
         const count = await Producto.countDocuments();
         if (count > 0) {
             return res.json({ message: 'Ya existen productos en la base de datos' });
@@ -750,73 +1068,4 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-// ============================================
-// RUTAS DE TESTING PARA VERIFICAR MONGODB
-// ============================================
-
-// TESTING: Estado general de la base de datos
-app.get('/api/test/estado-db', async (req, res) => {
-    try {
-        const totalUsuarios = await Usuario.countDocuments();
-        const totalProductos = await Producto.countDocuments();
-        const totalVentas = await Venta.countDocuments();
-        
-        // Verificar conexión
-        const estadoConexion = mongoose.connection.readyState;
-        const estadosConexion = {
-            0: 'Desconectado',
-            1: 'Conectado',
-            2: 'Conectando',
-            3: 'Desconectando'
-        };
-        
-        res.json({
-            mensaje: '📊 Estado General de MongoDB',
-            conexion: {
-                estado: estadosConexion[estadoConexion],
-                baseDatos: mongoose.connection.name,
-                host: mongoose.connection.host
-            },
-            estadisticas: {
-                usuarios: totalUsuarios,
-                productos: totalProductos,
-                ventas: totalVentas
-            },
-            timestamp: new Date()
-        });
-    } catch (error) {
-        res.status(500).json({
-            error: 'Error verificando estado de la base de datos',
-            mensaje: error.message
-        });
-    }
-});
-
-// TESTING: Ver todos los usuarios registrados
-app.get('/api/test/usuarios', async (req, res) => {
-    try {
-        const usuarios = await Usuario.find({}).select('-password');
-        const totalUsuarios = await Usuario.countDocuments();
-        
-        res.json({
-            mensaje: 'Conexión a MongoDB exitosa',
-            totalUsuarios: totalUsuarios,
-            usuarios: usuarios.map(user => ({
-                id: user._id,
-                nombre: user.nombre,
-                apellido: user.apellido,
-                email: user.email,
-                fechaRegistro: user.fechaRegistro,
-                activo: user.activo
-            }))
-        });
-    } catch (error) {
-        res.status(500).json({
-            error: 'Error conectando a MongoDB',
-            mensaje: error.message
-        });
-    }
-});
-
-// Para Vercel - exportar la app
 module.exports = app;
