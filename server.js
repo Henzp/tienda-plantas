@@ -619,4 +619,71 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Para Vercel - exportar la app
+// ============================================
+// RUTAS DE TESTING PARA VERIFICAR MONGODB
+// ============================================
+
+// TESTING: Estado general de la base de datos
+app.get('/api/test/estado-db', async (req, res) => {
+    try {
+        const totalUsuarios = await Usuario.countDocuments();
+        const totalProductos = await Producto.countDocuments();
+        const totalVentas = await Venta.countDocuments();
+        
+        // Verificar conexión
+        const estadoConexion = mongoose.connection.readyState;
+        const estadosConexion = {
+            0: 'Desconectado',
+            1: 'Conectado',
+            2: 'Conectando',
+            3: 'Desconectando'
+        };
+        
+        res.json({
+            mensaje: '📊 Estado General de MongoDB',
+            conexion: {
+                estado: estadosConexion[estadoConexion],
+                baseDatos: mongoose.connection.name,
+                host: mongoose.connection.host
+            },
+            estadisticas: {
+                usuarios: totalUsuarios,
+                productos: totalProductos,
+                ventas: totalVentas
+            },
+            timestamp: new Date()
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error verificando estado de la base de datos',
+            mensaje: error.message
+        });
+    }
+});
+
+// TESTING: Ver todos los usuarios registrados
+app.get('/api/test/usuarios', async (req, res) => {
+    try {
+        const usuarios = await Usuario.find({}).select('-password');
+        const totalUsuarios = await Usuario.countDocuments();
+        
+        res.json({
+            mensaje: 'Conexión a MongoDB exitosa',
+            totalUsuarios: totalUsuarios,
+            usuarios: usuarios.map(user => ({
+                id: user._id,
+                nombre: user.nombre,
+                apellido: user.apellido,
+                email: user.email,
+                fechaRegistro: user.fechaRegistro,
+                activo: user.activo
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error conectando a MongoDB',
+            mensaje: error.message
+        });
+    }
+});
 module.exports = app;
