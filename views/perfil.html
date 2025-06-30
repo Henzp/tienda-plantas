@@ -7,6 +7,108 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* ESTILOS PARA BOTONES DINÁMICOS (COPIADOS DEL INDEX) */
+        .user-actions-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .login-btn-small {
+            background: rgba(45, 80, 22, 0.1);
+            color: #2d5016;
+            border: 1px solid #2d5016;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .login-btn-small:hover {
+            background: #2d5016;
+            color: white;
+        }
+
+        .user-profile-btn {
+            background: #2d5016;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .user-profile-btn:hover {
+            background: #1a3009;
+        }
+
+        .admin-btn-small {
+            background: linear-gradient(135deg, #2d5016, #1a3009);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-btn-small:hover {
+            background: linear-gradient(135deg, #1a3009, #0d1a05);
+            transform: translateY(-1px);
+        }
+
+        .logout-btn-small {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.4rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn-small:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .user-name-small {
+            color: #2d5016;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .loading-user {
+            color: #666;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        /* ESTILOS DEL PERFIL */
         .perfil-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -38,7 +140,6 @@
             margin-bottom: 2rem;
         }
         
-        /* NUEVO: Botón prominente para ir a la tienda */
         .tienda-btn {
             font-family: 'Satisfy', cursive;
             background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
@@ -353,37 +454,52 @@
                 font-size: 1.1rem;
                 padding: 1rem 2rem;
             }
+            
+            .user-actions-container {
+                gap: 0.5rem;
+            }
+            
+            .login-btn-small, .user-profile-btn, .admin-btn-small {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+            
+            .user-name-small {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header copiado del index.html -->
+    <!-- Header con botones dinámicos (ACTUALIZADO) -->
     <header class="header">
-        <div class="container">
-            <div class="logo-section">
+        <div class="logo-section">
+            <div class="container">
                 <div class="logo-container">
                     <div class="logo">
-                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100" alt="Entre Hojas y Amigas" class="logo-img">
-                        <h1>Entre Hojas y Amigas</h1>
+                        <img src="/images/logo-entre-hojas-amigas.png" alt="Entre Hojas y Amigas" class="logo-img">
+                        <h1>🌿 Entre Hojas y Amigas</h1>
                     </div>
                     
+                    <!-- CORREGIDO: nav-actions con botones dinámicos -->
                     <div class="nav-actions">
-                        <button class="search-btn" aria-label="Buscar">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button class="cart-btn" aria-label="Carrito" onclick="toggleCarrito()">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="cart-btn" onclick="toggleCarrito()">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="cart-count" id="cartCount">0</span>
                         </button>
-                        <!-- Este se actualizará dinámicamente -->
-                        <div id="userActions">
-                            <a href="/login" class="admin-link">Iniciar Sesión</a>
+                        
+                        <!-- NUEVO: Contenedor dinámico corregido -->
+                        <div id="userActions" class="user-actions-container">
+                            <span class="loading-user">Cargando...</span>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <nav class="navbar">
+        </div>
+        
+        <nav class="navbar">
+            <div class="container">
                 <ul class="nav-menu">
                     <li><a href="/"><i class="fas fa-home"></i> Inicio</a></li>
                     <li class="dropdown">
@@ -399,8 +515,8 @@
                     <li><a href="#"><i class="fas fa-gift"></i> Regalos</a></li>
                     <li><a href="#"><i class="fas fa-envelope"></i> Contacto</a></li>
                 </ul>
-            </nav>
-        </div>
+            </div>
+        </nav>
     </header>
 
     <main class="perfil-container">
@@ -408,7 +524,7 @@
             <h1>Mi Jardín Personal 🌱</h1>
             <p id="welcomeMessage">Bienvenida a tu espacio verde</p>
             
-            <!-- NUEVO: Botón prominente para ir a la tienda -->
+            <!-- Botón prominente para ir a la tienda -->
             <a href="/" class="tienda-btn">
                 <i class="fas fa-store"></i>
                 Explorar Tienda
@@ -573,17 +689,81 @@
         </div>
     </main>
 
-    <!-- Carrito Sidebar (copiado del index) -->
+    <!-- Carrito Sidebar -->
     <div class="carrito-sidebar" id="carritoSidebar">
-        <!-- Contenido del carrito aquí -->
+        <!-- Contenido del carrito -->
     </div>
     <div class="overlay" id="overlay" onclick="toggleCarrito()"></div>
 
     <script>
         let userData = null;
 
+        // COPIADO DEL INDEX: Función para botones dinámicos
+        async function updateUserButtons() {
+            const userActionsContainer = document.getElementById('userActions');
+            
+            try {
+                console.log('🔍 [PERFIL] Verificando estado de sesión...');
+                
+                const response = await fetch('/api/session-status');
+                console.log('📡 [PERFIL] Respuesta del servidor:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const sessionData = await response.json();
+                console.log('📊 [PERFIL] Datos de sesión:', sessionData);
+                
+                if (sessionData.isLoggedIn) {
+                    if (sessionData.userType === 'admin') {
+                        userActionsContainer.innerHTML = `
+                            <span class="user-name-small">👑 ${sessionData.userName}</span>
+                            <a href="/admin" class="admin-btn-small">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        `;
+                        console.log('✅ [PERFIL] UI actualizada para ADMIN');
+                    } else {
+                        userActionsContainer.innerHTML = `
+                            <span class="user-name-small">👤 ${sessionData.userName}</span>
+                            <a href="/perfil" class="user-profile-btn">
+                                <i class="fas fa-user"></i> Mi Perfil
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        `;
+                        console.log('✅ [PERFIL] UI actualizada para USUARIO');
+                    }
+                } else {
+                    userActionsContainer.innerHTML = `
+                        <a href="/login" class="login-btn-small">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    `;
+                    console.log('✅ [PERFIL] UI actualizada para NO LOGUEADO');
+                }
+                
+            } catch (error) {
+                console.error('❌ [PERFIL] Error al verificar sesión:', error);
+                userActionsContainer.innerHTML = `
+                    <a href="/login" class="login-btn-small">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                `;
+            }
+        }
+
         // Cargar datos del usuario al iniciar
         document.addEventListener('DOMContentLoaded', async function() {
+            // Primero actualizar botones del header
+            await updateUserButtons();
+            
+            // Luego cargar perfil
             await loadUserProfile();
             setupEventListeners();
         });
@@ -678,6 +858,7 @@
                 if (result.success) {
                     showAlert('Perfil actualizado exitosamente', 'success');
                     await loadUserProfile(); // Recargar datos
+                    await updateUserButtons(); // Actualizar header
                 } else {
                     showAlert('Error al actualizar perfil', 'error');
                 }
@@ -697,8 +878,6 @@
             `;
 
             try {
-                // Aquí se cargarían las compras del usuario
-                // Por ahora mostramos un mensaje
                 setTimeout(() => {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 3rem; color: #666;">
@@ -725,11 +904,14 @@
         // Cerrar sesión
         async function logout() {
             try {
+                console.log('🚪 [PERFIL] Cerrando sesión...');
+                
                 const response = await fetch('/api/logout', {
                     method: 'POST'
                 });
                 
                 if (response.ok) {
+                    console.log('✅ [PERFIL] Sesión cerrada');
                     window.location.href = '/';
                 }
             } catch (error) {
