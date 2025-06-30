@@ -13,22 +13,129 @@
             padding: 20px;
         }
         
-        .form-section {
+        .section {
             background: #fff;
-            padding: 30px;
+            margin-bottom: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            overflow: hidden;
         }
         
-        .section-title {
+        .section-header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px 30px;
+            margin: 0;
+        }
+        
+        .section-header h2 {
             font-family: 'Dancing Script', cursive;
-            font-size: 2.5rem;
-            color: #2d5a27;
-            margin-bottom: 20px;
-            text-align: center;
+            font-size: 2.2rem;
+            margin: 0;
+            font-weight: 600;
         }
         
+        .section-content {
+            padding: 30px;
+        }
+        
+        /* LISTA DE PRODUCTOS */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .product-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: #fff;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f5f5f5;
+        }
+        
+        .product-info {
+            padding: 15px;
+        }
+        
+        .product-name {
+            font-family: 'Satisfy', cursive;
+            font-size: 1.3rem;
+            color: #2d5a27;
+            margin: 0 0 8px 0;
+        }
+        
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 5px 0;
+        }
+        
+        .product-stock {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .product-stock.low {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .product-stock.out {
+            color: #f44336;
+            font-weight: bold;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-edit, .btn-delete {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Satisfy', cursive;
+            transition: all 0.3s;
+        }
+        
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #1976D2;
+        }
+        
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #d32f2f;
+        }
+        
+        /* FORMULARIO DE NUEVO PRODUCTO */
         .form-group {
             margin-bottom: 20px;
         }
@@ -39,7 +146,7 @@
             font-weight: 600;
             color: #2d5a27;
             font-family: 'Satisfy', cursive;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         
         .form-group input, .form-group textarea, .form-group select {
@@ -49,15 +156,22 @@
             border-radius: 8px;
             font-size: 16px;
             transition: border-color 0.3s;
+            box-sizing: border-box;
         }
         
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
             outline: none;
             border-color: #4CAF50;
         }
-
-        /* Sistema de Imágenes - Solo URLs */
-        .image-section {
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* SISTEMA DE IMÁGENES VERCEL */
+        .images-section {
             border: 2px dashed #4CAF50;
             border-radius: 10px;
             padding: 20px;
@@ -65,39 +179,30 @@
             background: #f9f9f9;
         }
         
-        .vercel-notice {
+        .vercel-info {
             background: #e3f2fd;
-            border: 1px solid #2196f3;
-            border-radius: 8px;
+            border-left: 4px solid #2196f3;
             padding: 15px;
             margin-bottom: 20px;
-            text-align: center;
+            border-radius: 5px;
         }
         
-        .vercel-notice h4 {
-            color: #1976d2;
+        .vercel-info h4 {
             margin: 0 0 8px 0;
+            color: #1976d2;
             font-family: 'Satisfy', cursive;
         }
         
-        .vercel-notice p {
-            color: #666;
+        .vercel-info p {
             margin: 0;
+            color: #666;
             font-size: 14px;
         }
         
-        .url-input-section {
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-        
-        .url-input-group {
+        .url-input-container {
             display: flex;
             gap: 10px;
             margin: 15px 0;
-            align-items: flex-start;
         }
         
         .url-input {
@@ -119,92 +224,80 @@
             background: #45a049;
         }
         
-        .remove-url-btn {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
+        .example-urls {
+            margin: 15px 0;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .example-urls h5 {
+            margin: 0 0 10px 0;
+            color: #2d5a27;
+            font-family: 'Satisfy', cursive;
+        }
+        
+        .example-url {
+            display: inline-block;
+            margin: 5px 10px 5px 0;
+            padding: 5px 10px;
+            background: #f5f5f5;
+            border-radius: 15px;
             font-size: 12px;
-            margin-left: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        .remove-url-btn:hover {
-            background: #cc0000;
+        .example-url:hover {
+            background: #4CAF50;
+            color: white;
         }
         
-        /* Preview de Imágenes */
-        .image-preview-container {
+        .images-preview {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             margin: 20px 0;
         }
         
         .image-preview {
             position: relative;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background: #f5f5f5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .image-preview img {
             width: 100%;
-            height: 120px;
+            height: 100px;
             object-fit: cover;
         }
         
         .image-preview .error-img {
             width: 100%;
-            height: 120px;
+            height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #ffebee;
             color: #c62828;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
-            padding: 10px;
         }
         
-        .image-remove {
+        .remove-image {
             position: absolute;
             top: 5px;
             right: 5px;
-            background: #ff4444;
+            background: #f44336;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             font-size: 12px;
-        }
-        
-        .image-remove:hover {
-            background: #cc0000;
-        }
-        
-        .url-list {
-            margin: 15px 0;
-        }
-        
-        .url-item {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            background: #f9f9f9;
-            border-radius: 4px;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        
-        .url-item .url-text {
-            flex: 1;
-            word-break: break-all;
-            color: #666;
         }
         
         .submit-btn {
@@ -226,48 +319,51 @@
             box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
         }
         
-        .error-message {
+        .message {
+            padding: 12px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .message.error {
             background: #ffebee;
             color: #c62828;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            display: none;
+            border: 1px solid #ffcdd2;
         }
         
-        .success-message {
+        .message.success {
             background: #e8f5e8;
             color: #2e7d32;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            display: none;
+            border: 1px solid #c8e6c9;
         }
         
-        .example-urls {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
-        
-        .example-urls h5 {
-            color: #2d5a27;
-            margin: 0 0 10px 0;
-            font-family: 'Satisfy', cursive;
-        }
-        
-        .example-urls .example-url {
-            display: block;
+        .loading {
+            text-align: center;
             color: #666;
-            font-size: 12px;
-            margin: 5px 0;
-            cursor: pointer;
-            text-decoration: underline;
+            padding: 40px;
+            font-style: italic;
         }
         
-        .example-urls .example-url:hover {
-            color: #4CAF50;
+        .no-products {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .url-input-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -288,64 +384,83 @@
     </header>
 
     <div class="admin-container">
-        <div class="form-section">
-            <h2 class="section-title">🌱 Agregar Nuevo Producto</h2>
-            
-            <form id="productForm">
-                <div class="form-group">
-                    <label for="nombre">Nombre del Producto:</label>
-                    <input type="text" id="nombre" name="nombre" required>
+        <!-- SECCIÓN PRODUCTOS EXISTENTES -->
+        <div class="section">
+            <div class="section-header">
+                <h2>📦 Productos Existentes</h2>
+            </div>
+            <div class="section-content">
+                <div id="productsLoading" class="loading">
+                    🔄 Cargando productos...
                 </div>
-
-                <div class="form-group">
-                    <label for="descripcion">Descripción:</label>
-                    <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+                <div id="productsContainer" class="products-grid" style="display: none;"></div>
+                <div id="noProducts" class="no-products" style="display: none;">
+                    🌱 No hay productos registrados. ¡Agrega el primero!
                 </div>
+            </div>
+        </div>
 
-                <div class="form-group">
-                    <label for="precio">Precio (CLP):</label>
-                    <input type="number" id="precio" name="precio" min="0" step="100" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="stock">Stock Disponible:</label>
-                    <input type="number" id="stock" name="stock" min="0" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="categoria">Categoría:</label>
-                    <select id="categoria" name="categoria" required>
-                        <option value="">Seleccionar categoría</option>
-                        <option value="interior">Plantas de Interior</option>
-                        <option value="exterior">Plantas de Exterior</option>
-                        <option value="suculentas">Suculentas</option>
-                        <option value="cactus">Cactus</option>
-                        <option value="flores">Plantas con Flores</option>
-                        <option value="aromáticas">Plantas Aromáticas</option>
-                    </select>
-                </div>
-
-                <!-- SISTEMA DE IMÁGENES - SOLO URLs EXTERNAS -->
-                <div class="image-section">
-                    <h3 style="font-family: 'Satisfy', cursive; color: #2d5a27; margin-bottom: 15px;">
-                        📸 Imágenes del Producto
-                    </h3>
-                    
-                    <div class="vercel-notice">
-                        <h4>🌐 Modo Vercel Activo</h4>
-                        <p>En Vercel solo se pueden usar URLs externas de imágenes. Las imágenes deben estar alojadas en servicios como Unsplash, Imgur, o tu propio servidor.</p>
+        <!-- SECCIÓN AGREGAR PRODUCTO -->
+        <div class="section">
+            <div class="section-header">
+                <h2>🌱 Agregar Nuevo Producto</h2>
+            </div>
+            <div class="section-content">
+                <form id="productForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre">Nombre del Producto:</label>
+                            <input type="text" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoria">Categoría:</label>
+                            <select id="categoria" name="categoria" required>
+                                <option value="">Seleccionar categoría</option>
+                                <option value="interior">Plantas de Interior</option>
+                                <option value="exterior">Plantas de Exterior</option>
+                                <option value="suculentas">Suculentas</option>
+                                <option value="cactus">Cactus</option>
+                                <option value="flores">Plantas con Flores</option>
+                                <option value="aromáticas">Plantas Aromáticas</option>
+                            </select>
+                        </div>
                     </div>
-                    
-                    <div class="url-input-section">
-                        <div class="url-input-group">
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción:</label>
+                        <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="precio">Precio (CLP):</label>
+                            <input type="number" id="precio" name="precio" min="0" step="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stock">Stock Disponible:</label>
+                            <input type="number" id="stock" name="stock" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="images-section">
+                        <h3 style="font-family: 'Satisfy', cursive; color: #2d5a27; margin: 0 0 15px 0;">
+                            📸 Imágenes del Producto
+                        </h3>
+                        
+                        <div class="vercel-info">
+                            <h4>🌐 Modo Vercel - Solo URLs Externas</h4>
+                            <p>Agrega imágenes usando URLs de servicios como Unsplash, Imgur, o tu propio servidor.</p>
+                        </div>
+                        
+                        <div class="url-input-container">
                             <input type="url" id="imageUrl" class="url-input" placeholder="https://ejemplo.com/imagen.jpg">
-                            <button type="button" class="add-url-btn" onclick="addImageFromUrl()">
+                            <button type="button" class="add-url-btn" onclick="addImageUrl()">
                                 Agregar URL
                             </button>
                         </div>
                         
                         <div class="example-urls">
-                            <h5>🔗 Ejemplos de URLs que puedes usar:</h5>
+                            <h5>🔗 Ejemplos rápidos:</h5>
                             <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400')">
                                 Monstera Deliciosa
                             </span>
@@ -359,62 +474,121 @@
                                 Ficus Lyrata
                             </span>
                         </div>
+
+                        <div id="imagesPreview" class="images-preview"></div>
                     </div>
 
-                    <!-- Mensajes -->
-                    <div id="errorMessage" class="error-message"></div>
-                    <div id="successMessage" class="success-message"></div>
+                    <div id="formMessage" class="message"></div>
 
-                    <!-- Lista de URLs agregadas -->
-                    <div id="urlList" class="url-list"></div>
-
-                    <!-- Preview de Imágenes -->
-                    <div id="imagePreviewContainer" class="image-preview-container"></div>
-                </div>
-
-                <button type="submit" class="submit-btn">🌿 Agregar Producto</button>
-            </form>
+                    <button type="submit" class="submit-btn">🌿 Agregar Producto</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
         // Variables globales
         let selectedImages = [];
+        let allProducts = [];
+
+        // Cargar productos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
+
+        // Cargar productos existentes
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/productos');
+                const productos = await response.json();
+                
+                allProducts = productos;
+                displayProducts(productos);
+                
+                document.getElementById('productsLoading').style.display = 'none';
+                
+                if (productos.length === 0) {
+                    document.getElementById('noProducts').style.display = 'block';
+                } else {
+                    document.getElementById('productsContainer').style.display = 'grid';
+                }
+            } catch (error) {
+                console.error('Error cargando productos:', error);
+                document.getElementById('productsLoading').innerHTML = '❌ Error cargando productos';
+            }
+        }
+
+        // Mostrar productos en grid
+        function displayProducts(productos) {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+
+            productos.forEach(producto => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                const stockClass = producto.stock === 0 ? 'out' : producto.stock < 5 ? 'low' : '';
+                const stockText = producto.stock === 0 ? 'AGOTADO' : `Stock: ${producto.stock}`;
+                
+                const imageUrl = producto.imagenes && producto.imagenes.length > 0 
+                    ? producto.imagenes[0] 
+                    : 'https://via.placeholder.com/300x200?text=Sin+Imagen';
+
+                productCard.innerHTML = `
+                    <img src="${imageUrl}" alt="${producto.nombre}" class="product-image" 
+                         onerror="this.src='https://via.placeholder.com/300x200?text=Error+Imagen'">
+                    <div class="product-info">
+                        <h3 class="product-name">${producto.nombre}</h3>
+                        <p class="product-price">$${producto.precio.toLocaleString('es-CL')}</p>
+                        <p class="product-stock ${stockClass}">${stockText}</p>
+                        <div class="product-actions">
+                            <button class="btn-edit" onclick="editProduct('${producto._id}')">
+                                ✏️ Editar
+                            </button>
+                            <button class="btn-delete" onclick="deleteProduct('${producto._id}')">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(productCard);
+            });
+        }
 
         // Usar URL de ejemplo
         function useExampleUrl(url) {
             document.getElementById('imageUrl').value = url;
         }
 
-        // Agregar imagen desde URL
-        function addImageFromUrl() {
+        // Agregar URL de imagen
+        function addImageUrl() {
             const url = document.getElementById('imageUrl').value.trim();
             
             if (!url) {
-                showError('Por favor ingresa una URL');
+                showMessage('Por favor ingresa una URL', 'error');
                 return;
             }
 
             if (!isValidImageUrl(url)) {
-                showError('URL no válida. Debe ser una imagen (jpg, png, gif, webp) o de un servicio como Unsplash');
+                showMessage('URL no válida. Debe ser una imagen válida.', 'error');
                 return;
             }
 
             if (selectedImages.includes(url)) {
-                showError('Esta URL ya está agregada');
+                showMessage('Esta URL ya está agregada', 'error');
                 return;
             }
 
             if (selectedImages.length >= 5) {
-                showError('Máximo 5 imágenes permitidas');
+                showMessage('Máximo 5 imágenes permitidas', 'error');
                 return;
             }
 
             selectedImages.push(url);
-            updateImagePreview();
-            updateUrlList();
+            updateImagesPreview();
             document.getElementById('imageUrl').value = '';
-            showSuccess('URL de imagen agregada exitosamente');
+            showMessage('Imagen agregada correctamente', 'success');
         }
 
         // Validar URL de imagen
@@ -422,83 +596,57 @@
             try {
                 const urlObj = new URL(url);
                 const path = urlObj.pathname.toLowerCase();
-                
-                // Verificar extensiones de imagen o dominios conocidos
                 const hasImageExtension = /\.(jpg|jpeg|png|gif|webp)$/i.test(path);
-                const isKnownImageService = /^https:\/\/(images\.unsplash\.com|i\.imgur\.com|.*\.githubusercontent\.com)/i.test(url);
-                
-                return hasImageExtension || isKnownImageService || url.includes('unsplash') || url.includes('imgur');
+                const isKnownService = /^https:\/\/(images\.unsplash\.com|i\.imgur\.com)/i.test(url);
+                return hasImageExtension || isKnownService || url.includes('unsplash');
             } catch {
                 return false;
             }
         }
 
-        // Actualizar lista de URLs
-        function updateUrlList() {
-            const container = document.getElementById('urlList');
-            container.innerHTML = '';
-
-            if (selectedImages.length === 0) {
-                return;
-            }
-
-            selectedImages.forEach((url, index) => {
-                const item = document.createElement('div');
-                item.className = 'url-item';
-                item.innerHTML = `
-                    <span class="url-text">${url}</span>
-                    <button type="button" class="remove-url-btn" onclick="removeImageUrl(${index})">×</button>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        // Remover URL de imagen
-        function removeImageUrl(index) {
-            selectedImages.splice(index, 1);
-            updateImagePreview();
-            updateUrlList();
-            showSuccess('URL removida');
-        }
-
         // Actualizar preview de imágenes
-        function updateImagePreview() {
-            const container = document.getElementById('imagePreviewContainer');
+        function updateImagesPreview() {
+            const container = document.getElementById('imagesPreview');
             container.innerHTML = '';
 
             selectedImages.forEach((url, index) => {
-                const previewDiv = document.createElement('div');
-                previewDiv.className = 'image-preview';
+                const preview = document.createElement('div');
+                preview.className = 'image-preview';
                 
                 const img = document.createElement('img');
                 img.src = url;
                 img.alt = `Preview ${index + 1}`;
                 
                 img.onerror = function() {
-                    previewDiv.innerHTML = `
-                        <div class="error-img">
-                            ❌ Error cargando imagen
-                        </div>
-                        <button type="button" class="image-remove" onclick="removeImageUrl(${index})">×</button>
+                    preview.innerHTML = `
+                        <div class="error-img">❌ Error cargando</div>
+                        <button type="button" class="remove-image" onclick="removeImage(${index})">×</button>
                     `;
                 };
                 
                 img.onload = function() {
-                    previewDiv.innerHTML = '';
-                    previewDiv.appendChild(img);
-                    previewDiv.innerHTML += `<button type="button" class="image-remove" onclick="removeImageUrl(${index})">×</button>`;
+                    preview.innerHTML = '';
+                    preview.appendChild(img);
+                    preview.innerHTML += `<button type="button" class="remove-image" onclick="removeImage(${index})">×</button>`;
                 };
                 
-                container.appendChild(previewDiv);
+                container.appendChild(preview);
             });
         }
 
-        // Manejar envío del formulario
+        // Remover imagen
+        function removeImage(index) {
+            selectedImages.splice(index, 1);
+            updateImagesPreview();
+            showMessage('Imagen removida', 'success');
+        }
+
+        // Enviar formulario
         document.getElementById('productForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             if (selectedImages.length === 0) {
-                showError('Debes agregar al menos una imagen');
+                showMessage('Debes agregar al menos una imagen', 'error');
                 return;
             }
 
@@ -512,63 +660,75 @@
             };
 
             try {
-                showSuccess('Creando producto...');
+                showMessage('Creando producto...', 'success');
                 
                 const response = await fetch('/api/productos', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    showSuccess('Producto agregado exitosamente');
+                    showMessage('¡Producto agregado exitosamente!', 'success');
                     document.getElementById('productForm').reset();
                     selectedImages = [];
-                    updateImagePreview();
-                    updateUrlList();
+                    updateImagesPreview();
+                    loadProducts(); // Recargar lista de productos
                 } else {
-                    showError(result.error || 'Error al agregar producto');
+                    showMessage(result.error || 'Error al agregar producto', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError('Error de conexión');
+                showMessage('Error de conexión', 'error');
             }
         });
 
-        // Funciones de mensajes
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
+        // Mostrar mensajes
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('formMessage');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
             
             setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+                messageDiv.style.display = 'none';
+            }, type === 'success' ? 3000 : 5000);
         }
 
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-            
-            setTimeout(() => {
-                successDiv.style.display = 'none';
-            }, 3000);
+        // Editar producto (placeholder)
+        function editProduct(id) {
+            showMessage('Funcionalidad de edición próximamente', 'error');
         }
 
-        // Función de logout
-        async function logout() {
+        // Eliminar producto
+        async function deleteProduct(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                return;
+            }
+
             try {
-                const response = await fetch('/api/logout', {
-                    method: 'POST'
+                const response = await fetch(`/api/productos/${id}`, {
+                    method: 'DELETE'
                 });
 
+                if (response.ok) {
+                    showMessage('Producto eliminado exitosamente', 'success');
+                    loadProducts();
+                } else {
+                    showMessage('Error al eliminar producto', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Error de conexión', 'error');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', { method: 'POST' });
                 if (response.ok) {
                     window.location.href = '/';
                 } else {
@@ -580,11 +740,11 @@
             }
         }
 
-        // Manejar Enter en el input de URL
+        // Enter en URL input
         document.getElementById('imageUrl').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                addImageFromUrl();
+                addImageUrl();
             }
         });
     </script>
