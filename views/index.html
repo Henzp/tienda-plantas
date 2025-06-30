@@ -7,78 +7,120 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* NUEVOS ESTILOS PARA BOTONES DINÁMICOS */
-        .login-link, .register-link, .perfil-link {
-            background: #2d5016;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+        /* ESTILOS MEJORADOS PARA BOTONES PEQUEÑOS Y ESTÉTICOS */
+        .user-actions-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .login-btn-small {
+            background: rgba(45, 80, 22, 0.1);
+            color: #2d5016;
+            border: 1px solid #2d5016;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: background 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.3rem;
             font-family: 'Inter', sans-serif;
-            white-space: nowrap;
         }
 
-        .login-link:hover, .perfil-link:hover {
+        .login-btn-small:hover {
+            background: #2d5016;
+            color: white;
+        }
+
+        .user-profile-btn {
+            background: #2d5016;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .user-profile-btn:hover {
             background: #1a3009;
         }
 
-        .register-link {
-            background: linear-gradient(135deg, #90ee90 0%, #4a7c59 100%);
-        }
-
-        .register-link:hover {
-            background: linear-gradient(135deg, #4a7c59 0%, #2d5016 100%);
-        }
-
-        .logout-btn {
-            background: #e74c3c;
+        .admin-btn-small {
+            background: linear-gradient(135deg, #2d5016, #1a3009);
             color: white;
             border: none;
-            padding: 0.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .logout-btn:hover {
-            background: #c0392b;
-        }
-
-        #userActions {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
         }
 
-        .user-name {
+        .admin-btn-small:hover {
+            background: linear-gradient(135deg, #1a3009, #0d1a05);
+            transform: translateY(-1px);
+        }
+
+        .logout-btn-small {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.4rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn-small:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .user-name-small {
             color: #2d5016;
             font-weight: 600;
             font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             gap: 0.3rem;
         }
 
+        /* Loading indicator */
+        .loading-user {
+            color: #666;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
         @media (max-width: 768px) {
-            #userActions {
-                flex-direction: column;
+            .user-actions-container {
                 gap: 0.5rem;
             }
             
-            .login-link, .register-link, .perfil-link {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.8rem;
+            .login-btn-small, .user-profile-btn, .admin-btn-small {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
             }
             
-            .user-name {
-                font-size: 0.8rem;
+            .user-name-small {
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -95,7 +137,7 @@
                         <h1>🌿 Entre Hojas y Amigas</h1>
                     </div>
                     
-                    <!-- MODIFICADO: nav-actions con botones dinámicos -->
+                    <!-- MEJORADO: nav-actions con botones pequeños y estéticos -->
                     <div class="nav-actions">
                         <button class="search-btn"><i class="fas fa-search"></i></button>
                         <button class="cart-btn" onclick="toggleCarrito()">
@@ -103,17 +145,10 @@
                             <span class="cart-count" id="cartCount">0</span>
                         </button>
                         
-                        <!-- NUEVO: Contenedor dinámico de botones de usuario -->
-                        <div id="userActions">
-                            <!-- Los botones se cargarán dinámicamente aquí -->
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <a href="/login" class="login-link">
-                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                                </a>
-                                <a href="/register" class="register-link">
-                                    <i class="fas fa-user-plus"></i> Registrarse
-                                </a>
-                            </div>
+                        <!-- NUEVO: Contenedor mejorado de acciones de usuario -->
+                        <div id="userActions" class="user-actions-container">
+                            <!-- Loading inicial -->
+                            <span class="loading-user">Cargando...</span>
                         </div>
                     </div>
                 </div>
@@ -322,102 +357,119 @@
     <!-- Scripts -->
     <script src="/js/main.js"></script>
     
-    <!-- NUEVO: Script para botones dinámicos -->
+    <!-- MEJORADO: Script con debugging y mejor manejo de errores -->
     <script>
-        // Función para verificar estado de sesión y actualizar botones
+        // DEBUG: Variable global para ver el estado
+        let currentUserState = null;
+
+        // Función mejorada para verificar estado de sesión
         async function updateUserButtons() {
+            const userActionsContainer = document.getElementById('userActions');
+            
             try {
-                const response = await fetch('/api/session-status');
-                const sessionData = await response.json();
+                console.log('🔍 Verificando estado de sesión...');
                 
-                const userActionsContainer = document.getElementById('userActions');
+                const response = await fetch('/api/session-status');
+                console.log('📡 Respuesta del servidor:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const sessionData = await response.json();
+                console.log('📊 Datos de sesión:', sessionData);
+                
+                currentUserState = sessionData; // Para debugging
                 
                 if (sessionData.isLoggedIn) {
                     if (sessionData.userType === 'admin') {
-                        // Botones para admin
+                        // Admin logueado - botón pequeño
                         userActionsContainer.innerHTML = `
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <span class="user-name">
-                                    👑 ${sessionData.userName}
-                                </span>
-                                <a href="/admin" class="admin-link">
-                                    <i class="fas fa-cog"></i> Admin
-                                </a>
-                                <button class="logout-btn" onclick="logout()" title="Cerrar Sesión">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                </button>
-                            </div>
+                            <span class="user-name-small">👑 ${sessionData.userName}</span>
+                            <a href="/admin" class="admin-btn-small">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
                         `;
+                        console.log('✅ UI actualizada para ADMIN');
                     } else {
-                        // Botones para usuario normal
+                        // Usuario normal logueado
                         userActionsContainer.innerHTML = `
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <span class="user-name">
-                                    👤 ${sessionData.userName}
-                                </span>
-                                <a href="/perfil" class="perfil-link">
-                                    <i class="fas fa-user"></i> Mi Perfil
-                                </a>
-                                <button class="logout-btn" onclick="logout()" title="Cerrar Sesión">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                </button>
-                            </div>
+                            <span class="user-name-small">👤 ${sessionData.userName}</span>
+                            <a href="/perfil" class="user-profile-btn">
+                                <i class="fas fa-user"></i> Mi Perfil
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
                         `;
+                        console.log('✅ UI actualizada para USUARIO');
                     }
                 } else {
-                    // Botones para usuario no logueado
+                    // No logueado - solo botón pequeño de login
                     userActionsContainer.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <a href="/login" class="login-link">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                            </a>
-                            <a href="/register" class="register-link">
-                                <i class="fas fa-user-plus"></i> Registrarse
-                            </a>
-                        </div>
+                        <a href="/login" class="login-btn-small">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
                     `;
+                    console.log('✅ UI actualizada para NO LOGUEADO');
                 }
                 
             } catch (error) {
-                console.log('No hay sesión activa');
-                // Mostrar botones de no logueado por defecto
-                const userActionsContainer = document.getElementById('userActions');
+                console.error('❌ Error al verificar sesión:', error);
+                
+                // Por defecto, mostrar login si hay error
                 userActionsContainer.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <a href="/login" class="login-link">
-                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                        </a>
-                        <a href="/register" class="register-link">
-                            <i class="fas fa-user-plus"></i> Registrarse
-                        </a>
-                    </div>
+                    <a href="/login" class="login-btn-small">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
                 `;
             }
         }
 
-        // Función para cerrar sesión
+        // Función para cerrar sesión con mejor manejo
         async function logout() {
             try {
+                console.log('🚪 Cerrando sesión...');
+                
                 const response = await fetch('/api/logout', {
                     method: 'POST'
                 });
                 
                 if (response.ok) {
-                    // Recargar la página para actualizar los botones
+                    console.log('✅ Sesión cerrada');
+                    // Actualizar UI inmediatamente
+                    await updateUserButtons();
+                    // Opcional: recargar para limpiar completamente
                     window.location.reload();
+                } else {
+                    console.error('❌ Error al cerrar sesión');
                 }
             } catch (error) {
-                console.error('Error al cerrar sesión:', error);
+                console.error('❌ Error de red al cerrar sesión:', error);
             }
+        }
+
+        // Función de debugging para el usuario
+        function checkUserState() {
+            console.log('🔍 Estado actual del usuario:', currentUserState);
+            return currentUserState;
         }
 
         // Ejecutar cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página cargada, verificando sesión...');
             updateUserButtons();
             
-            // Actualizar cada 30 segundos para mantener sincronizado
+            // Verificar cada 30 segundos
             setInterval(updateUserButtons, 30000);
         });
+
+        // Exponer función de debug globalmente
+        window.checkUserState = checkUserState;
+        window.updateUserButtons = updateUserButtons;
     </script>
 </body>
 </html>
