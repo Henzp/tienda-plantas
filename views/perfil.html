@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Entre Hojas y Amigas</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .perfil-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 20px 60px;
+            min-height: 100vh;
+        }
+        
+        .perfil-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(45, 80, 22, 0.1);
+        }
+        
+        .perfil-header h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: #2d5016;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(45, 80, 22, 0.1);
+        }
+        
+        .perfil-header p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        /* NUEVO: Botón prominente para ir a la tienda */
+        .tienda-btn {
+            font-family: 'Satisfy', cursive;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tienda-btn:hover {
+            background: linear-gradient(135deg, #1a3009 0%, #2d5016 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.4);
+        }
+        
+        .perfil-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .perfil-sidebar {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            height: fit-content;
+        }
+        
+        .perfil-avatar {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2d5016, #4a7c59);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+        }
+        
+        .user-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .user-email {
+            font-family: 'Inter', sans-serif;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .menu-perfil {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .menu-perfil li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .menu-perfil a {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-perfil a:hover,
+        .menu-perfil a.active {
+            background: #f8fff8;
+            color: #2d5016;
+            transform: translateX(5px);
+        }
+        
+        .perfil-main {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #2d5016;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-section {
+            display: none;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            font-family: 'Inter', sans-serif;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d5016;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2d5016;
+            box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+        }
+        
+        .btn-actualizar {
+            font-family: 'Satisfy', cursive;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-actualizar:hover {
+            background: linear-gradient(135deg, #1a3009 0%, #2d5016 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+        }
+        
+        .btn-logout {
+            font-family: 'Inter', sans-serif;
+            background: #e74c3c;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-logout:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .compras-list {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .compra-item {
+            background: #f8fff8;
+            border: 1px solid #e0f0e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        
+        .compra-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .compra-fecha {
+            font-family: 'Inter', sans-serif;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .compra-total {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3rem;
+            color: #2d5016;
+            font-weight: 600;
+        }
+        
+        .qr-code {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 1rem;
+            border: 2px dashed #2d5016;
+        }
+        
+        .qr-code i {
+            font-size: 3rem;
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+        }
+        
+        .qr-code p {
+            font-family: 'Inter', sans-serif;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            color: #2d5016;
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .alert.show {
+            display: flex;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .perfil-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .perfil-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .tienda-btn {
+                font-size: 1.1rem;
+                padding: 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header copiado del index.html -->
+    <header class="header">
+        <div class="container">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="logo">
+                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100" alt="Entre Hojas y Amigas" class="logo-img">
+                        <h1>Entre Hojas y Amigas</h1>
+                    </div>
+                    
+                    <div class="nav-actions">
+                        <button class="search-btn" aria-label="Buscar">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="cart-btn" aria-label="Carrito" onclick="toggleCarrito()">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count" id="cartCount">0</span>
+                        </button>
+                        <!-- Este se actualizará dinámicamente -->
+                        <div id="userActions">
+                            <a href="/login" class="admin-link">Iniciar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="navbar">
+                <ul class="nav-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li class="dropdown">
+                        <a href="#"><i class="fas fa-seedling"></i> Plantas</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#interior">Plantas de Interior</a></li>
+                            <li><a href="#exterior">Plantas de Exterior</a></li>
+                            <li><a href="#suculentas">Suculentas</a></li>
+                            <li><a href="#cactus">Cactus</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#"><i class="fas fa-tools"></i> Maceteros</a></li>
+                    <li><a href="#"><i class="fas fa-gift"></i> Regalos</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="perfil-container">
+        <div class="perfil-header">
+            <h1>Mi Jardín Personal 🌱</h1>
+            <p id="welcomeMessage">Bienvenida a tu espacio verde</p>
+            
+            <!-- NUEVO: Botón prominente para ir a la tienda -->
+            <a href="/" class="tienda-btn">
+                <i class="fas fa-store"></i>
+                Explorar Tienda
+            </a>
+            <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                Descubre nuevas plantas para tu colección
+            </p>
+        </div>
+
+        <div class="perfil-content">
+            <!-- Sidebar -->
+            <div class="perfil-sidebar">
+                <div class="perfil-avatar">
+                    <div class="avatar-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-email" id="userEmail">Cargando...</div>
+                </div>
+
+                <ul class="menu-perfil">
+                    <li>
+                        <a href="#" class="menu-item active" data-section="datos">
+                            <i class="fas fa-user-edit"></i>
+                            Mis Datos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="menu-item" data-section="compras">
+                            <i class="fas fa-shopping-bag"></i>
+                            Mis Compras
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="menu-item" data-section="cuidados">
+                            <i class="fas fa-seedling"></i>
+                            Guías de Cuidado
+                        </a>
+                    </li>
+                </ul>
+
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </button>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="perfil-main">
+                <div id="alertContainer"></div>
+
+                <!-- Sección: Mis Datos -->
+                <div class="form-section active" id="datos-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-edit"></i>
+                        Mis Datos Personales
+                    </h2>
+
+                    <form id="profileForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" name="nombre" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="apellido">Apellido</label>
+                                <input type="text" id="apellido" name="apellido" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="direccion">Dirección</label>
+                            <input type="text" id="direccion" name="direccion" placeholder="Calle y número">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="ciudad">Ciudad</label>
+                                <input type="text" id="ciudad" name="ciudad">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="region">Región</label>
+                                <input type="text" id="region" name="region">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-actualizar">
+                            <i class="fas fa-save"></i>
+                            Actualizar Datos
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Sección: Mis Compras -->
+                <div class="form-section" id="compras-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-shopping-bag"></i>
+                        Historial de Compras
+                    </h2>
+
+                    <div id="comprasContainer">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Cargando tus compras...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección: Guías de Cuidado -->
+                <div class="form-section" id="cuidados-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-seedling"></i>
+                        Guías de Cuidado
+                    </h2>
+
+                    <div class="categorias-grid">
+                        <div class="categoria-card" onclick="window.open('/cuidados/monstera-deliciosa', '_blank')">
+                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="Monstera Deliciosa">
+                            <div class="categoria-overlay">
+                                <h3>Monstera Deliciosa</h3>
+                                <p>Cuidados completos para tu Monstera</p>
+                                <button class="ver-mas">Ver Guía</button>
+                            </div>
+                        </div>
+
+                        <div class="categoria-card" onclick="window.open('/cuidados/pothos-dorado', '_blank')">
+                            <img src="https://images.unsplash.com/photo-1463154545680-d59320fd685d?w=400" alt="Pothos Dorado">
+                            <div class="categoria-overlay">
+                                <h3>Pothos Dorado</h3>
+                                <p>Guía de cuidados para principiantes</p>
+                                <button class="ver-mas">Ver Guía</button>
+                            </div>
+                        </div>
+
+                        <div class="categoria-card" onclick="window.open('/cuidados/sansevieria', '_blank')">
+                            <img src="https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=400" alt="Sansevieria">
+                            <div class="categoria-overlay">
+                                <h3>Sansevieria</h3>
+                                <p>La planta más resistente</p>
+                                <button class="ver-mas">Ver Guía</button>
+                            </div>
+                        </div>
+
+                        <div class="categoria-card" onclick="window.open('/cuidados/ficus-lyrata', '_blank')">
+                            <img src="https://images.unsplash.com/photo-1468245856972-a0333f3f8293?w=400" alt="Ficus Lyrata">
+                            <div class="categoria-overlay">
+                                <h3>Ficus Lyrata</h3>
+                                <p>Cuidados para hoja de violín</p>
+                                <button class="ver-mas">Ver Guía</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Carrito Sidebar (copiado del index) -->
+    <div class="carrito-sidebar" id="carritoSidebar">
+        <!-- Contenido del carrito aquí -->
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleCarrito()"></div>
+
+    <script>
+        let userData = null;
+
+        // Cargar datos del usuario al iniciar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadUserProfile();
+            setupEventListeners();
+        });
+
+        // Cargar perfil del usuario
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user-profile');
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                userData = await response.json();
+                
+                // Actualizar UI con datos del usuario
+                document.getElementById('userName').textContent = `${userData.nombre} ${userData.apellido}`;
+                document.getElementById('userEmail').textContent = userData.email;
+                document.getElementById('welcomeMessage').textContent = `¡Hola ${userData.nombre}! Gestiona tu perfil y descubre nuevas plantas`;
+
+                // Llenar formulario
+                document.getElementById('nombre').value = userData.nombre || '';
+                document.getElementById('apellido').value = userData.apellido || '';
+                document.getElementById('telefono').value = userData.telefono || '';
+                
+                if (userData.direccion) {
+                    document.getElementById('direccion').value = userData.direccion.calle || '';
+                    document.getElementById('ciudad').value = userData.direccion.ciudad || '';
+                    document.getElementById('region').value = userData.direccion.region || '';
+                }
+
+            } catch (error) {
+                console.error('Error cargando perfil:', error);
+                showAlert('Error al cargar el perfil', 'error');
+            }
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Menú de navegación
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remover active de todos
+                    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+                    
+                    // Activar seleccionado
+                    this.classList.add('active');
+                    const section = this.dataset.section;
+                    document.getElementById(section + '-section').classList.add('active');
+                    
+                    // Cargar datos específicos de la sección
+                    if (section === 'compras') {
+                        loadCompras();
+                    }
+                });
+            });
+
+            // Formulario de actualización
+            document.getElementById('profileForm').addEventListener('submit', updateProfile);
+        }
+
+        // Actualizar perfil
+        async function updateProfile(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const updateData = {
+                nombre: formData.get('nombre'),
+                apellido: formData.get('apellido'),
+                telefono: formData.get('telefono'),
+                direccion: {
+                    calle: formData.get('direccion'),
+                    ciudad: formData.get('ciudad'),
+                    region: formData.get('region')
+                }
+            };
+
+            try {
+                const response = await fetch('/api/user-profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Perfil actualizado exitosamente', 'success');
+                    await loadUserProfile(); // Recargar datos
+                } else {
+                    showAlert('Error al actualizar perfil', 'error');
+                }
+            } catch (error) {
+                showAlert('Error de conexión', 'error');
+            }
+        }
+
+        // Cargar historial de compras
+        async function loadCompras() {
+            const container = document.getElementById('comprasContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Cargando tus compras...</p>
+                </div>
+            `;
+
+            try {
+                // Aquí se cargarían las compras del usuario
+                // Por ahora mostramos un mensaje
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <i class="fas fa-shopping-bag" style="font-size: 3rem; color: #2d5016; margin-bottom: 1rem;"></i>
+                            <h3 style="margin-bottom: 1rem; color: #2d5016;">¡Aún no tienes compras!</h3>
+                            <p style="margin-bottom: 2rem;">Cuando realices tu primera compra, aparecerá aquí con su código QR.</p>
+                            <a href="/" class="tienda-btn">
+                                <i class="fas fa-store"></i>
+                                Ir a la Tienda
+                            </a>
+                        </div>
+                    `;
+                }, 1000);
+            } catch (error) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #e74c3c;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p>Error al cargar las compras</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Cerrar sesión
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass} show">
+                    <i class="${icon}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            // Auto-ocultar después de 5 segundos
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Función del carrito (simplificada)
+        function toggleCarrito() {
+            const sidebar = document.getElementById('carritoSidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

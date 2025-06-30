@@ -307,6 +307,22 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// NUEVO: Verificar estado de sesión
+app.get('/api/session-status', (req, res) => {
+    if (req.session.isLoggedIn) {
+        res.json({
+            isLoggedIn: true,
+            userType: req.session.isAdmin ? 'admin' : 'cliente',
+            userName: req.session.userName || 'Usuario',
+            userId: req.session.userId
+        });
+    } else {
+        res.json({
+            isLoggedIn: false
+        });
+    }
+});
+
 // NUEVO: Obtener datos del usuario logueado
 app.get('/api/user-profile', async (req, res) => {
     try {

@@ -395,3 +395,119 @@ document.querySelectorAll('input').forEach(input => {
         this.parentElement.style.transform = 'scale(1)';
     });
 });
+// AGREGAR AL FINAL DE tu archivo public/js/main.js
+
+// Función para verificar estado de sesión y actualizar botones
+async function updateUserButtons() {
+    try {
+        const response = await fetch('/api/session-status');
+        const sessionData = await response.json();
+        
+        const userActionsContainer = document.querySelector('.nav-actions');
+        const existingUserActions = document.getElementById('userActions');
+        
+        if (existingUserActions) {
+            existingUserActions.remove();
+        }
+        
+        // Crear nuevo contenedor de acciones de usuario
+        const userActions = document.createElement('div');
+        userActions.id = 'userActions';
+        userActions.style.display = 'flex';
+        userActions.style.alignItems = 'center';
+        userActions.style.gap = '1rem';
+        
+        if (sessionData.isLoggedIn) {
+            if (sessionData.userType === 'admin') {
+                // Botones para admin
+                userActions.innerHTML = `
+                    <span style="color: #2d5016; font-weight: 600; font-family: 'Inter', sans-serif;">
+                        👑 ${sessionData.userName}
+                    </span>
+                    <a href="/admin" class="admin-link">
+                        <i class="fas fa-cog"></i> Admin
+                    </a>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                `;
+            } else {
+                // Botones para usuario normal
+                userActions.innerHTML = `
+                    <span style="color: #2d5016; font-weight: 600; font-family: 'Inter', sans-serif;">
+                        👤 ${sessionData.userName}
+                    </span>
+                    <a href="/perfil" class="perfil-link">
+                        <i class="fas fa-user"></i> Mi Perfil
+                    </a>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                `;
+            }
+        } else {
+            // Botones para usuario no logueado
+            userActions.innerHTML = `
+                <a href="/login" class="login-link">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </a>
+                <a href="/register" class="register-link">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </a>
+            `;
+        }
+        
+        userActionsContainer.appendChild(userActions);
+        
+    } catch (error) {
+        console.log('No hay sesión activa');
+        // Mostrar botones de no logueado por defecto
+        const userActionsContainer = document.querySelector('.nav-actions');
+        const existingUserActions = document.getElementById('userActions');
+        
+        if (existingUserActions) {
+            existingUserActions.remove();
+        }
+        
+        const userActions = document.createElement('div');
+        userActions.id = 'userActions';
+        userActions.style.display = 'flex';
+        userActions.style.alignItems = 'center';
+        userActions.style.gap = '1rem';
+        
+        userActions.innerHTML = `
+            <a href="/login" class="login-link">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </a>
+            <a href="/register" class="register-link">
+                <i class="fas fa-user-plus"></i> Registrarse
+            </a>
+        `;
+        
+        userActionsContainer.appendChild(userActions);
+    }
+}
+
+// Función para cerrar sesión
+async function logout() {
+    try {
+        const response = await fetch('/api/logout', {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            // Recargar la página para actualizar los botones
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+    }
+}
+
+// Ejecutar cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    updateUserButtons();
+    
+    // Actualizar cada 30 segundos para mantener sincronizado
+    setInterval(updateUserButtons, 30000);
+});
