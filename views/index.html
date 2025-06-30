@@ -6,6 +6,82 @@
     <title>🌱 Entre Hojas y Amigas - Plantas de interior y exterior a domicilio</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* NUEVOS ESTILOS PARA BOTONES DINÁMICOS */
+        .login-link, .register-link, .perfil-link {
+            background: #2d5016;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .login-link:hover, .perfil-link:hover {
+            background: #1a3009;
+        }
+
+        .register-link {
+            background: linear-gradient(135deg, #90ee90 0%, #4a7c59 100%);
+        }
+
+        .register-link:hover {
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5016 100%);
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        #userActions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            color: #2d5016;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        @media (max-width: 768px) {
+            #userActions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .login-link, .register-link, .perfil-link {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .user-name {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -18,13 +94,27 @@
                         <img src="/images/logo-entre-hojas-amigas.png" alt="Entre Hojas y Amigas" class="logo-img">
                         <h1>🌿 Entre Hojas y Amigas</h1>
                     </div>
+                    
+                    <!-- MODIFICADO: nav-actions con botones dinámicos -->
                     <div class="nav-actions">
                         <button class="search-btn"><i class="fas fa-search"></i></button>
                         <button class="cart-btn" onclick="toggleCarrito()">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="cart-count" id="cartCount">0</span>
                         </button>
-                        <a href="/admin" class="admin-link">Admin</a>
+                        
+                        <!-- NUEVO: Contenedor dinámico de botones de usuario -->
+                        <div id="userActions">
+                            <!-- Los botones se cargarán dinámicamente aquí -->
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <a href="/login" class="login-link">
+                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                                </a>
+                                <a href="/register" class="register-link">
+                                    <i class="fas fa-user-plus"></i> Registrarse
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -231,5 +321,103 @@
 
     <!-- Scripts -->
     <script src="/js/main.js"></script>
+    
+    <!-- NUEVO: Script para botones dinámicos -->
+    <script>
+        // Función para verificar estado de sesión y actualizar botones
+        async function updateUserButtons() {
+            try {
+                const response = await fetch('/api/session-status');
+                const sessionData = await response.json();
+                
+                const userActionsContainer = document.getElementById('userActions');
+                
+                if (sessionData.isLoggedIn) {
+                    if (sessionData.userType === 'admin') {
+                        // Botones para admin
+                        userActionsContainer.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span class="user-name">
+                                    👑 ${sessionData.userName}
+                                </span>
+                                <a href="/admin" class="admin-link">
+                                    <i class="fas fa-cog"></i> Admin
+                                </a>
+                                <button class="logout-btn" onclick="logout()" title="Cerrar Sesión">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        // Botones para usuario normal
+                        userActionsContainer.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span class="user-name">
+                                    👤 ${sessionData.userName}
+                                </span>
+                                <a href="/perfil" class="perfil-link">
+                                    <i class="fas fa-user"></i> Mi Perfil
+                                </a>
+                                <button class="logout-btn" onclick="logout()" title="Cerrar Sesión">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Botones para usuario no logueado
+                    userActionsContainer.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <a href="/login" class="login-link">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </a>
+                            <a href="/register" class="register-link">
+                                <i class="fas fa-user-plus"></i> Registrarse
+                            </a>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.log('No hay sesión activa');
+                // Mostrar botones de no logueado por defecto
+                const userActionsContainer = document.getElementById('userActions');
+                userActionsContainer.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <a href="/login" class="login-link">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                        <a href="/register" class="register-link">
+                            <i class="fas fa-user-plus"></i> Registrarse
+                        </a>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para cerrar sesión
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    // Recargar la página para actualizar los botones
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        }
+
+        // Ejecutar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserButtons();
+            
+            // Actualizar cada 30 segundos para mantener sincronizado
+            setInterval(updateUserButtons, 30000);
+        });
+    </script>
 </body>
 </html>
