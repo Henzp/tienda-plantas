@@ -15,6 +15,11 @@ const PORT = process.env.PORT || 3000;
 // ============================================
 // CONFIGURACIÓN DE CLOUDINARY
 // ============================================
+console.log('🔍 [CLOUDINARY] Verificando configuración...');
+console.log('🔍 [CLOUDINARY] CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? 'Configurado' : 'NO configurado');
+console.log('🔍 [CLOUDINARY] API_KEY:', process.env.CLOUDINARY_API_KEY ? 'Configurado' : 'NO configurado');
+console.log('🔍 [CLOUDINARY] API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'Configurado' : 'NO configurado');
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -39,13 +44,21 @@ const upload = multer({
         files: 5 // máximo 5 archivos
     },
     fileFilter: function(req, file, cb) {
+        console.log('🔍 [MULTER] Procesando archivo:', {
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size
+        });
+        
         const allowedTypes = /jpeg|jpg|png|gif|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
         
         if (mimetype && extname) {
+            console.log('✅ [MULTER] Archivo aceptado:', file.originalname);
             return cb(null, true);
         } else {
+            console.log('❌ [MULTER] Archivo rechazado:', file.originalname);
             cb(new Error('Solo se permiten archivos de imagen (jpg, png, gif, webp)'));
         }
     }
@@ -166,32 +179,92 @@ app.get('/perfil', (req, res) => {
 // RUTAS DE MANEJO DE IMÁGENES CON CLOUDINARY
 // ============================================
 
-// Subir archivos a Cloudinary
+// ✅ CORREGIDO: Subir archivos a Cloudinary con mejor manejo de errores
 app.post('/api/upload-images', upload.array('images', 5), async (req, res) => {
     try {
+        console.log('🔍 [UPLOAD] Iniciando subida de imágenes...');
+        console.log('🔍 [UPLOAD] Archivos recibidos:', req.files?.length || 0);
+        
+        // Verificar configuración de Cloudinary
+        if (!process.env.CLOUDINARY_CLOUD_NAME) {
+            console.error('❌ [CLOUDINARY] CLOUDINARY_CLOUD_NAME no configurado');
+            return res.status(500).json({ 
+                success: false,
+                error: 'Cloudinary no configurado correctamente - falta CLOUD_NAME' 
+            });
+        }
+        
+        if (!process.env.CLOUDINARY_API_KEY) {
+            console.error('❌ [CLOUDINARY] CLOUDINARY_API_KEY no configurado');
+            return res.status(500).json({ 
+                success: false,
+                error: 'Cloudinary no configurado correctamente - falta API_KEY' 
+            });
+        }
+        
+        if (!process.env.CLOUDINARY_API_SECRET) {
+            console.error('❌ [CLOUDINARY] CLOUDINARY_API_SECRET no configurado');
+            return res.status(500).json({ 
+                success: false,
+                error: 'Cloudinary no configurado correctamente - falta API_SECRET' 
+            });
+        }
+        
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: 'No se han subido archivos' });
+            console.log('⚠️ [UPLOAD] No se recibieron archivos');
+            return res.status(400).json({ 
+                success: false,
+                error: 'No se han subido archivos' 
+            });
         }
 
         // Los archivos ya están subidos a Cloudinary por multer-storage-cloudinary
-        const uploadedImages = req.files.map(file => ({
-            url: file.path, // URL de Cloudinary
-            publicId: file.filename, // ID público de Cloudinary
-            originalName: file.originalname
-        }));
+        const uploadedImages = req.files.map(file => {
+            console.log('📸 [UPLOAD] Archivo procesado:', {
+                originalName: file.originalname,
+                cloudinaryUrl: file.path,
+                publicId: file.filename,
+                size: file.size
+            });
+            
+            return {
+                url: file.path, // URL de Cloudinary
+                publicId: file.filename, // ID público de Cloudinary
+                originalName: file.originalname
+            };
+        });
 
-        console.log('📸 [CLOUDINARY] Imágenes subidas:', uploadedImages.length);
+        console.log('✅ [CLOUDINARY] Imágenes subidas exitosamente:', uploadedImages.length);
         
         res.json({
             success: true,
             message: `${uploadedImages.length} imagen(es) subida(s) exitosamente`,
             images: uploadedImages
         });
+        
     } catch (error) {
-        console.error('❌ [CLOUDINARY] Error:', error);
+        console.error('❌ [CLOUDINARY] Error completo:', error);
+        console.error('❌ [CLOUDINARY] Stack trace:', error.stack);
+        
+        // Manejo específico de errores de Cloudinary
+        let errorMessage = 'Error al subir imágenes';
+        
+        if (error.message.includes('Invalid API key')) {
+            errorMessage = 'API Key de Cloudinary inválida';
+        } else if (error.message.includes('Invalid cloud name')) {
+            errorMessage = 'Nombre de cloud de Cloudinary inválido';
+        } else if (error.message.includes('Invalid API secret')) {
+            errorMessage = 'API Secret de Cloudinary inválido';
+        } else if (error.message.includes('File size too large')) {
+            errorMessage = 'Archivo muy grande (máximo 10MB)';
+        } else {
+            errorMessage = error.message;
+        }
+        
         res.status(500).json({ 
             success: false,
-            error: 'Error al subir imágenes: ' + error.message 
+            error: errorMessage,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });
@@ -200,17 +273,19 @@ app.post('/api/upload-images', upload.array('images', 5), async (req, res) => {
 app.delete('/api/delete-image/:publicId', async (req, res) => {
     try {
         const publicId = req.params.publicId;
+        console.log('🗑️ [CLOUDINARY] Eliminando imagen:', publicId);
         
         // Eliminar de Cloudinary
         const result = await cloudinary.uploader.destroy(publicId);
         
         if (result.result === 'ok') {
-            console.log('🗑️ [CLOUDINARY] Imagen eliminada:', publicId);
+            console.log('✅ [CLOUDINARY] Imagen eliminada exitosamente:', publicId);
             res.json({
                 success: true,
                 message: 'Imagen eliminada exitosamente'
             });
         } else {
+            console.log('⚠️ [CLOUDINARY] Imagen no encontrada:', publicId);
             res.status(404).json({
                 success: false,
                 error: 'Imagen no encontrada'
@@ -228,6 +303,8 @@ app.delete('/api/delete-image/:publicId', async (req, res) => {
 // Listar imágenes de Cloudinary
 app.get('/api/uploaded-images', async (req, res) => {
     try {
+        console.log('🔍 [CLOUDINARY] Listando imágenes...');
+        
         // Obtener imágenes de la carpeta 'plantas-tienda'
         const result = await cloudinary.search
             .expression('folder:plantas-tienda')
@@ -241,6 +318,8 @@ app.get('/api/uploaded-images', async (req, res) => {
             createdAt: resource.created_at
         }));
 
+        console.log('✅ [CLOUDINARY] Imágenes listadas:', images.length);
+        
         res.json({
             success: true,
             totalImages: images.length,
@@ -263,6 +342,7 @@ app.get('/api/productos', async (req, res) => {
         const productos = await Producto.find({ activo: true });
         res.json(productos);
     } catch (error) {
+        console.error('❌ [PRODUCTOS] Error obteniendo productos:', error);
         res.status(500).json({ error: 'Error al obtener productos' });
     }
 });
@@ -275,6 +355,7 @@ app.get('/api/productos/:id', async (req, res) => {
         }
         res.json(producto);
     } catch (error) {
+        console.error('❌ [PRODUCTOS] Error obteniendo producto:', error);
         res.status(500).json({ error: 'Error al obtener producto' });
     }
 });
@@ -315,7 +396,7 @@ app.post('/api/productos', async (req, res) => {
         
         res.status(201).json(productoGuardado);
     } catch (error) {
-        console.error('❌ [PRODUCTO] Error:', error);
+        console.error('❌ [PRODUCTO] Error creando producto:', error);
         res.status(400).json({ error: 'Error al crear producto: ' + error.message });
     }
 });
@@ -323,6 +404,8 @@ app.post('/api/productos', async (req, res) => {
 app.put('/api/productos/:id', async (req, res) => {
     try {
         const { nombre, descripcion, precio, categoria, imagenes, stock } = req.body;
+        
+        console.log('🔄 [PRODUCTO] Actualizando producto:', req.params.id);
         
         const productoActualizado = await Producto.findByIdAndUpdate(
             req.params.id,
@@ -341,14 +424,18 @@ app.put('/api/productos/:id', async (req, res) => {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
+        console.log('✅ [PRODUCTO] Producto actualizado:', productoActualizado._id);
         res.json(productoActualizado);
     } catch (error) {
+        console.error('❌ [PRODUCTO] Error actualizando producto:', error);
         res.status(400).json({ error: 'Error al actualizar producto: ' + error.message });
     }
 });
 
 app.delete('/api/productos/:id', async (req, res) => {
     try {
+        console.log('🗑️ [PRODUCTO] Eliminando producto:', req.params.id);
+        
         const producto = await Producto.findByIdAndUpdate(
             req.params.id,
             { activo: false },
@@ -359,8 +446,10 @@ app.delete('/api/productos/:id', async (req, res) => {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
+        console.log('✅ [PRODUCTO] Producto eliminado:', producto._id);
         res.json({ message: 'Producto eliminado correctamente' });
     } catch (error) {
+        console.error('❌ [PRODUCTO] Error eliminando producto:', error);
         res.status(500).json({ error: 'Error al eliminar producto' });
     }
 });
@@ -528,8 +617,10 @@ app.get('/api/test/estado-db', async (req, res) => {
         res.json({
             mensaje: '📊 Estado General de MongoDB',
             cloudinary: {
-                configured: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY),
-                cloudName: process.env.CLOUDINARY_CLOUD_NAME
+                configured: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET),
+                cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+                apiKeyConfigured: !!process.env.CLOUDINARY_API_KEY,
+                apiSecretConfigured: !!process.env.CLOUDINARY_API_SECRET
             },
             conexion: {
                 estado: estadosConexion[estadoConexion],
@@ -543,6 +634,7 @@ app.get('/api/test/estado-db', async (req, res) => {
             timestamp: new Date()
         });
     } catch (error) {
+        console.error('❌ [TEST] Error verificando estado:', error);
         res.status(500).json({
             error: 'Error verificando estado de la base de datos',
             mensaje: error.message
@@ -550,20 +642,70 @@ app.get('/api/test/estado-db', async (req, res) => {
     }
 });
 
+// ✅ NUEVA RUTA: Test específico de Cloudinary
+app.get('/api/test/cloudinary', async (req, res) => {
+    try {
+        console.log('🧪 [TEST] Probando conexión a Cloudinary...');
+        
+        // Verificar credenciales
+        const credencialesOk = !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+        
+        if (!credencialesOk) {
+            return res.status(500).json({
+                success: false,
+                error: 'Credenciales de Cloudinary no configuradas',
+                details: {
+                    cloudName: !!process.env.CLOUDINARY_CLOUD_NAME,
+                    apiKey: !!process.env.CLOUDINARY_API_KEY,
+                    apiSecret: !!process.env.CLOUDINARY_API_SECRET
+                }
+            });
+        }
+        
+        // Probar conexión con Cloudinary
+        const result = await cloudinary.api.ping();
+        
+        console.log('✅ [TEST] Cloudinary conectado:', result);
+        
+        res.json({
+            success: true,
+            message: 'Cloudinary configurado correctamente',
+            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+            status: result.status
+        });
+        
+    } catch (error) {
+        console.error('❌ [TEST] Error conectando a Cloudinary:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error conectando a Cloudinary: ' + error.message
+        });
+    }
+});
+
 // Manejo de errores global
 app.use((error, req, res, next) => {
-    console.error('Error global:', error);
+    console.error('❌ [ERROR GLOBAL]:', error);
     
     if (error instanceof multer.MulterError) {
         if (error.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({ error: 'Archivo muy grande (máximo 10MB)' });
+            return res.status(400).json({ 
+                success: false,
+                error: 'Archivo muy grande (máximo 10MB)' 
+            });
         }
         if (error.code === 'LIMIT_FILE_COUNT') {
-            return res.status(400).json({ error: 'Demasiados archivos (máximo 5)' });
+            return res.status(400).json({ 
+                success: false,
+                error: 'Demasiados archivos (máximo 5)' 
+            });
         }
     }
     
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ 
+        success: false,
+        error: 'Error interno del servidor' 
+    });
 });
 
 // Ruta 404
@@ -576,7 +718,7 @@ if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`🌱 Servidor corriendo en http://localhost:${PORT}`);
         console.log(`📊 Admin panel en http://localhost:${PORT}/admin`);
-        console.log(`☁️ Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME ? 'Configurado' : 'NO configurado'}`);
+        console.log(`☁️ Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME ? 'Configurado ✅' : 'NO configurado ❌'}`);
     });
 }
 
