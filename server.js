@@ -159,6 +159,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+// ✅ NUEVA RUTA: Página individual de producto
+app.get('/producto/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'producto.html'));
+});
+
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });

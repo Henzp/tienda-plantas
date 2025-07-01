@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* ✅ NUEVO: ESTILOS PARA IMÁGENES UNIFORMES */
+        /* ✅ NUEVO: ESTILOS PARA IMÁGENES UNIFORMES Y CLICKEABLES */
         .producto-card {
             background: white;
             border-radius: 20px;
@@ -26,13 +26,19 @@
             border-color: #90ee90;
         }
 
-        /* ✅ CONTENEDOR DE IMÁGENES CON TAMAÑO FIJO */
+        /* ✅ CONTENEDOR DE IMÁGENES CON TAMAÑO FIJO Y CLICKEABLE */
         .producto-images {
             position: relative;
             height: 280px; /* Altura fija para todas las imágenes */
             width: 100%;
             overflow: hidden;
             background: #f8f9fa; /* Color de fondo por si la imagen no carga */
+            cursor: pointer; /* Indica que es clickeable */
+            transition: all 0.3s ease;
+        }
+
+        .producto-images:hover {
+            transform: scale(1.02);
         }
 
         /* ✅ IMAGEN PRINCIPAL CON TAMAÑO UNIFORME */
@@ -104,6 +110,12 @@
             margin-bottom: 0.8rem;
             text-shadow: 1px 1px 2px rgba(45, 80, 22, 0.1);
             line-height: 1.2;
+            cursor: pointer; /* Nombre también clickeable */
+            transition: color 0.3s ease;
+        }
+
+        .producto-nombre:hover {
+            color: #1a3009;
         }
 
         .producto-descripcion {
@@ -127,7 +139,7 @@
             text-shadow: 1px 1px 2px rgba(231, 76, 60, 0.1);
         }
 
-        /* ✅ BOTONES DE ACCIÓN */
+        /* ✅ BOTONES DE ACCIÓN MEJORADOS */
         .producto-botones {
             display: flex;
             gap: 0.8rem;
@@ -190,6 +202,7 @@
             font-size: 0.8rem;
             font-weight: 600;
             backdrop-filter: blur(5px);
+            z-index: 5;
         }
 
         .stock-indicator.low-stock {
@@ -209,6 +222,7 @@
             font-weight: 600;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(45, 80, 22, 0.2);
+            z-index: 5;
         }
 
         /* ✅ LOADING MEJORADO */
@@ -742,7 +756,7 @@
             return currentUserState;
         }
 
-        // ✅ NUEVA FUNCIÓN: Cargar y mostrar productos con imágenes uniformes
+        // ✅ NUEVA FUNCIÓN: Cargar y mostrar productos con imágenes clickeables
         async function cargarProductos() {
             const productosGrid = document.getElementById('productosGrid');
             
@@ -777,7 +791,7 @@
                     
                     return `
                         <div class="producto-card" data-categoria="${producto.categoria}">
-                            <div class="producto-images">
+                            <div class="producto-images" onclick="verProducto('${producto._id}')" title="Ver detalles de ${producto.nombre}">
                                 <div class="categoria-badge">${producto.categoria}</div>
                                 ${stockInfo}
                                 
@@ -792,7 +806,8 @@
                                     <div class="image-dots">
                                         ${imagenes.map((_, index) => `
                                             <span class="dot ${index === 0 ? 'active' : ''}" 
-                                                  onclick="cambiarImagen(this, ${index})"></span>
+                                                  onclick="event.stopPropagation(); cambiarImagen(this, ${index})"
+                                                  title="Imagen ${index + 1}"></span>
                                         `).join('')}
                                     </div>
                                 ` : ''}
@@ -800,7 +815,7 @@
                             
                             <div class="producto-info">
                                 <div class="producto-content">
-                                    <h3 class="producto-nombre">${producto.nombre}</h3>
+                                    <h3 class="producto-nombre" onclick="verProducto('${producto._id}')" title="Ver detalles de ${producto.nombre}">${producto.nombre}</h3>
                                     <p class="producto-descripcion">${producto.descripcion}</p>
                                     <div class="producto-precio">$${formatearPrecio(producto.precio)}</div>
                                 </div>
@@ -809,8 +824,8 @@
                                     <button class="btn-agregar" onclick="agregarAlCarrito('${producto._id}')" ${producto.stock <= 0 ? 'disabled' : ''}>
                                         <i class="fas fa-cart-plus"></i> ${producto.stock <= 0 ? 'Agotado' : 'Agregar'}
                                     </button>
-                                    <button class="btn-comprar" onclick="comprarAhora('${producto._id}')" ${producto.stock <= 0 ? 'disabled' : ''}>
-                                        <i class="fas fa-shopping-bag"></i> Comprar
+                                    <button class="btn-comprar" onclick="verProducto('${producto._id}')">
+                                        <i class="fas fa-eye"></i> Ver más
                                     </button>
                                 </div>
                             </div>
@@ -831,6 +846,12 @@
                     </div>
                 `;
             }
+        }
+
+        // ✅ NUEVA FUNCIÓN: Ir a la página del producto
+        function verProducto(productoId) {
+            console.log('🔍 Navegando a producto:', productoId);
+            window.location.href = `/producto/${productoId}`;
         }
 
         // ✅ NUEVA FUNCIÓN: Cambiar imagen en el carrusel
@@ -882,11 +903,7 @@
         function agregarAlCarrito(productoId) {
             console.log('Agregando al carrito:', productoId);
             // Aquí implementarías la lógica del carrito
-        }
-
-        function comprarAhora(productoId) {
-            console.log('Comprar ahora:', productoId);
-            // Aquí implementarías la lógica de compra directa
+            alert('¡Función de carrito en desarrollo! 🛒');
         }
 
         function toggleCarrito() {
@@ -900,6 +917,7 @@
         function procesarCompra() {
             console.log('Procesando compra...');
             // Aquí implementarías la lógica de checkout
+            alert('¡Función de checkout en desarrollo! 💳');
         }
 
         // Ejecutar cuando se carga la página
