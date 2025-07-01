@@ -411,7 +411,7 @@
             transform: none !important;
         }
 
-        /* ✅ NUEVO: SISTEMA DE IMÁGENES COMPLETO */
+        /* SISTEMA DE IMÁGENES COMPLETO */
         .image-upload-tabs {
             display: flex;
             border-bottom: 2px solid #e0e0e0;
@@ -1064,7 +1064,7 @@
                                     <textarea id="descripcion" class="form-control" rows="4" placeholder="Describe las características y cuidados de la planta..." required></textarea>
                                 </div>
                                 
-                                <!-- ✅ NUEVO: Sistema de imágenes completo con AMBAS opciones -->
+                                <!-- Sistema de imágenes completo con AMBAS opciones -->
                                 <div class="form-group full-width">
                                     <label class="form-label">Imágenes del Producto *</label>
                                     
@@ -1218,7 +1218,11 @@
                 'productos': 'Gestionar Productos',
                 'nuevo-producto': fromEdit ? 'Editar Producto' : 'Nuevo Producto'
             };
-            document.getElementById('pageTitle').textContent = titles[pageId] || 'Dashboard';
+            
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+                pageTitle.textContent = titles[pageId] || 'Dashboard';
+            }
             
             if (pageId === 'nuevo-producto' && !fromEdit) {
                 limpiarFormulario();
@@ -1229,7 +1233,7 @@
             document.getElementById('sidebar').classList.toggle('open');
         }
 
-        // ✅ NUEVO: Cambiar entre pestañas de upload
+        // ✅ Cambiar entre pestañas de upload
         function switchUploadTab(tabType) {
             // Actualizar pestañas
             document.querySelectorAll('.upload-tab').forEach(tab => {
@@ -1241,11 +1245,17 @@
             });
             
             // Activar pestaña seleccionada
-            event.target.classList.add('active');
-            document.getElementById(tabType + '-content').classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            const targetContent = document.getElementById(tabType + '-content');
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
         }
 
-        // ✅ NUEVO: Manejo de archivos locales con drag & drop
+        // ✅ Manejo de archivos locales con drag & drop
         function handleDragOver(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1254,21 +1264,28 @@
         function handleDragEnter(e) {
             e.preventDefault();
             e.stopPropagation();
-            e.target.closest('.file-upload-section').classList.add('dragover');
+            const uploadSection = e.target.closest('.file-upload-section');
+            if (uploadSection) {
+                uploadSection.classList.add('dragover');
+            }
         }
 
         function handleDragLeave(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (!e.target.closest('.file-upload-section').contains(e.relatedTarget)) {
-                e.target.closest('.file-upload-section').classList.remove('dragover');
+            const uploadSection = e.target.closest('.file-upload-section');
+            if (uploadSection && !uploadSection.contains(e.relatedTarget)) {
+                uploadSection.classList.remove('dragover');
             }
         }
 
         function handleDrop(e) {
             e.preventDefault();
             e.stopPropagation();
-            e.target.closest('.file-upload-section').classList.remove('dragover');
+            const uploadSection = e.target.closest('.file-upload-section');
+            if (uploadSection) {
+                uploadSection.classList.remove('dragover');
+            }
             
             const files = e.dataTransfer.files;
             uploadFiles(files);
@@ -1279,7 +1296,7 @@
             uploadFiles(files);
         }
 
-        // ✅ NUEVO: Subir archivos a Cloudinary
+        // ✅ Subir archivos a Cloudinary
         async function uploadFiles(files) {
             if (!files || files.length === 0) return;
             
@@ -1292,8 +1309,8 @@
             const progressBar = document.getElementById('uploadProgress');
             const progressBarFill = document.getElementById('uploadProgressBar');
             
-            progressBar.style.display = 'block';
-            progressBarFill.style.width = '0%';
+            if (progressBar) progressBar.style.display = 'block';
+            if (progressBarFill) progressBarFill.style.width = '0%';
             
             try {
                 const formData = new FormData();
@@ -1310,7 +1327,7 @@
                     body: formData
                 });
                 
-                progressBarFill.style.width = '50%';
+                if (progressBarFill) progressBarFill.style.width = '50%';
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -1324,12 +1341,13 @@
                         imagenesSeleccionadas.push(img.url);
                     });
                     
-                    progressBarFill.style.width = '100%';
+                    if (progressBarFill) progressBarFill.style.width = '100%';
                     actualizarPreviewImagenes();
                     mostrarAlerta(`${result.images.length} imagen(es) subida(s) exitosamente`, 'success');
                     
                     // Limpiar input de archivos
-                    document.getElementById('imageFiles').value = '';
+                    const imageFiles = document.getElementById('imageFiles');
+                    if (imageFiles) imageFiles.value = '';
                     
                 } else {
                     throw new Error(result.error || 'Error desconocido');
@@ -1340,8 +1358,8 @@
                 mostrarAlerta('Error al subir archivos: ' + error.message, 'error');
             } finally {
                 setTimeout(() => {
-                    progressBar.style.display = 'none';
-                    progressBarFill.style.width = '0%';
+                    if (progressBar) progressBar.style.display = 'none';
+                    if (progressBarFill) progressBarFill.style.width = '0%';
                 }, 2000);
             }
         }
@@ -1430,19 +1448,29 @@
             const inactivos = total - activos;
             const categorias = [...new Set(productos.map(p => p.categoria))].length;
 
-            document.getElementById('totalProductos').textContent = total;
-            document.getElementById('productosActivos').textContent = activos;
-            document.getElementById('productosInactivos').textContent = inactivos;
-            document.getElementById('totalCategorias').textContent = categorias;
+            const totalElement = document.getElementById('totalProductos');
+            const activosElement = document.getElementById('productosActivos');
+            const inactivosElement = document.getElementById('productosInactivos');
+            const categoriasElement = document.getElementById('totalCategorias');
+
+            if (totalElement) totalElement.textContent = total;
+            if (activosElement) activosElement.textContent = activos;
+            if (inactivosElement) inactivosElement.textContent = inactivos;
+            if (categoriasElement) categoriasElement.textContent = categorias;
         }
 
         // Manejo de imágenes por URL
         function useExampleUrl(url) {
-            document.getElementById('nuevaImagen').value = url;
+            const input = document.getElementById('nuevaImagen');
+            if (input) {
+                input.value = url;
+            }
         }
 
         function agregarImagenUrl() {
             const input = document.getElementById('nuevaImagen');
+            if (!input) return;
+            
             const url = input.value.trim();
 
             if (!url) {
@@ -1473,6 +1501,8 @@
 
         function actualizarPreviewImagenes() {
             const container = document.getElementById('imagenPreview');
+            if (!container) return;
+            
             container.innerHTML = imagenesSeleccionadas.map((url, index) => `
                 <div class="image-preview-item">
                     <img src="${url}" alt="Imagen ${index + 1}" 
@@ -1490,62 +1520,69 @@
         }
 
         // Formulario
-        document.getElementById('productoForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        const productoForm = document.getElementById('productoForm');
+        if (productoForm) {
+            productoForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-            if (imagenesSeleccionadas.length === 0) {
-                mostrarAlerta('Debes agregar al menos una imagen', 'error');
-                return;
-            }
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-            const formData = {
-                nombre: document.getElementById('nombre').value,
-                descripcion: document.getElementById('descripcion').value,
-                precio: parseFloat(document.getElementById('precio').value),
-                categoria: document.getElementById('categoria').value,
-                stock: parseInt(document.getElementById('stock').value),
-                imagenes: imagenesSeleccionadas
-            };
-
-            try {
-                let response;
-                const productoId = document.getElementById('productoId').value;
-
-                if (productoId) {
-                    response = await fetch(`/api/productos/${productoId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formData)
-                    });
-                } else {
-                    response = await fetch('/api/productos', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formData)
-                    });
+                if (imagenesSeleccionadas.length === 0) {
+                    mostrarAlerta('Debes agregar al menos una imagen', 'error');
+                    return;
                 }
 
-                if (response.ok) {
-                    mostrarAlerta(`Producto ${productoId ? 'actualizado' : 'creado'} exitosamente`, 'success');
-                    limpiarFormulario();
-                    cargarProductos();
-                    showPage('productos');
-                } else {
-                    const error = await response.json();
-                    mostrarAlerta(error.error || 'Error al guardar producto', 'error');
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarAlerta('Error de conexión', 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> <span id="btnText">Guardar Producto</span>';
-            }
-        });
+
+                const formData = {
+                    nombre: document.getElementById('nombre').value,
+                    descripcion: document.getElementById('descripcion').value,
+                    precio: parseFloat(document.getElementById('precio').value),
+                    categoria: document.getElementById('categoria').value,
+                    stock: parseInt(document.getElementById('stock').value),
+                    imagenes: imagenesSeleccionadas
+                };
+
+                try {
+                    let response;
+                    const productoId = document.getElementById('productoId').value;
+
+                    if (productoId) {
+                        response = await fetch(`/api/productos/${productoId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formData)
+                        });
+                    } else {
+                        response = await fetch('/api/productos', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formData)
+                        });
+                    }
+
+                    if (response.ok) {
+                        mostrarAlerta(`Producto ${productoId ? 'actualizado' : 'creado'} exitosamente`, 'success');
+                        limpiarFormulario();
+                        cargarProductos();
+                        showPage('productos');
+                    } else {
+                        const error = await response.json();
+                        mostrarAlerta(error.error || 'Error al guardar producto', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    mostrarAlerta('Error de conexión', 'error');
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> <span id="btnText">Guardar Producto</span>';
+                    }
+                }
+            });
+        }
 
         // Editar producto
         function editarProducto(id) {
@@ -1555,25 +1592,53 @@
             productoEditando = producto;
             imagenesSeleccionadas = [...producto.imagenes];
 
-            document.getElementById('productoId').value = producto._id;
-            document.getElementById('nombre').value = producto.nombre;
-            document.getElementById('descripcion').value = producto.descripcion;
-            document.getElementById('precio').value = producto.precio;
-            document.getElementById('categoria').value = producto.categoria;
-            document.getElementById('stock').value = producto.stock;
+            const fields = {
+                'productoId': producto._id,
+                'nombre': producto.nombre,
+                'descripcion': producto.descripcion,
+                'precio': producto.precio,
+                'categoria': producto.categoria,
+                'stock': producto.stock
+            };
 
-            document.getElementById('formTitle').textContent = 'Editar Producto';
-            document.getElementById('btnText').textContent = 'Actualizar Producto';
-            actualizarPreviewImagenes();
+            // Llenar formulario verificando que los elementos existan
+            Object.entries(fields).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = value;
+                }
+            });
+
+            const formTitle = document.getElementById('formTitle');
+            if (formTitle) {
+                formTitle.textContent = 'Editar Producto';
+            }
             
+            const btnText = document.getElementById('btnText');
+            if (btnText) {
+                btnText.textContent = 'Actualizar Producto';
+            }
+            
+            actualizarPreviewImagenes();
             showPage('nuevo-producto', true);
         }
 
         function confirmarEliminar(id, nombre) {
-            document.getElementById('confirmMessage').textContent = 
-                `¿Estás seguro de que deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`;
-            document.getElementById('confirmBtn').onclick = () => eliminarProducto(id);
-            document.getElementById('confirmModal').classList.add('active');
+            const confirmMessage = document.getElementById('confirmMessage');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const modal = document.getElementById('confirmModal');
+            
+            if (confirmMessage) {
+                confirmMessage.textContent = `¿Estás seguro de que deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`;
+            }
+            
+            if (confirmBtn) {
+                confirmBtn.onclick = () => eliminarProducto(id);
+            }
+            
+            if (modal) {
+                modal.classList.add('active');
+            }
         }
 
         async function eliminarProducto(id) {
@@ -1596,29 +1661,62 @@
             }
         }
 
+        // ✅ FUNCIÓN CORREGIDA: Limpiar formulario
         function limpiarFormulario() {
-            document.getElementById('productoForm').reset();
-            document.getElementById('productoId').value = '';
+            const form = document.getElementById('productoForm');
+            if (form) {
+                form.reset();
+            }
+            
+            const productoId = document.getElementById('productoId');
+            if (productoId) {
+                productoId.value = '';
+            }
+            
             imagenesSeleccionadas = [];
             productoEditando = null;
             
-            document.getElementById('formTitle').textContent = 'Agregar Nuevo Producto';
-            document.getElementById('btnText').textContent = 'Guardar Producto';
-            document.getElementById('pageTitle').textContent = 'Nuevo Producto';
+            // ✅ CORREGIDO: Verificar que los elementos existan antes de modificarlos
+            const formTitle = document.getElementById('formTitle');
+            if (formTitle) {
+                formTitle.textContent = 'Agregar Nuevo Producto';
+            }
+            
+            const btnText = document.getElementById('btnText');
+            if (btnText) {
+                btnText.textContent = 'Guardar Producto';
+            }
+            
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+                pageTitle.textContent = 'Nuevo Producto';
+            }
             
             actualizarPreviewImagenes();
-            document.getElementById('alertContainer').innerHTML = '';
+            
+            const alertContainer = document.getElementById('alertContainer');
+            if (alertContainer) {
+                alertContainer.innerHTML = '';
+            }
             
             // Limpiar input de archivos
-            document.getElementById('imageFiles').value = '';
+            const imageFiles = document.getElementById('imageFiles');
+            if (imageFiles) {
+                imageFiles.value = '';
+            }
         }
 
         function cerrarModal() {
-            document.getElementById('confirmModal').classList.remove('active');
+            const modal = document.getElementById('confirmModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
         }
 
         function mostrarAlerta(mensaje, tipo) {
             const alertContainer = document.getElementById('alertContainer');
+            if (!alertContainer) return;
+            
             const alertClass = tipo === 'success' ? 'alert-success' : 'alert-error';
             const icon = tipo === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
             
@@ -1630,7 +1728,9 @@
             `;
 
             setTimeout(() => {
-                alertContainer.innerHTML = '';
+                if (alertContainer) {
+                    alertContainer.innerHTML = '';
+                }
             }, 5000);
         }
 
@@ -1658,12 +1758,15 @@
         }
 
         // Enter en URL input
-        document.getElementById('nuevaImagen').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                agregarImagenUrl();
-            }
-        });
+        const nuevaImagenInput = document.getElementById('nuevaImagen');
+        if (nuevaImagenInput) {
+            nuevaImagenInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    agregarImagenUrl();
+                }
+            });
+        }
 
         // Cerrar modal con ESC
         document.addEventListener('keydown', function(e) {
