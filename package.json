@@ -14,7 +14,9 @@
     "express-session": "^1.17.3",
     "mongoose": "^7.0.3",
     "dotenv": "^16.0.3",
-    "multer": "^2.0.1"
+    "multer": "^2.0.1",
+    "cloudinary": "^2.0.3",
+    "multer-storage-cloudinary": "^4.0.0"
   },
   "engines": {
     "node": ">=18.x"
@@ -28,7 +30,8 @@
     "tienda",
     "express",
     "mongodb",
-    "nodejs"
+    "nodejs",
+    "cloudinary"
   ],
   "author": "TamyPau",
   "license": "ISC"

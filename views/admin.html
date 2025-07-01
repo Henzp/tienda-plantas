@@ -170,35 +170,140 @@
             gap: 20px;
         }
         
-        /* SISTEMA DE IMÁGENES VERCEL */
+        /* SISTEMA DE IMÁGENES HÍBRIDO */
         .images-section {
             border: 2px dashed #4CAF50;
             border-radius: 10px;
-            padding: 20px;
+            padding: 25px;
             margin: 20px 0;
-            background: #f9f9f9;
+            background: linear-gradient(135deg, #f9f9f9, #f0f8f0);
         }
         
-        .vercel-info {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
+        .cloudinary-info {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-left: 4px solid #4CAF50;
             padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+            margin-bottom: 25px;
+            border-radius: 8px;
         }
         
-        .vercel-info h4 {
+        .cloudinary-info h4 {
             margin: 0 0 8px 0;
-            color: #1976d2;
+            color: #2e7d32;
             font-family: 'Satisfy', cursive;
+            font-size: 1.2rem;
         }
         
-        .vercel-info p {
+        .cloudinary-info p {
             margin: 0;
+            color: #388e3c;
+            font-size: 14px;
+        }
+        
+        .upload-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: #f5f5f5;
+            color: #666;
+            cursor: pointer;
+            font-family: 'Satisfy', cursive;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .tab-button:hover:not(.active) {
+            background: #e8f5e8;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* TAB 1: UPLOAD LOCAL */
+        .upload-area {
+            border: 2px dashed #4CAF50;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #fafafa;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            background: #f0f8f0;
+            border-color: #45a049;
+        }
+        
+        .upload-area.dragover {
+            background: #e8f5e8;
+            border-color: #2e7d32;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 15px 0;
+        }
+        
+        .file-input {
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
+        }
+        
+        .file-input-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Satisfy', cursive;
+            font-size: 1.1rem;
+            border: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+        
+        .upload-info {
+            margin-top: 15px;
             color: #666;
             font-size: 14px;
         }
         
+        /* TAB 2: URL EXTERNA */
         .url-input-container {
             display: flex;
             gap: 10px;
@@ -210,7 +315,7 @@
         }
         
         .add-url-btn {
-            background: #4CAF50;
+            background: #2196F3;
             color: white;
             border: none;
             padding: 12px 20px;
@@ -221,19 +326,19 @@
         }
         
         .add-url-btn:hover {
-            background: #45a049;
+            background: #1976D2;
         }
         
         .example-urls {
-            margin: 15px 0;
-            padding: 15px;
-            background: #fff;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
             border-radius: 8px;
             border: 1px solid #e0e0e0;
         }
         
         .example-urls h5 {
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
             color: #2d5a27;
             font-family: 'Satisfy', cursive;
         }
@@ -241,24 +346,40 @@
         .example-url {
             display: inline-block;
             margin: 5px 10px 5px 0;
-            padding: 5px 10px;
-            background: #f5f5f5;
-            border-radius: 15px;
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
             font-size: 12px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .example-url:hover {
-            background: #4CAF50;
+            background: #2196F3;
             color: white;
+            border-color: #2196F3;
         }
         
+        /* PREVIEW DE IMÁGENES */
         .images-preview {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
-            margin: 20px 0;
+            margin: 25px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+        
+        .images-preview:empty:before {
+            content: "📷 Las imágenes aparecerán aquí";
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 20px;
         }
         
         .image-preview {
@@ -266,6 +387,7 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: white;
         }
         
         .image-preview img {
@@ -294,10 +416,17 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
             font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .remove-image:hover {
+            background: #d32f2f;
         }
         
         .submit-btn {
@@ -317,6 +446,13 @@
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .message {
@@ -362,6 +498,10 @@
             }
             
             .url-input-container {
+                flex-direction: column;
+            }
+            
+            .upload-tabs {
                 flex-direction: column;
             }
         }
@@ -443,44 +583,74 @@
                     </div>
 
                     <div class="images-section">
-                        <h3 style="font-family: 'Satisfy', cursive; color: #2d5a27; margin: 0 0 15px 0;">
+                        <h3 style="font-family: 'Satisfy', cursive; color: #2d5a27; margin: 0 0 20px 0;">
                             📸 Imágenes del Producto
                         </h3>
                         
-                        <div class="vercel-info">
-                            <h4>🌐 Modo Vercel - Solo URLs Externas</h4>
-                            <p>Agrega imágenes usando URLs de servicios como Unsplash, Imgur, o tu propio servidor.</p>
+                        <div class="cloudinary-info">
+                            <h4>☁️ Sistema Híbrido de Imágenes</h4>
+                            <p>Ahora puedes subir archivos desde tu computadora (se guardan en Cloudinary) o usar URLs externas. ¡Las dos opciones funcionan perfectamente!</p>
                         </div>
                         
-                        <div class="url-input-container">
-                            <input type="url" id="imageUrl" class="url-input" placeholder="https://ejemplo.com/imagen.jpg">
-                            <button type="button" class="add-url-btn" onclick="addImageUrl()">
-                                Agregar URL
+                        <div class="upload-tabs">
+                            <button type="button" class="tab-button active" onclick="switchTab('upload')">
+                                📁 Subir Archivos
+                            </button>
+                            <button type="button" class="tab-button" onclick="switchTab('url')">
+                                🔗 URL Externa
                             </button>
                         </div>
                         
-                        <div class="example-urls">
-                            <h5>🔗 Ejemplos rápidos:</h5>
-                            <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400')">
-                                Monstera Deliciosa
-                            </span>
-                            <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1463154545680-d59320fd685d?w=400')">
-                                Pothos Dorado
-                            </span>
-                            <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=400')">
-                                Sansevieria
-                            </span>
-                            <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1468245856972-a0333f3f8293?w=400')">
-                                Ficus Lyrata
-                            </span>
+                        <!-- TAB 1: UPLOAD LOCAL -->
+                        <div id="upload-tab" class="tab-content active">
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-icon">☁️</div>
+                                <h4 style="margin: 0 0 10px 0; color: #2d5a27;">Arrastra archivos aquí o haz clic para seleccionar</h4>
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="imageFiles" class="file-input" multiple accept="image/*">
+                                    <label for="imageFiles" class="file-input-button">
+                                        📷 Seleccionar Imágenes
+                                    </label>
+                                </div>
+                                <div class="upload-info">
+                                    <small>Máximo 5 archivos • 10MB cada uno • JPG, PNG, GIF, WebP</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- TAB 2: URL EXTERNA -->
+                        <div id="url-tab" class="tab-content">
+                            <div class="url-input-container">
+                                <input type="url" id="imageUrl" class="url-input" placeholder="https://ejemplo.com/imagen.jpg">
+                                <button type="button" class="add-url-btn" onclick="addImageUrl()">
+                                    ➕ Agregar URL
+                                </button>
+                            </div>
+                            
+                            <div class="example-urls">
+                                <h5>🔗 URLs de ejemplo (un clic para usar):</h5>
+                                <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400')">
+                                    Monstera Deliciosa
+                                </span>
+                                <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1463154545680-d59320fd685d?w=400')">
+                                    Pothos Dorado
+                                </span>
+                                <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=400')">
+                                    Sansevieria
+                                </span>
+                                <span class="example-url" onclick="useExampleUrl('https://images.unsplash.com/photo-1468245856972-a0333f3f8293?w=400')">
+                                    Ficus Lyrata
+                                </span>
+                            </div>
                         </div>
 
+                        <!-- PREVIEW DE IMÁGENES -->
                         <div id="imagesPreview" class="images-preview"></div>
                     </div>
 
                     <div id="formMessage" class="message"></div>
 
-                    <button type="submit" class="submit-btn">🌿 Agregar Producto</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">🌿 Agregar Producto</button>
                 </form>
             </div>
         </div>
@@ -494,7 +664,126 @@
         // Cargar productos al iniciar
         document.addEventListener('DOMContentLoaded', function() {
             loadProducts();
+            setupDragAndDrop();
         });
+
+        // Configurar drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function highlight(e) {
+                uploadArea.classList.add('dragover');
+            }
+
+            function unhighlight(e) {
+                uploadArea.classList.remove('dragover');
+            }
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+        }
+
+        // Cambiar entre tabs
+        function switchTab(tabName) {
+            // Actualizar botones
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // Actualizar contenido
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Manejar selección de archivos
+        document.getElementById('imageFiles').addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Procesar archivos seleccionados
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+
+            if (files.length > 5) {
+                showMessage('Máximo 5 archivos permitidos', 'error');
+                return;
+            }
+
+            if (selectedImages.length + files.length > 5) {
+                showMessage('Máximo 5 imágenes en total', 'error');
+                return;
+            }
+
+            // Validar archivos
+            for (let file of files) {
+                if (file.size > 10 * 1024 * 1024) {
+                    showMessage(`El archivo ${file.name} es muy grande (máximo 10MB)`, 'error');
+                    return;
+                }
+                
+                if (!file.type.startsWith('image/')) {
+                    showMessage(`${file.name} no es una imagen válida`, 'error');
+                    return;
+                }
+            }
+
+            const formData = new FormData();
+            Array.from(files).forEach(file => {
+                formData.append('images', file);
+            });
+
+            try {
+                showMessage('Subiendo imágenes a Cloudinary...', 'success');
+                
+                const response = await fetch('/api/upload-images', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showMessage(`${result.images.length} imagen(es) subida(s) exitosamente`, 'success');
+                    
+                    // Agregar URLs a la lista
+                    result.images.forEach(img => {
+                        selectedImages.push(img.url);
+                    });
+                    
+                    updateImagesPreview();
+                    
+                    // Limpiar input
+                    document.getElementById('imageFiles').value = '';
+                } else {
+                    showMessage(result.error || 'Error al subir imágenes', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Error de conexión al subir imágenes', 'error');
+            }
+        }
 
         // Cargar productos existentes
         async function loadProducts() {
@@ -597,8 +886,8 @@
                 const urlObj = new URL(url);
                 const path = urlObj.pathname.toLowerCase();
                 const hasImageExtension = /\.(jpg|jpeg|png|gif|webp)$/i.test(path);
-                const isKnownService = /^https:\/\/(images\.unsplash\.com|i\.imgur\.com)/i.test(url);
-                return hasImageExtension || isKnownService || url.includes('unsplash');
+                const isKnownService = /^https:\/\/(images\.unsplash\.com|i\.imgur\.com|res\.cloudinary\.com)/i.test(url);
+                return hasImageExtension || isKnownService || url.includes('unsplash') || url.includes('cloudinary');
             } catch {
                 return false;
             }
@@ -650,6 +939,10 @@
                 return;
             }
 
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔄 Creando producto...';
+
             const formData = {
                 nombre: document.getElementById('nombre').value,
                 descripcion: document.getElementById('descripcion').value,
@@ -660,8 +953,6 @@
             };
 
             try {
-                showMessage('Creando producto...', 'success');
-                
                 const response = await fetch('/api/productos', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -682,6 +973,9 @@
             } catch (error) {
                 console.error('Error:', error);
                 showMessage('Error de conexión', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🌿 Agregar Producto';
             }
         });
 
