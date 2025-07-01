@@ -15,7 +15,7 @@
     "mongoose": "^7.0.3",
     "dotenv": "^16.0.3",
     "multer": "^2.0.1",
-    "cloudinary": "^2.0.3",
+    "cloudinary": "^1.41.3",
     "multer-storage-cloudinary": "^4.0.0"
   },
   "engines": {
