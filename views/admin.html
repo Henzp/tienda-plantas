@@ -1033,8 +1033,8 @@
             cargarProductos();
         });
 
-        // Navegación
-        function showPage(pageId) {
+        // ✅ FUNCIÓN CORREGIDA: Navegación
+        function showPage(pageId, fromEdit = false) {
             // Ocultar todas las páginas
             document.querySelectorAll('.page-section').forEach(section => {
                 section.classList.remove('active');
@@ -1048,19 +1048,27 @@
             // Mostrar página seleccionada
             document.getElementById(pageId).classList.add('active');
             
-            // Marcar menú como activo
-            event.target.classList.add('active');
+            // ✅ CORREGIDO: Solo marcar menú como activo si viene de un click real
+            if (typeof event !== 'undefined' && event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Si no hay event (viene de editarProducto), buscar el menú correcto
+                const menuCorrect = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+                if (menuCorrect) {
+                    menuCorrect.classList.add('active');
+                }
+            }
             
             // Actualizar título
             const titles = {
                 'dashboard': 'Dashboard',
                 'productos': 'Gestionar Productos',
-                'nuevo-producto': 'Nuevo Producto'
+                'nuevo-producto': fromEdit ? 'Editar Producto' : 'Nuevo Producto'
             };
             document.getElementById('pageTitle').textContent = titles[pageId] || 'Dashboard';
             
-            // Limpiar formulario si vamos a nuevo producto
-            if (pageId === 'nuevo-producto') {
+            // ✅ CORREGIDO: Solo limpiar formulario si NO viene de edición
+            if (pageId === 'nuevo-producto' && !fromEdit) {
                 limpiarFormulario();
             }
         }
@@ -1270,6 +1278,7 @@
             }
         });
 
+        // ✅ FUNCIÓN CORREGIDA: Editar producto
         function editarProducto(id) {
             const producto = productos.find(p => p._id === id);
             if (!producto) return;
@@ -1287,7 +1296,9 @@
             document.getElementById('formTitle').textContent = 'Editar Producto';
             document.getElementById('btnText').textContent = 'Actualizar Producto';
             actualizarPreviewImagenes();
-            showPage('nuevo-producto');
+            
+            // ✅ CORREGIDO: Indicar que viene de edición
+            showPage('nuevo-producto', true);
         }
 
         function confirmarEliminar(id, nombre) {
@@ -1317,14 +1328,18 @@
             }
         }
 
+        // ✅ FUNCIÓN CORREGIDA: Limpiar formulario
         function limpiarFormulario() {
             document.getElementById('productoForm').reset();
             document.getElementById('productoId').value = '';
             imagenesSeleccionadas = [];
             productoEditando = null;
             
+            // ✅ AGREGADO: Resetear títulos a "nuevo producto"
             document.getElementById('formTitle').textContent = 'Agregar Nuevo Producto';
             document.getElementById('btnText').textContent = 'Guardar Producto';
+            document.getElementById('pageTitle').textContent = 'Nuevo Producto';
+            
             actualizarPreviewImagenes();
             document.getElementById('alertContainer').innerHTML = '';
         }
