@@ -45,7 +45,7 @@
         .producto-image {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Mantiene proporción y llena el contenedor */
+            object-fit: contain; /* ✅ ARREGLADO: Muestra imagen completa */
             object-position: center; /* Centra la imagen */
             transition: all 0.5s ease;
             position: absolute;
@@ -267,6 +267,86 @@
             margin-bottom: 1rem;
         }
 
+        /* ✅ BANNER DE IMÁGENES ANIMADO */
+        .banner-imagenes {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            padding: 4rem 0;
+            overflow: hidden;
+            position: relative;
+            margin-top: 2rem;
+        }
+
+        .banner-imagenes::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><defs><pattern id="bannerLeaves" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse"><circle cx="40" cy="40" r="1.5" fill="%2390ee90" opacity="0.1"/><circle cx="20" cy="20" r="1" fill="%234a7c59" opacity="0.08"/><circle cx="60" cy="60" r="0.8" fill="%232d5016" opacity="0.06"/></pattern></defs><rect width="100%" height="100%" fill="url(%23bannerLeaves)"/></svg>') center/300px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .banner-container {
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-track {
+            display: flex;
+            gap: 2rem;
+            animation: scroll-left 30s linear infinite;
+            width: calc(200% + 4rem); /* Ancho doble para el efecto infinito */
+        }
+
+        .banner-item {
+            flex: 0 0 300px;
+            height: 200px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+            position: relative;
+            background: white;
+            border: 3px solid rgba(144, 238, 144, 0.3);
+        }
+
+        .banner-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            border-color: #90ee90;
+        }
+
+        .banner-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            transition: transform 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .banner-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Animación de desplazamiento infinito */
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Efecto de pausa al hacer hover */
+        .banner-track:hover {
+            animation-play-state: paused;
+        }
+
         /* ✅ RESPONSIVE MEJORADO */
         @media (max-width: 768px) {
             .productos-grid {
@@ -294,6 +374,21 @@
                 font-size: 0.9rem;
                 padding: 0.8rem;
             }
+
+            /* Banner responsive */
+            .banner-imagenes {
+                padding: 2rem 0;
+            }
+            
+            .banner-item {
+                flex: 0 0 250px;
+                height: 160px;
+            }
+            
+            .banner-track {
+                gap: 1.5rem;
+                animation-duration: 25s;
+            }
         }
 
         @media (max-width: 480px) {
@@ -304,6 +399,16 @@
             
             .producto-images {
                 height: 220px;
+            }
+
+            .banner-item {
+                flex: 0 0 200px;
+                height: 130px;
+            }
+            
+            .banner-track {
+                gap: 1rem;
+                animation-duration: 20s;
             }
         }
 
@@ -578,6 +683,47 @@
         <div class="container">
             <div class="mision-content">
                 <h2>Compartiendo una conexión especial con la naturaleza, entregando alegría, pero en macetas</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- ✅ NUEVO: Banner de Imágenes Animado -->
+    <section class="banner-imagenes">
+        <div class="banner-container">
+            <div class="banner-track">
+                <!-- Primera ronda de imágenes -->
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop" alt="Planta 1">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1493606278519-11aa9a6b8453?w=300&h=200&fit=crop" alt="Planta 2">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1544568100-847a948585b9?w=300&h=200&fit=crop" alt="Planta 3">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&h=200&fit=crop" alt="Planta 4">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=300&h=200&fit=crop" alt="Planta 5">
+                </div>
+                
+                <!-- Segunda ronda (duplicada para efecto infinito) -->
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop" alt="Planta 1">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1493606278519-11aa9a6b8453?w=300&h=200&fit=crop" alt="Planta 2">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1544568100-847a948585b9?w=300&h=200&fit=crop" alt="Planta 3">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&h=200&fit=crop" alt="Planta 4">
+                </div>
+                <div class="banner-item">
+                    <img src="https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=300&h=200&fit=crop" alt="Planta 5">
+                </div>
             </div>
         </div>
     </section>
