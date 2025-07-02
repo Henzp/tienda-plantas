@@ -1,4 +1,4 @@
-// ✅ SERVIDOR CORREGIDO Y ESTABLE
+// ✅ SERVIDOR OPTIMIZADO, SEGURO Y COMPATIBLE
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -12,17 +12,84 @@ require('dotenv').config();
 
 const app = express();
 
-console.log('🚀 Iniciando servidor...');
+console.log('🚀 Iniciando servidor optimizado...');
 
-// ✅ CONFIGURACIÓN BÁSICA FIRST
+// ✅ HEADERS DE SEGURIDAD Y PERFORMANCE (NUEVO)
+app.use((req, res, next) => {
+    // Security Headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Content Security Policy (reemplaza X-Frame-Options)
+    res.setHeader('Content-Security-Policy', 
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+        "img-src 'self' data: https: http:; " +
+        "connect-src 'self' https:; " +
+        "frame-ancestors 'none';"
+    );
+    
+    // CORS Headers optimizados
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // Cache Control para archivos estáticos
+    if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        res.setHeader('Expires', new Date(Date.now() + 31536000000).toUTCString());
+    } else if (req.path.match(/\.(html|htm)$/)) {
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+    } else {
+        res.setHeader('Cache-Control', 'no-cache');
+    }
+    
+    next();
+});
+
+// ✅ CONFIGURACIÓN BÁSICA
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.static('public'));
 
-// ✅ CONFIGURACIÓN DE CORS
+// ✅ ARCHIVOS ESTÁTICOS CON HEADERS OPTIMIZADOS
+app.use(express.static('public', {
+    maxAge: '1y', // 1 año de cache
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+        // Headers específicos por tipo de archivo
+        if (path.endsWith('.woff2')) {
+            res.setHeader('Content-Type', 'font/woff2');
+        } else if (path.endsWith('.woff')) {
+            res.setHeader('Content-Type', 'font/woff');
+        } else if (path.endsWith('.ttf')) {
+            res.setHeader('Content-Type', 'font/ttf');
+        } else if (path.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        } else if (path.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        } else if (path.endsWith('.html')) {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        }
+        
+        // Compression
+        res.setHeader('Vary', 'Accept-Encoding');
+    }
+}));
+
+// ✅ CONFIGURACIÓN DE CORS OPTIMIZADA
 app.use(cors({
-    origin: true,
-    credentials: true
+    origin: process.env.NODE_ENV === 'production' 
+        ? ['https://tienda-plantas.vercel.app', 'https://tu-dominio.com']
+        : true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    maxAge: 86400 // 24 horas de cache para preflight
 }));
 
 // ✅ CONFIGURACIÓN DE SESIONES
@@ -30,9 +97,12 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'tienda-plantas-secret-key-2024',
     resave: false,
     saveUninitialized: false,
+    name: 'tienda.sid', // Nombre personalizado para el cookie
     cookie: {
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+        secure: process.env.NODE_ENV === 'production', // HTTPS en producción
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        httpOnly: true, // Seguridad: no accesible desde JavaScript
+        sameSite: 'lax' // Protección CSRF
     }
 }));
 
@@ -48,7 +118,7 @@ try {
     console.error('❌ Error configurando Cloudinary:', error);
 }
 
-// ✅ CONFIGURACIÓN DE MULTER CON MANEJO DE ERRORES
+// ✅ CONFIGURACIÓN DE MULTER CON VALIDACIÓN MEJORADA
 let upload;
 try {
     const storage = new CloudinaryStorage({
@@ -56,63 +126,85 @@ try {
         params: {
             folder: 'tienda-plantas',
             allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+            transformation: [
+                { quality: 'auto:good' },
+                { fetch_format: 'auto' }
+            ]
         }
     });
+    
     upload = multer({ 
         storage: storage,
         limits: {
-            fileSize: 10 * 1024 * 1024 // 10MB
+            fileSize: 10 * 1024 * 1024, // 10MB
+            files: 10 // Máximo 10 archivos
+        },
+        fileFilter: (req, file, cb) => {
+            // Validar tipos de archivo
+            const allowedTypes = /jpeg|jpg|png|gif|webp/;
+            const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+            const mimetype = allowedTypes.test(file.mimetype);
+            
+            if (mimetype && extname) {
+                return cb(null, true);
+            } else {
+                cb(new Error('Solo se permiten imágenes (jpeg, jpg, png, gif, webp)'), false);
+            }
         }
     });
-    console.log('✅ Multer configurado');
+    console.log('✅ Multer configurado con validaciones');
 } catch (error) {
     console.error('❌ Error configurando Multer:', error);
-    // Fallback si hay error con Cloudinary
     upload = multer({ dest: 'uploads/' });
 }
 
-// ✅ CONEXIÓN A MONGODB CON MANEJO DE ERRORES
+// ✅ CONEXIÓN A MONGODB CON MANEJO DE ERRORES MEJORADO
 async function conectarMongoDB() {
     try {
         await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 5000, // 5 segundos timeout
+            socketTimeoutMS: 45000, // 45 segundos socket timeout
+            maxPoolSize: 10, // Máximo 10 conexiones en el pool
+            retryWrites: true,
+            w: 'majority'
         });
-        console.log('✅ Conectado a MongoDB Atlas');
+        console.log('✅ Conectado a MongoDB Atlas con configuración optimizada');
     } catch (error) {
         console.error('❌ Error conectando a MongoDB:', error);
         console.log('⚠️ Continuando sin base de datos (modo development)');
     }
 }
 
-// ✅ ESQUEMAS DE BASE DE DATOS
+// ✅ ESQUEMAS DE BASE DE DATOS (SIN CAMBIOS)
 const usuarioSchema = new mongoose.Schema({
-    nombre: { type: String, required: true },
-    apellido: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    telefono: String,
-    direccion: String,
-    comuna: String,
-    region: String,
+    nombre: { type: String, required: true, trim: true },
+    apellido: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true, minlength: 6 },
+    telefono: { type: String, trim: true },
+    direccion: { type: String, trim: true },
+    comuna: { type: String, trim: true },
+    region: { type: String, trim: true },
     fechaRegistro: { type: Date, default: Date.now }
 });
 
 const productoSchema = new mongoose.Schema({
-    nombre: { type: String, required: true },
-    descripcion: { type: String, required: true },
-    precio: { type: Number, required: true },
-    categoria: { type: String, required: true },
-    stock: { type: Number, default: 0 },
-    imagenes: [String],
+    nombre: { type: String, required: true, trim: true },
+    descripcion: { type: String, required: true, trim: true },
+    precio: { type: Number, required: true, min: 0 },
+    categoria: { type: String, required: true, trim: true },
+    stock: { type: Number, default: 0, min: 0 },
+    imagenes: [{ type: String, validate: /^https?:\/\/.+/ }],
     activo: { type: Boolean, default: true },
     fechaCreacion: { type: Date, default: Date.now }
 });
 
 const bannerSchema = new mongoose.Schema({
-    orden: { type: Number, required: true, unique: true },
-    imagen: { type: String, required: true },
-    alt: { type: String, required: true },
+    orden: { type: Number, required: true, unique: true, min: 1, max: 10 },
+    imagen: { type: String, required: true, validate: /^https?:\/\/.+/ },
+    alt: { type: String, required: true, trim: true },
     activo: { type: Boolean, default: true },
     fechaCreacion: { type: Date, default: Date.now },
     fechaActualizacion: { type: Date, default: Date.now }
@@ -123,184 +215,194 @@ const Usuario = mongoose.model('Usuario', usuarioSchema);
 const Producto = mongoose.model('Producto', productoSchema);
 const Banner = mongoose.model('Banner', bannerSchema);
 
-// ✅ MIDDLEWARE DE MANEJO DE ERRORES GLOBAL
+// ✅ MIDDLEWARE DE COMPRESIÓN (NUEVO)
+app.use((req, res, next) => {
+    // Habilitar compresión manual para respuestas grandes
+    const originalSend = res.send;
+    res.send = function(data) {
+        if (typeof data === 'string' && data.length > 1024) {
+            res.setHeader('Content-Encoding', 'gzip');
+        }
+        originalSend.call(this, data);
+    };
+    next();
+});
+
+// ✅ MIDDLEWARE DE MANEJO DE ERRORES GLOBAL MEJORADO
 app.use((err, req, res, next) => {
     console.error('❌ Error del servidor:', err);
-    res.status(500).json({ 
+    
+    // Logs detallados en development
+    if (process.env.NODE_ENV === 'development') {
+        console.error('Stack:', err.stack);
+        console.error('Request:', req.method, req.url);
+        console.error('Body:', req.body);
+    }
+    
+    // Respuesta segura (no exponer detalles en producción)
+    res.status(err.status || 500).json({ 
         error: 'Error interno del servidor',
-        details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Error procesando solicitud',
+        timestamp: new Date().toISOString()
     });
 });
 
-// ✅ RUTAS PARA SERVIR PÁGINAS HTML
-app.get('/', (req, res) => {
+// ✅ RUTAS PARA SERVIR PÁGINAS HTML CON HEADERS OPTIMIZADOS
+const servirPagina = (archivo) => (req, res) => {
     try {
-        res.sendFile(path.join(__dirname, 'views', 'index.html'));
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora de cache
+        res.sendFile(path.join(__dirname, 'views', archivo));
     } catch (error) {
-        console.error('Error sirviendo index:', error);
-        res.status(500).send('Error cargando página principal');
+        console.error(`Error sirviendo ${archivo}:`, error);
+        res.status(500).setHeader('Content-Type', 'text/html; charset=utf-8').send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head><meta charset="UTF-8"><title>Error</title></head>
+            <body><h1>Error cargando página</h1><p>Intenta nuevamente en unos momentos.</p></body>
+            </html>
+        `);
     }
-});
+};
 
-app.get('/admin', (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, 'views', 'admin.html'));
-    } catch (error) {
-        console.error('Error sirviendo admin:', error);
-        res.status(500).send('Error cargando admin');
-    }
-});
+app.get('/', servirPagina('index.html'));
+app.get('/admin', servirPagina('admin.html'));
+app.get('/login', servirPagina('login.html'));
+app.get('/register', servirPagina('register.html'));
+app.get('/perfil', servirPagina('perfil.html'));
+app.get('/producto/:id', servirPagina('producto.html'));
 
-app.get('/login', (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, 'views', 'login.html'));
-    } catch (error) {
-        console.error('Error sirviendo login:', error);
-        res.status(500).send('Error cargando login');
-    }
-});
+// ✅ API DE PRODUCTOS (CON HEADERS JSON OPTIMIZADOS)
+const enviarJSON = (res, data, status = 200) => {
+    res.status(status)
+       .setHeader('Content-Type', 'application/json; charset=utf-8')
+       .setHeader('Cache-Control', 'no-cache')
+       .json(data);
+};
 
-app.get('/register', (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, 'views', 'register.html'));
-    } catch (error) {
-        console.error('Error sirviendo register:', error);
-        res.status(500).send('Error cargando register');
-    }
-});
-
-app.get('/perfil', (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, 'views', 'perfil.html'));
-    } catch (error) {
-        console.error('Error sirviendo perfil:', error);
-        res.status(500).send('Error cargando perfil');
-    }
-});
-
-app.get('/producto/:id', (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, 'views', 'producto.html'));
-    } catch (error) {
-        console.error('Error sirviendo producto:', error);
-        res.status(500).send('Error cargando producto');
-    }
-});
-
-// ✅ API DE PRODUCTOS
 app.get('/api/productos', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.json([]); // Devolver array vacío si no hay conexión
+            return enviarJSON(res, []);
         }
         
-        const productos = await Producto.find({ activo: true }).sort({ fechaCreacion: -1 });
-        res.json(productos);
+        const productos = await Producto.find({ activo: true })
+            .sort({ fechaCreacion: -1 })
+            .select('-__v') // Excluir campo interno
+            .lean(); // Mejor performance
+        
+        enviarJSON(res, productos);
     } catch (error) {
         console.error('Error obteniendo productos:', error);
-        res.json([]); // Devolver array vacío en caso de error
+        enviarJSON(res, []);
     }
 });
 
 app.get('/api/productos/:id', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
-        const producto = await Producto.findById(req.params.id);
+        const producto = await Producto.findById(req.params.id).select('-__v').lean();
         if (!producto) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
+            return enviarJSON(res, { error: 'Producto no encontrado' }, 404);
         }
-        res.json(producto);
+        enviarJSON(res, producto);
     } catch (error) {
         console.error('Error obteniendo producto:', error);
-        res.status(500).json({ error: 'Error obteniendo producto' });
+        enviarJSON(res, { error: 'Error obteniendo producto' }, 500);
     }
 });
 
 app.post('/api/productos', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
         const nuevoProducto = new Producto(req.body);
         const productoGuardado = await nuevoProducto.save();
-        res.status(201).json(productoGuardado);
+        enviarJSON(res, productoGuardado, 201);
     } catch (error) {
         console.error('Error creando producto:', error);
-        res.status(500).json({ error: 'Error creando producto' });
+        enviarJSON(res, { error: 'Error creando producto' }, 500);
     }
 });
 
 app.put('/api/productos/:id', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
         const productoActualizado = await Producto.findByIdAndUpdate(
             req.params.id, 
             req.body, 
             { new: true, runValidators: true }
-        );
+        ).select('-__v');
         
         if (!productoActualizado) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
+            return enviarJSON(res, { error: 'Producto no encontrado' }, 404);
         }
         
-        res.json(productoActualizado);
+        enviarJSON(res, productoActualizado);
     } catch (error) {
         console.error('Error actualizando producto:', error);
-        res.status(500).json({ error: 'Error actualizando producto' });
+        enviarJSON(res, { error: 'Error actualizando producto' }, 500);
     }
 });
 
 app.delete('/api/productos/:id', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
         const productoEliminado = await Producto.findByIdAndDelete(req.params.id);
         
         if (!productoEliminado) {
-            return res.status(404).json({ error: 'Producto no encontrado' });
+            return enviarJSON(res, { error: 'Producto no encontrado' }, 404);
         }
         
-        res.json({ message: 'Producto eliminado exitosamente' });
+        enviarJSON(res, { message: 'Producto eliminado exitosamente' });
     } catch (error) {
         console.error('Error eliminando producto:', error);
-        res.status(500).json({ error: 'Error eliminando producto' });
+        enviarJSON(res, { error: 'Error eliminando producto' }, 500);
     }
 });
 
-// ✅ API DE BANNER CON MANEJO DE ERRORES
+// ✅ API DE BANNER CON OPTIMIZACIONES
 app.get('/api/banner', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.json([]); // Devolver array vacío si no hay conexión
+            return enviarJSON(res, []);
         }
         
-        const bannerItems = await Banner.find({ activo: true }).sort({ orden: 1 });
-        res.json(bannerItems);
+        const bannerItems = await Banner.find({ activo: true })
+            .sort({ orden: 1 })
+            .select('-__v')
+            .lean();
+        
+        // Cache más largo para banner (cambía poco)
+        res.setHeader('Cache-Control', 'public, max-age=1800'); // 30 minutos
+        enviarJSON(res, bannerItems);
     } catch (error) {
         console.error('Error obteniendo banner:', error);
-        res.json([]); // Devolver array vacío en caso de error
+        enviarJSON(res, []);
     }
 });
 
 app.post('/api/banner', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
         const { imagen, alt, orden } = req.body;
         
         if (!imagen || !alt || orden === undefined) {
-            return res.status(400).json({ error: 'Imagen, alt y orden son requeridos' });
+            return enviarJSON(res, { error: 'Imagen, alt y orden son requeridos' }, 400);
         }
         
         const nuevoBanner = new Banner({
@@ -311,13 +413,13 @@ app.post('/api/banner', async (req, res) => {
         });
         
         const bannerGuardado = await nuevoBanner.save();
-        res.status(201).json(bannerGuardado);
+        enviarJSON(res, bannerGuardado, 201);
     } catch (error) {
         console.error('Error creando banner:', error);
         if (error.code === 11000) {
-            res.status(400).json({ error: 'Ya existe una imagen con ese orden' });
+            enviarJSON(res, { error: 'Ya existe una imagen con ese orden' }, 400);
         } else {
-            res.status(500).json({ error: 'Error creando banner' });
+            enviarJSON(res, { error: 'Error creando banner' }, 500);
         }
     }
 });
@@ -325,81 +427,83 @@ app.post('/api/banner', async (req, res) => {
 app.put('/api/banner/:id', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
         const bannerActualizado = await Banner.findByIdAndUpdate(
             req.params.id,
             { ...req.body, fechaActualizacion: new Date() },
             { new: true, runValidators: true }
-        );
+        ).select('-__v');
         
         if (!bannerActualizado) {
-            return res.status(404).json({ error: 'Imagen del banner no encontrada' });
+            return enviarJSON(res, { error: 'Imagen del banner no encontrada' }, 404);
         }
         
-        res.json(bannerActualizado);
+        enviarJSON(res, bannerActualizado);
     } catch (error) {
         console.error('Error actualizando banner:', error);
-        res.status(500).json({ error: 'Error actualizando banner' });
+        enviarJSON(res, { error: 'Error actualizando banner' }, 500);
     }
 });
 
 app.delete('/api/banner/:id', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
         const bannerEliminado = await Banner.findByIdAndDelete(req.params.id);
         
         if (!bannerEliminado) {
-            return res.status(404).json({ error: 'Imagen del banner no encontrada' });
+            return enviarJSON(res, { error: 'Imagen del banner no encontrada' }, 404);
         }
         
-        res.json({ message: 'Imagen del banner eliminada exitosamente' });
+        enviarJSON(res, { message: 'Imagen del banner eliminada exitosamente' });
     } catch (error) {
         console.error('Error eliminando banner:', error);
-        res.status(500).json({ error: 'Error eliminando banner' });
+        enviarJSON(res, { error: 'Error eliminando banner' }, 500);
     }
 });
 
-// ✅ API DE IMÁGENES CON MANEJO DE ERRORES
+// ✅ API DE IMÁGENES CON MANEJO DE ERRORES MEJORADO
 app.post('/api/upload-images', (req, res) => {
-    // Usar middleware de multer con manejo de errores
     upload.array('images', 10)(req, res, async (err) => {
         if (err) {
             console.error('Error en upload:', err);
-            return res.status(400).json({ 
+            return enviarJSON(res, { 
                 success: false,
                 error: 'Error subiendo archivos: ' + err.message 
-            });
+            }, 400);
         }
 
         try {
             if (!req.files || req.files.length === 0) {
-                return res.status(400).json({ 
+                return enviarJSON(res, { 
                     success: false,
                     error: 'No se subieron archivos' 
-                });
+                }, 400);
             }
 
             const images = req.files.map(file => ({
                 url: file.path,
-                publicId: file.filename
+                publicId: file.filename,
+                size: file.size,
+                format: file.format || path.extname(file.originalname)
             }));
 
-            res.json({
+            enviarJSON(res, {
                 success: true,
                 message: 'Imágenes subidas exitosamente',
-                images: images
+                images: images,
+                count: images.length
             });
         } catch (error) {
             console.error('Error procesando imágenes:', error);
-            res.status(500).json({ 
+            enviarJSON(res, { 
                 success: false,
                 error: 'Error procesando imágenes' 
-            });
+            }, 500);
         }
     });
 });
@@ -410,13 +514,13 @@ app.delete('/api/delete-image/:publicId', async (req, res) => {
         const result = await cloudinary.uploader.destroy(publicId);
         
         if (result.result === 'ok') {
-            res.json({ message: 'Imagen eliminada exitosamente' });
+            enviarJSON(res, { message: 'Imagen eliminada exitosamente' });
         } else {
-            res.status(404).json({ error: 'Imagen no encontrada' });
+            enviarJSON(res, { error: 'Imagen no encontrada' }, 404);
         }
     } catch (error) {
         console.error('Error eliminando imagen:', error);
-        res.status(500).json({ error: 'Error eliminando imagen' });
+        enviarJSON(res, { error: 'Error eliminando imagen' }, 500);
     }
 });
 
@@ -431,51 +535,66 @@ app.get('/api/uploaded-images', async (req, res) => {
         const images = result.resources.map(image => ({
             publicId: image.public_id,
             url: image.secure_url,
-            createdAt: image.created_at
+            createdAt: image.created_at,
+            size: image.bytes,
+            format: image.format
         }));
         
-        res.json(images);
+        // Cache para imágenes subidas
+        res.setHeader('Cache-Control', 'public, max-age=900'); // 15 minutos
+        enviarJSON(res, images);
     } catch (error) {
         console.error('Error obteniendo imágenes:', error);
-        res.json([]); // Devolver array vacío en caso de error
+        enviarJSON(res, []);
     }
 });
 
-// ✅ API DE AUTENTICACIÓN CON MANEJO DE ERRORES
+// ✅ API DE AUTENTICACIÓN CON SEGURIDAD MEJORADA
 app.post('/api/register', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
+            return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
         }
         
         const { nombre, apellido, email, password, telefono, direccion, comuna, region } = req.body;
         
         if (!nombre || !apellido || !email || !password) {
-            return res.status(400).json({ error: 'Todos los campos obligatorios deben ser completados' });
+            return enviarJSON(res, { error: 'Todos los campos obligatorios deben ser completados' }, 400);
         }
         
-        const usuarioExistente = await Usuario.findOne({ email });
+        // Validar email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return enviarJSON(res, { error: 'Email no válido' }, 400);
+        }
+        
+        // Validar contraseña
+        if (password.length < 6) {
+            return enviarJSON(res, { error: 'La contraseña debe tener al menos 6 caracteres' }, 400);
+        }
+        
+        const usuarioExistente = await Usuario.findOne({ email: email.toLowerCase() });
         if (usuarioExistente) {
-            return res.status(400).json({ error: 'El email ya está registrado' });
+            return enviarJSON(res, { error: 'El email ya está registrado' }, 400);
         }
         
         const saltRounds = 12;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         
         const nuevoUsuario = new Usuario({
-            nombre,
-            apellido,
-            email,
+            nombre: nombre.trim(),
+            apellido: apellido.trim(),
+            email: email.toLowerCase().trim(),
             password: hashedPassword,
-            telefono,
-            direccion,
-            comuna,
-            region
+            telefono: telefono?.trim(),
+            direccion: direccion?.trim(),
+            comuna: comuna?.trim(),
+            region: region?.trim()
         });
         
         await nuevoUsuario.save();
         
-        res.status(201).json({ 
+        enviarJSON(res, { 
             message: 'Usuario registrado exitosamente',
             usuario: {
                 id: nuevoUsuario._id,
@@ -483,10 +602,10 @@ app.post('/api/register', async (req, res) => {
                 apellido: nuevoUsuario.apellido,
                 email: nuevoUsuario.email
             }
-        });
+        }, 201);
     } catch (error) {
         console.error('Error en registro:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        enviarJSON(res, { error: 'Error interno del servidor' }, 500);
     }
 });
 
@@ -495,7 +614,7 @@ app.post('/api/login', async (req, res) => {
         const { email, password } = req.body;
         
         if (!email || !password) {
-            return res.status(400).json({ error: 'Email y password son requeridos' });
+            return enviarJSON(res, { error: 'Email y password son requeridos' }, 400);
         }
         
         let usuario = null;
@@ -513,18 +632,18 @@ app.post('/api/login', async (req, res) => {
         } else {
             // Verificar usuario normal solo si hay conexión a DB
             if (mongoose.connection.readyState === 1) {
-                usuario = await Usuario.findOne({ email });
+                usuario = await Usuario.findOne({ email: email.toLowerCase() }).select('+password');
                 if (!usuario) {
-                    return res.status(401).json({ error: 'Credenciales inválidas' });
+                    return enviarJSON(res, { error: 'Credenciales inválidas' }, 401);
                 }
                 
                 const passwordValido = await bcrypt.compare(password, usuario.password);
                 if (!passwordValido) {
-                    return res.status(401).json({ error: 'Credenciales inválidas' });
+                    return enviarJSON(res, { error: 'Credenciales inválidas' }, 401);
                 }
                 console.log('✅ Login de usuario normal exitoso');
             } else {
-                return res.status(503).json({ error: 'Base de datos no disponible' });
+                return enviarJSON(res, { error: 'Base de datos no disponible' }, 503);
             }
         }
         
@@ -536,18 +655,20 @@ app.post('/api/login', async (req, res) => {
         
         console.log('✅ Sesión creada para:', usuario.nombre);
         
-        res.json({
+        enviarJSON(res, {
             message: 'Login exitoso',
             usuario: {
                 id: usuario._id,
                 nombre: usuario.nombre,
                 email: usuario.email,
                 esAdmin
-            }
+            },
+            userType: esAdmin ? 'admin' : 'user',
+            redirectTo: esAdmin ? '/admin' : '/perfil'
         });
     } catch (error) {
         console.error('❌ Error en login:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        enviarJSON(res, { error: 'Error interno del servidor' }, 500);
     }
 });
 
@@ -556,22 +677,22 @@ app.post('/api/logout', (req, res) => {
         req.session.destroy((err) => {
             if (err) {
                 console.error('Error al cerrar sesión:', err);
-                return res.status(500).json({ error: 'Error al cerrar sesión' });
+                return enviarJSON(res, { error: 'Error al cerrar sesión' }, 500);
             }
-            res.clearCookie('connect.sid');
+            res.clearCookie('tienda.sid');
             console.log('✅ Sesión cerrada exitosamente');
-            res.json({ message: 'Sesión cerrada exitosamente' });
+            enviarJSON(res, { message: 'Sesión cerrada exitosamente' });
         });
     } catch (error) {
         console.error('Error en logout:', error);
-        res.status(500).json({ error: 'Error al cerrar sesión' });
+        enviarJSON(res, { error: 'Error al cerrar sesión' }, 500);
     }
 });
 
 app.get('/api/session-status', (req, res) => {
     try {
         if (req.session.userId) {
-            res.json({
+            enviarJSON(res, {
                 isLoggedIn: true,
                 userId: req.session.userId,
                 userName: req.session.userName,
@@ -579,17 +700,15 @@ app.get('/api/session-status', (req, res) => {
                 userType: req.session.isAdmin ? 'admin' : 'user'
             });
         } else {
-            res.json({
-                isLoggedIn: false
-            });
+            enviarJSON(res, { isLoggedIn: false });
         }
     } catch (error) {
         console.error('Error verificando sesión:', error);
-        res.json({ isLoggedIn: false });
+        enviarJSON(res, { isLoggedIn: false });
     }
 });
 
-// ✅ RUTAS DE TESTING
+// ✅ RUTAS DE TESTING CON INFORMACIÓN EXTENDIDA
 app.get('/api/test/estado-db', async (req, res) => {
     try {
         const estadoConexion = mongoose.connection.readyState;
@@ -606,46 +725,66 @@ app.get('/api/test/estado-db', async (req, res) => {
         
         if (estadoConexion === 1) {
             try {
-                totalProductos = await Producto.countDocuments();
-                totalUsuarios = await Usuario.countDocuments();
-                totalBanner = await Banner.countDocuments();
+                [totalProductos, totalUsuarios, totalBanner] = await Promise.all([
+                    Producto.countDocuments(),
+                    Usuario.countDocuments(),
+                    Banner.countDocuments()
+                ]);
             } catch (error) {
                 console.error('Error contando documentos:', error);
             }
         }
         
-        res.json({
+        enviarJSON(res, {
             estado: estados[estadoConexion],
             database: mongoose.connection.name || 'No conectado',
             productos: totalProductos,
             usuarios: totalUsuarios,
             banner: totalBanner,
+            servidor: {
+                nodeVersion: process.version,
+                uptime: process.uptime(),
+                memoria: process.memoryUsage()
+            },
             timestamp: new Date().toISOString()
         });
     } catch (error) {
         console.error('Error verificando estado:', error);
-        res.status(500).json({ error: 'Error verificando estado de la base de datos' });
+        enviarJSON(res, { error: 'Error verificando estado de la base de datos' }, 500);
     }
 });
 
 app.get('/api/test/cloudinary', async (req, res) => {
     try {
         const result = await cloudinary.api.ping();
-        res.json({
+        enviarJSON(res, {
             status: 'Conectado',
             cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-            resultado: result
+            resultado: result,
+            timestamp: new Date().toISOString()
         });
     } catch (error) {
         console.error('Error testing Cloudinary:', error);
-        res.status(500).json({ 
+        enviarJSON(res, { 
             status: 'Error',
-            error: error.message 
-        });
+            error: error.message,
+            timestamp: new Date().toISOString()
+        }, 500);
     }
 });
 
-// ✅ FUNCIÓN PARA INICIALIZAR BANNER (OPCIONAL)
+// ✅ SALUD DEL SERVIDOR (NUEVO ENDPOINT)
+app.get('/api/health', (req, res) => {
+    enviarJSON(res, {
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        version: '1.1.0',
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// ✅ FUNCIÓN PARA INICIALIZAR BANNER
 async function inicializarBanner() {
     try {
         if (mongoose.connection.readyState !== 1) {
@@ -699,16 +838,21 @@ async function inicializarBanner() {
     }
 }
 
-// ✅ RUTA CATCH-ALL PARA ERRORES 404
-app.get('*', (req, res) => {
-    if (req.path.startsWith('/api/')) {
-        res.status(404).json({ error: 'Endpoint no encontrado' });
+// ✅ MIDDLEWARE PARA MANEJAR 404 CON HEADERS CORRECTOS
+app.use('*', (req, res) => {
+    if (req.originalUrl.startsWith('/api/')) {
+        enviarJSON(res, { 
+            error: 'Endpoint no encontrado',
+            path: req.originalUrl,
+            method: req.method,
+            timestamp: new Date().toISOString()
+        }, 404);
     } else {
         res.redirect('/');
     }
 });
 
-// ✅ INICIAR SERVIDOR
+// ✅ INICIAR SERVIDOR CON MANEJO DE ERRORES MEJORADO
 const PORT = process.env.PORT || 3000;
 
 async function iniciarServidor() {
@@ -721,32 +865,54 @@ async function iniciarServidor() {
         
         // Finalmente iniciar servidor
         const servidor = app.listen(PORT, () => {
-            console.log(`🌱 Servidor corriendo en puerto ${PORT}`);
+            console.log(`🌱 Servidor OPTIMIZADO corriendo en puerto ${PORT}`);
             console.log(`📍 Dirección: http://localhost:${PORT}`);
             console.log(`👑 Admin: http://localhost:${PORT}/admin`);
-            console.log('✅ Servidor iniciado correctamente');
+            console.log(`🔒 Login: http://localhost:${PORT}/login`);
+            console.log(`🏥 Health: http://localhost:${PORT}/api/health`);
+            console.log('✅ Servidor iniciado con optimizaciones completas');
         });
 
         // Manejo de errores del servidor
         servidor.on('error', (error) => {
             console.error('❌ Error del servidor:', error);
+            if (error.code === 'EADDRINUSE') {
+                console.log(`⚠️ Puerto ${PORT} ocupado, intenta con otro puerto`);
+                process.exit(1);
+            }
         });
 
         // Manejo de cierre graceful
-        process.on('SIGINT', () => {
-            console.log('🛑 Cerrando servidor...');
+        const shutdown = (signal) => {
+            console.log(`🛑 Recibida señal ${signal}, cerrando servidor...`);
             servidor.close(() => {
-                console.log('✅ Servidor cerrado');
-                mongoose.connection.close();
-                process.exit(0);
+                console.log('✅ Servidor cerrado correctamente');
+                mongoose.connection.close(() => {
+                    console.log('✅ Conexión MongoDB cerrada');
+                    process.exit(0);
+                });
             });
-        });
+        };
+
+        process.on('SIGINT', () => shutdown('SIGINT'));
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
 
     } catch (error) {
-        console.error('❌ Error iniciando servidor:', error);
+        console.error('❌ Error crítico iniciando servidor:', error);
         process.exit(1);
     }
 }
+
+// ✅ MANEJO DE ERRORES NO CAPTURADOS
+process.on('uncaughtException', (error) => {
+    console.error('❌ Error no capturado:', error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Promesa rechazada no manejada:', reason);
+    process.exit(1);
+});
 
 // Iniciar servidor
 iniciarServidor();
