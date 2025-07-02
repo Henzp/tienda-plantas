@@ -270,6 +270,19 @@
             to { transform: rotate(360deg); }
         }
 
+        /* ✅ SOLO ESTE CSS FUE AGREGADO PARA ACCESIBILIDAD */
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
         /* Responsive */
         @media (max-width: 480px) {
             .login-container {
@@ -373,6 +386,7 @@
                         aria-pressed="false"
                     >
                         <i class="fas fa-eye" id="toggleIcon" aria-hidden="true"></i>
+                        <span class="sr-only">Mostrar u ocultar contraseña</span>
                     </button>
                 </div>
             </div>
@@ -402,7 +416,6 @@
     <script>
         let isSubmitting = false;
 
-        // ✅ FUNCIÓN MEJORADA: Toggle password con accesibilidad
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('toggleIcon');
@@ -423,7 +436,6 @@
             }
         }
 
-        // ✅ FUNCIÓN MEJORADA: Mostrar alertas con accesibilidad
         function showAlert(message, type = 'error') {
             const alertContainer = document.getElementById('alertContainer');
             const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
@@ -438,11 +450,9 @@
             
             alertContainer.querySelector('.alert').style.display = 'flex';
             
-            // Focus en el alert para lectores de pantalla
             alertContainer.querySelector('.alert').setAttribute('tabindex', '-1');
             alertContainer.querySelector('.alert').focus();
 
-            // Auto-hide después de 5 segundos
             setTimeout(() => {
                 const alert = alertContainer.querySelector('.alert');
                 if (alert) {
@@ -451,7 +461,6 @@
             }, 5000);
         }
 
-        // ✅ FUNCIÓN MEJORADA: Estado de loading accesible
         function setLoadingState(loading) {
             const button = document.getElementById('loginButton');
             const buttonText = button.querySelector('.button-text');
@@ -472,7 +481,6 @@
             }
         }
 
-        // ✅ MANEJO DEL FORMULARIO CON ACCESIBILIDAD
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -481,7 +489,6 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             
-            // Validaciones con mensajes accesibles
             if (!email) {
                 showAlert('Por favor ingresa tu email', 'error');
                 document.getElementById('email').focus();
@@ -519,7 +526,6 @@
                 if (response.ok) {
                     showAlert('¡Login exitoso! Redirigiendo...', 'success');
                     
-                    // Anunciar éxito a lectores de pantalla
                     const announcement = document.createElement('div');
                     announcement.setAttribute('aria-live', 'polite');
                     announcement.setAttribute('aria-atomic', 'true');
@@ -547,7 +553,6 @@
             }
         });
 
-        // ✅ ACCESIBILIDAD: Enter en password toggle
         document.querySelector('.password-toggle').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -555,7 +560,6 @@
             }
         });
 
-        // ✅ ACCESIBILIDAD: Anunciar errores de validación
         document.getElementById('email').addEventListener('invalid', function(e) {
             e.preventDefault();
             showAlert('Por favor ingresa un email válido', 'error');
@@ -566,7 +570,6 @@
             showAlert('Por favor ingresa tu contraseña', 'error');
         });
 
-        // ✅ MEJORAR EXPERIENCIA: Auto-focus en email al cargar
         document.addEventListener('DOMContentLoaded', function() {
             const emailInput = document.getElementById('email');
             if (emailInput) {
@@ -574,7 +577,6 @@
             }
         });
 
-        // ✅ ACCESIBILIDAD: Escape key para cerrar alerts
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 const alert = document.querySelector('.alert');
