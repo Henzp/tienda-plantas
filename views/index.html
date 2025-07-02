@@ -687,43 +687,11 @@
         </div>
     </section>
 
-    <!-- ✅ NUEVO: Banner de Imágenes Animado -->
-    <section class="banner-imagenes">
+    <!-- ✅ NUEVO: Banner de Imágenes Animado (Dinámico) -->
+    <section class="banner-imagenes" id="bannerSection" style="display: none;">
         <div class="banner-container">
-            <div class="banner-track">
-                <!-- Primera ronda de imágenes -->
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop" alt="Planta 1">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1493606278519-11aa9a6b8453?w=300&h=200&fit=crop" alt="Planta 2">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1544568100-847a948585b9?w=300&h=200&fit=crop" alt="Planta 3">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&h=200&fit=crop" alt="Planta 4">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=300&h=200&fit=crop" alt="Planta 5">
-                </div>
-                
-                <!-- Segunda ronda (duplicada para efecto infinito) -->
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop" alt="Planta 1">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1493606278519-11aa9a6b8453?w=300&h=200&fit=crop" alt="Planta 2">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1544568100-847a948585b9?w=300&h=200&fit=crop" alt="Planta 3">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&h=200&fit=crop" alt="Planta 4">
-                </div>
-                <div class="banner-item">
-                    <img src="https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=300&h=200&fit=crop" alt="Planta 5">
-                </div>
+            <div class="banner-track" id="bannerTrack">
+                <!-- Las imágenes se cargarán dinámicamente -->
             </div>
         </div>
     </section>
@@ -902,7 +870,44 @@
             return currentUserState;
         }
 
-        // ✅ NUEVA FUNCIÓN: Cargar y mostrar productos con imágenes clickeables
+        // ✅ NUEVA FUNCIÓN: Cargar banner dinámicamente
+        async function cargarBannerDinamico() {
+            try {
+                const response = await fetch('/api/banner');
+                const bannerItems = await response.json();
+                
+                if (bannerItems.length === 0) {
+                    // Ocultar banner si no hay imágenes
+                    document.getElementById('bannerSection').style.display = 'none';
+                    return;
+                }
+                
+                // Mostrar banner
+                document.getElementById('bannerSection').style.display = 'block';
+                
+                // Crear HTML del banner
+                const bannerTrack = document.getElementById('bannerTrack');
+                
+                // Duplicar las imágenes para efecto infinito
+                const imagenesHTML = bannerItems.map(item => `
+                    <div class="banner-item">
+                        <img src="${item.imagen}" 
+                             alt="${item.alt}" 
+                             onerror="this.src='https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop'">
+                    </div>
+                `).join('');
+                
+                // Primera ronda + segunda ronda (para efecto infinito)
+                bannerTrack.innerHTML = imagenesHTML + imagenesHTML;
+                
+                console.log('✅ Banner cargado con', bannerItems.length, 'imágenes');
+                
+            } catch (error) {
+                console.error('❌ Error cargando banner:', error);
+                // Mantener banner oculto si hay error
+                document.getElementById('bannerSection').style.display = 'none';
+            }
+        }
         async function cargarProductos() {
             const productosGrid = document.getElementById('productosGrid');
             
@@ -1071,6 +1076,7 @@
             console.log('🚀 Página cargada, inicializando...');
             updateUserButtons();
             cargarProductos();
+            cargarBannerDinamico(); // ✅ NUEVO: Cargar banner dinámico
             
             // Verificar cada 30 segundos
             setInterval(updateUserButtons, 30000);

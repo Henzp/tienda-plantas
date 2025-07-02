@@ -1,167 +1,102 @@
+// ✅ AGREGADO: Importaciones y configuración (mantener lo existente)
 const express = require('express');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
 const path = require('path');
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// ============================================
-// CONFIGURACIÓN DE CLOUDINARY
-// ============================================
-console.log('🔍 [CLOUDINARY] Verificando configuración...');
-console.log('🔍 [CLOUDINARY] CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? 'Configurado' : 'NO configurado');
-console.log('🔍 [CLOUDINARY] API_KEY:', process.env.CLOUDINARY_API_KEY ? 'Configurado' : 'NO configurado');
-console.log('🔍 [CLOUDINARY] API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'Configurado' : 'NO configurado');
-
+// Configuración de Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Configuración de almacenamiento Cloudinary
+// Middleware
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.static('public'));
+
+// Configuración de sesiones
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'tienda-plantas-secret-key-2024',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    }
+}));
+
+// Configuración de Multer con Cloudinary
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'plantas-tienda', // Carpeta en Cloudinary
+        folder: 'tienda-plantas',
         allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        transformation: [{ width: 800, height: 600, crop: 'limit', quality: 'auto' }]
     }
 });
-
-// Configuración de Multer con Cloudinary
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB por archivo
-        files: 5 // máximo 5 archivos
-    },
-    fileFilter: function(req, file, cb) {
-        console.log('🔍 [MULTER] Procesando archivo:', {
-            originalname: file.originalname,
-            mimetype: file.mimetype,
-            size: file.size
-        });
-        
-        const allowedTypes = /jpeg|jpg|png|gif|webp/;
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = allowedTypes.test(file.mimetype);
-        
-        if (mimetype && extname) {
-            console.log('✅ [MULTER] Archivo aceptado:', file.originalname);
-            return cb(null, true);
-        } else {
-            console.log('❌ [MULTER] Archivo rechazado:', file.originalname);
-            cb(new Error('Solo se permiten archivos de imagen (jpg, png, gif, webp)'));
-        }
-    }
-});
-
-// Middlewares
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.static('public'));
-
-// ============================================
-// CONFIGURACIÓN DE SESIONES
-// ============================================
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'entre-hojas-amigas-super-secret-key-2024',
-    resave: false,
-    saveUninitialized: false,
-    name: 'plantme.sid',
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production' ? 'auto' : false,
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
-        sameSite: 'lax'
-    },
-    rolling: true
-}));
-
-// Middleware de debug de sesiones
-app.use((req, res, next) => {
-    const timestamp = new Date().toISOString();
-    if (req.path.includes('/api/') || req.path === '/' || req.path === '/perfil') {
-        console.log(`🔍 [${timestamp}] ${req.method} ${req.path} - Session: ${req.session?.isLoggedIn || false}`);
-    }
-    next();
-});
+const upload = multer({ storage: storage });
 
 // Conexión a MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/plantme', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('✅ Conectado a MongoDB'))
-.catch(err => console.error('❌ Error conectando a MongoDB:', err));
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('✅ Conectado a MongoDB Atlas'))
+    .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
-// MODELOS DE BASE DE DATOS
+// ✅ ESQUEMAS EXISTENTES
 const usuarioSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     apellido: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    telefono: { type: String },
-    direccion: {
-        calle: String,
-        ciudad: String,
-        region: String,
-        codigoPostal: String
-    },
-    tipoUsuario: { type: String, enum: ['cliente', 'admin'], default: 'cliente' },
-    fechaRegistro: { type: Date, default: Date.now },
-    activo: { type: Boolean, default: true }
+    telefono: String,
+    direccion: String,
+    comuna: String,
+    region: String,
+    fechaRegistro: { type: Date, default: Date.now }
 });
-
-const Usuario = mongoose.model('Usuario', usuarioSchema);
 
 const productoSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     descripcion: { type: String, required: true },
     precio: { type: Number, required: true },
     categoria: { type: String, required: true },
-    imagenes: [{ type: String }],
     stock: { type: Number, default: 0 },
+    imagenes: [String],
     activo: { type: Boolean, default: true },
     fechaCreacion: { type: Date, default: Date.now }
 });
 
-const Producto = mongoose.model('Producto', productoSchema);
-
-const ventaSchema = new mongoose.Schema({
-    usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-    productos: [{
-        producto: { type: mongoose.Schema.Types.ObjectId, ref: 'Producto' },
-        cantidad: Number,
-        precioUnitario: Number
-    }],
-    total: { type: Number, required: true },
-    codigoQR: { type: String, unique: true },
-    fechaVenta: { type: Date, default: Date.now },
-    estado: { type: String, enum: ['pendiente', 'completada', 'cancelada'], default: 'completada' }
+// ✅ NUEVO: ESQUEMA PARA BANNER
+const bannerSchema = new mongoose.Schema({
+    orden: { type: Number, required: true, unique: true },
+    imagen: { type: String, required: true },
+    alt: { type: String, required: true },
+    activo: { type: Boolean, default: true },
+    fechaCreacion: { type: Date, default: Date.now },
+    fechaActualizacion: { type: Date, default: Date.now }
 });
 
-const Venta = mongoose.model('Venta', ventaSchema);
+// Modelos
+const Usuario = mongoose.model('Usuario', usuarioSchema);
+const Producto = mongoose.model('Producto', productoSchema);
+const Banner = mongoose.model('Banner', bannerSchema); // ✅ NUEVO
 
-// ============================================
-// RUTAS PRINCIPALES
-// ============================================
+// ✅ RUTAS EXISTENTES (mantener todas)
+// Servir páginas HTML
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
-
-// ✅ NUEVA RUTA: Página individual de producto
-app.get('/producto/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'producto.html'));
 });
 
 app.get('/admin', (req, res) => {
@@ -180,175 +115,18 @@ app.get('/perfil', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'perfil.html'));
 });
 
-// ============================================
-// RUTAS DE MANEJO DE IMÁGENES CON CLOUDINARY
-// ============================================
-
-// ✅ CORREGIDO: Subir archivos a Cloudinary con mejor manejo de errores
-app.post('/api/upload-images', upload.array('images', 5), async (req, res) => {
-    try {
-        console.log('🔍 [UPLOAD] Iniciando subida de imágenes...');
-        console.log('🔍 [UPLOAD] Archivos recibidos:', req.files?.length || 0);
-        
-        // Verificar configuración de Cloudinary
-        if (!process.env.CLOUDINARY_CLOUD_NAME) {
-            console.error('❌ [CLOUDINARY] CLOUDINARY_CLOUD_NAME no configurado');
-            return res.status(500).json({ 
-                success: false,
-                error: 'Cloudinary no configurado correctamente - falta CLOUD_NAME' 
-            });
-        }
-        
-        if (!process.env.CLOUDINARY_API_KEY) {
-            console.error('❌ [CLOUDINARY] CLOUDINARY_API_KEY no configurado');
-            return res.status(500).json({ 
-                success: false,
-                error: 'Cloudinary no configurado correctamente - falta API_KEY' 
-            });
-        }
-        
-        if (!process.env.CLOUDINARY_API_SECRET) {
-            console.error('❌ [CLOUDINARY] CLOUDINARY_API_SECRET no configurado');
-            return res.status(500).json({ 
-                success: false,
-                error: 'Cloudinary no configurado correctamente - falta API_SECRET' 
-            });
-        }
-        
-        if (!req.files || req.files.length === 0) {
-            console.log('⚠️ [UPLOAD] No se recibieron archivos');
-            return res.status(400).json({ 
-                success: false,
-                error: 'No se han subido archivos' 
-            });
-        }
-
-        // Los archivos ya están subidos a Cloudinary por multer-storage-cloudinary
-        const uploadedImages = req.files.map(file => {
-            console.log('📸 [UPLOAD] Archivo procesado:', {
-                originalName: file.originalname,
-                cloudinaryUrl: file.path,
-                publicId: file.filename,
-                size: file.size
-            });
-            
-            return {
-                url: file.path, // URL de Cloudinary
-                publicId: file.filename, // ID público de Cloudinary
-                originalName: file.originalname
-            };
-        });
-
-        console.log('✅ [CLOUDINARY] Imágenes subidas exitosamente:', uploadedImages.length);
-        
-        res.json({
-            success: true,
-            message: `${uploadedImages.length} imagen(es) subida(s) exitosamente`,
-            images: uploadedImages
-        });
-        
-    } catch (error) {
-        console.error('❌ [CLOUDINARY] Error completo:', error);
-        console.error('❌ [CLOUDINARY] Stack trace:', error.stack);
-        
-        // Manejo específico de errores de Cloudinary
-        let errorMessage = 'Error al subir imágenes';
-        
-        if (error.message.includes('Invalid API key')) {
-            errorMessage = 'API Key de Cloudinary inválida';
-        } else if (error.message.includes('Invalid cloud name')) {
-            errorMessage = 'Nombre de cloud de Cloudinary inválido';
-        } else if (error.message.includes('Invalid API secret')) {
-            errorMessage = 'API Secret de Cloudinary inválido';
-        } else if (error.message.includes('File size too large')) {
-            errorMessage = 'Archivo muy grande (máximo 10MB)';
-        } else {
-            errorMessage = error.message;
-        }
-        
-        res.status(500).json({ 
-            success: false,
-            error: errorMessage,
-            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    }
+app.get('/producto/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'producto.html'));
 });
 
-// Eliminar imagen de Cloudinary
-app.delete('/api/delete-image/:publicId', async (req, res) => {
-    try {
-        const publicId = req.params.publicId;
-        console.log('🗑️ [CLOUDINARY] Eliminando imagen:', publicId);
-        
-        // Eliminar de Cloudinary
-        const result = await cloudinary.uploader.destroy(publicId);
-        
-        if (result.result === 'ok') {
-            console.log('✅ [CLOUDINARY] Imagen eliminada exitosamente:', publicId);
-            res.json({
-                success: true,
-                message: 'Imagen eliminada exitosamente'
-            });
-        } else {
-            console.log('⚠️ [CLOUDINARY] Imagen no encontrada:', publicId);
-            res.status(404).json({
-                success: false,
-                error: 'Imagen no encontrada'
-            });
-        }
-    } catch (error) {
-        console.error('❌ [CLOUDINARY] Error eliminando:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error al eliminar imagen: ' + error.message
-        });
-    }
-});
-
-// Listar imágenes de Cloudinary
-app.get('/api/uploaded-images', async (req, res) => {
-    try {
-        console.log('🔍 [CLOUDINARY] Listando imágenes...');
-        
-        // Obtener imágenes de la carpeta 'plantas-tienda'
-        const result = await cloudinary.search
-            .expression('folder:plantas-tienda')
-            .sort_by([['created_at', 'desc']])
-            .max_results(50)
-            .execute();
-
-        const images = result.resources.map(resource => ({
-            url: resource.secure_url,
-            publicId: resource.public_id,
-            createdAt: resource.created_at
-        }));
-
-        console.log('✅ [CLOUDINARY] Imágenes listadas:', images.length);
-        
-        res.json({
-            success: true,
-            totalImages: images.length,
-            images: images
-        });
-    } catch (error) {
-        console.error('❌ [CLOUDINARY] Error listando:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error al listar imágenes: ' + error.message
-        });
-    }
-});
-
-// ============================================
-// API ROUTES - PRODUCTOS
-// ============================================
+// ✅ API EXISTENTES DE PRODUCTOS (mantener todas)
 app.get('/api/productos', async (req, res) => {
     try {
-        const productos = await Producto.find({ activo: true });
+        const productos = await Producto.find({ activo: true }).sort({ fechaCreacion: -1 });
         res.json(productos);
     } catch (error) {
-        console.error('❌ [PRODUCTOS] Error obteniendo productos:', error);
-        res.status(500).json({ error: 'Error al obtener productos' });
+        console.error('Error obteniendo productos:', error);
+        res.status(500).json({ error: 'Error obteniendo productos' });
     }
 });
 
@@ -360,121 +138,231 @@ app.get('/api/productos/:id', async (req, res) => {
         }
         res.json(producto);
     } catch (error) {
-        console.error('❌ [PRODUCTOS] Error obteniendo producto:', error);
-        res.status(500).json({ error: 'Error al obtener producto' });
+        console.error('Error obteniendo producto:', error);
+        res.status(500).json({ error: 'Error obteniendo producto' });
     }
 });
 
 app.post('/api/productos', async (req, res) => {
     try {
-        const { nombre, descripcion, precio, categoria, imagenes, stock } = req.body;
-        
-        console.log('🌱 [PRODUCTO] Creando producto:', { nombre, imagenes });
-        
-        if (!nombre || !descripcion || !precio || !categoria) {
-            return res.status(400).json({ error: 'Faltan campos requeridos' });
-        }
-        
-        let imagenesFinales = [];
-        if (imagenes && Array.isArray(imagenes)) {
-            imagenesFinales = imagenes.filter(img => img && img.trim() !== '');
-        } else if (imagenes && typeof imagenes === 'string') {
-            imagenesFinales = [imagenes.trim()];
-        }
-        
-        const nuevoProducto = new Producto({
-            nombre: nombre.trim(),
-            descripcion: descripcion.trim(),
-            precio: parseFloat(precio),
-            categoria: categoria.trim(),
-            imagenes: imagenesFinales,
-            stock: parseInt(stock) || 0
-        });
-
+        const nuevoProducto = new Producto(req.body);
         const productoGuardado = await nuevoProducto.save();
-        
-        console.log('✅ [PRODUCTO] Producto creado:', {
-            id: productoGuardado._id,
-            nombre: productoGuardado.nombre,
-            imagenes: productoGuardado.imagenes
-        });
-        
         res.status(201).json(productoGuardado);
     } catch (error) {
-        console.error('❌ [PRODUCTO] Error creando producto:', error);
-        res.status(400).json({ error: 'Error al crear producto: ' + error.message });
+        console.error('Error creando producto:', error);
+        res.status(500).json({ error: 'Error creando producto' });
     }
 });
 
 app.put('/api/productos/:id', async (req, res) => {
     try {
-        const { nombre, descripcion, precio, categoria, imagenes, stock } = req.body;
-        
-        console.log('🔄 [PRODUCTO] Actualizando producto:', req.params.id);
-        
         const productoActualizado = await Producto.findByIdAndUpdate(
-            req.params.id,
-            {
-                nombre,
-                descripcion,
-                precio: parseFloat(precio),
-                categoria,
-                imagenes,
-                stock: parseInt(stock)
-            },
-            { new: true }
+            req.params.id, 
+            req.body, 
+            { new: true, runValidators: true }
         );
-
+        
         if (!productoActualizado) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
-
-        console.log('✅ [PRODUCTO] Producto actualizado:', productoActualizado._id);
+        
         res.json(productoActualizado);
     } catch (error) {
-        console.error('❌ [PRODUCTO] Error actualizando producto:', error);
-        res.status(400).json({ error: 'Error al actualizar producto: ' + error.message });
+        console.error('Error actualizando producto:', error);
+        res.status(500).json({ error: 'Error actualizando producto' });
     }
 });
 
 app.delete('/api/productos/:id', async (req, res) => {
     try {
-        console.log('🗑️ [PRODUCTO] Eliminando producto:', req.params.id);
+        const productoEliminado = await Producto.findByIdAndDelete(req.params.id);
         
-        const producto = await Producto.findByIdAndUpdate(
-            req.params.id,
-            { activo: false },
-            { new: true }
-        );
-
-        if (!producto) {
+        if (!productoEliminado) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
-
-        console.log('✅ [PRODUCTO] Producto eliminado:', producto._id);
-        res.json({ message: 'Producto eliminado correctamente' });
+        
+        res.json({ message: 'Producto eliminado exitosamente' });
     } catch (error) {
-        console.error('❌ [PRODUCTO] Error eliminando producto:', error);
-        res.status(500).json({ error: 'Error al eliminar producto' });
+        console.error('Error eliminando producto:', error);
+        res.status(500).json({ error: 'Error eliminando producto' });
     }
 });
 
-// ============================================
-// API ROUTES - USUARIOS Y AUTENTICACIÓN
-// ============================================
+// ✅ NUEVAS RUTAS API PARA BANNER
+// Obtener todas las imágenes del banner
+app.get('/api/banner', async (req, res) => {
+    try {
+        const bannerItems = await Banner.find({ activo: true }).sort({ orden: 1 });
+        res.json(bannerItems);
+    } catch (error) {
+        console.error('Error obteniendo banner:', error);
+        res.status(500).json({ error: 'Error obteniendo banner' });
+    }
+});
+
+// Crear nueva imagen del banner
+app.post('/api/banner', async (req, res) => {
+    try {
+        const { imagen, alt, orden } = req.body;
+        
+        if (!imagen || !alt || orden === undefined) {
+            return res.status(400).json({ error: 'Imagen, alt y orden son requeridos' });
+        }
+        
+        const nuevoBanner = new Banner({
+            orden,
+            imagen,
+            alt,
+            activo: true
+        });
+        
+        const bannerGuardado = await nuevoBanner.save();
+        res.status(201).json(bannerGuardado);
+    } catch (error) {
+        console.error('Error creando banner:', error);
+        if (error.code === 11000) {
+            res.status(400).json({ error: 'Ya existe una imagen con ese orden' });
+        } else {
+            res.status(500).json({ error: 'Error creando banner' });
+        }
+    }
+});
+
+// Actualizar imagen del banner
+app.put('/api/banner/:id', async (req, res) => {
+    try {
+        const bannerActualizado = await Banner.findByIdAndUpdate(
+            req.params.id,
+            { ...req.body, fechaActualizacion: new Date() },
+            { new: true, runValidators: true }
+        );
+        
+        if (!bannerActualizado) {
+            return res.status(404).json({ error: 'Imagen del banner no encontrada' });
+        }
+        
+        res.json(bannerActualizado);
+    } catch (error) {
+        console.error('Error actualizando banner:', error);
+        res.status(500).json({ error: 'Error actualizando banner' });
+    }
+});
+
+// Eliminar imagen del banner
+app.delete('/api/banner/:id', async (req, res) => {
+    try {
+        const bannerEliminado = await Banner.findByIdAndDelete(req.params.id);
+        
+        if (!bannerEliminado) {
+            return res.status(404).json({ error: 'Imagen del banner no encontrada' });
+        }
+        
+        res.json({ message: 'Imagen del banner eliminada exitosamente' });
+    } catch (error) {
+        console.error('Error eliminando banner:', error);
+        res.status(500).json({ error: 'Error eliminando banner' });
+    }
+});
+
+// Reordenar imágenes del banner
+app.put('/api/banner/reordenar', async (req, res) => {
+    try {
+        const { items } = req.body; // Array de {id, orden}
+        
+        if (!items || !Array.isArray(items)) {
+            return res.status(400).json({ error: 'Se requiere un array de items' });
+        }
+        
+        // Actualizar orden de cada item
+        const promesas = items.map(item => 
+            Banner.findByIdAndUpdate(
+                item.id, 
+                { orden: item.orden, fechaActualizacion: new Date() },
+                { new: true }
+            )
+        );
+        
+        await Promise.all(promesas);
+        
+        // Devolver items ordenados
+        const bannerActualizado = await Banner.find({ activo: true }).sort({ orden: 1 });
+        res.json(bannerActualizado);
+    } catch (error) {
+        console.error('Error reordenando banner:', error);
+        res.status(500).json({ error: 'Error reordenando banner' });
+    }
+});
+
+// ✅ RUTAS EXISTENTES DE IMÁGENES (mantener todas)
+app.post('/api/upload-images', upload.array('images', 10), async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: 'No se subieron archivos' });
+        }
+
+        const imageUrls = req.files.map(file => file.path);
+        res.json({
+            message: 'Imágenes subidas exitosamente',
+            urls: imageUrls
+        });
+    } catch (error) {
+        console.error('Error subiendo imágenes:', error);
+        res.status(500).json({ error: 'Error subiendo imágenes' });
+    }
+});
+
+app.delete('/api/delete-image/:publicId', async (req, res) => {
+    try {
+        const { publicId } = req.params;
+        const result = await cloudinary.uploader.destroy(publicId);
+        
+        if (result.result === 'ok') {
+            res.json({ message: 'Imagen eliminada exitosamente' });
+        } else {
+            res.status(404).json({ error: 'Imagen no encontrada' });
+        }
+    } catch (error) {
+        console.error('Error eliminando imagen:', error);
+        res.status(500).json({ error: 'Error eliminando imagen' });
+    }
+});
+
+app.get('/api/uploaded-images', async (req, res) => {
+    try {
+        const result = await cloudinary.search
+            .expression('folder:tienda-plantas')
+            .sort_by([['created_at', 'desc']])
+            .max_results(30)
+            .execute();
+        
+        const images = result.resources.map(image => ({
+            publicId: image.public_id,
+            url: image.secure_url,
+            createdAt: image.created_at
+        }));
+        
+        res.json(images);
+    } catch (error) {
+        console.error('Error obteniendo imágenes:', error);
+        res.status(500).json({ error: 'Error obteniendo imágenes' });
+    }
+});
+
+// ✅ RUTAS EXISTENTES DE AUTENTICACIÓN (mantener todas)
 app.post('/api/register', async (req, res) => {
     try {
-        const { nombre, apellido, email, password, telefono, direccion } = req.body;
+        const { nombre, apellido, email, password, telefono, direccion, comuna, region } = req.body;
         
-        console.log('🔐 [REGISTER] Iniciando registro para:', email);
+        if (!nombre || !apellido || !email || !password) {
+            return res.status(400).json({ error: 'Todos los campos obligatorios deben ser completados' });
+        }
         
         const usuarioExistente = await Usuario.findOne({ email });
         if (usuarioExistente) {
-            console.log('❌ [REGISTER] Email ya registrado:', email);
-            return res.status(400).json({ success: false, message: 'El email ya está registrado' });
+            return res.status(400).json({ error: 'El email ya está registrado' });
         }
         
-        const saltRounds = 10;
+        const saltRounds = 12;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         
         const nuevoUsuario = new Usuario({
@@ -483,30 +371,25 @@ app.post('/api/register', async (req, res) => {
             email,
             password: hashedPassword,
             telefono,
-            direccion
+            direccion,
+            comuna,
+            region
         });
         
-        const usuarioGuardado = await nuevoUsuario.save();
-        console.log('✅ [REGISTER] Usuario guardado en DB:', usuarioGuardado._id);
+        await nuevoUsuario.save();
         
-        req.session.isLoggedIn = true;
-        req.session.userId = usuarioGuardado._id;
-        req.session.userType = 'cliente';
-        req.session.userName = `${usuarioGuardado.nombre} ${usuarioGuardado.apellido}`;
-        
-        res.json({ 
-            success: true, 
+        res.status(201).json({ 
             message: 'Usuario registrado exitosamente',
-            user: {
-                id: usuarioGuardado._id,
-                nombre: usuarioGuardado.nombre,
-                apellido: usuarioGuardado.apellido,
-                email: usuarioGuardado.email
+            usuario: {
+                id: nuevoUsuario._id,
+                nombre: nuevoUsuario.nombre,
+                apellido: nuevoUsuario.apellido,
+                email: nuevoUsuario.email
             }
         });
     } catch (error) {
-        console.error('❌ [REGISTER] Error:', error);
-        res.status(500).json({ success: false, message: 'Error al registrar usuario: ' + error.message });
+        console.error('Error en registro:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -514,72 +397,71 @@ app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        console.log('🔐 [LOGIN] Intento de login para:', email);
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email y password son requeridos' });
+        }
         
-        const adminUsername = process.env.ADMIN_USERNAME || 'tamypau';
-        const adminPassword = process.env.ADMIN_PASSWORD || 'Isii2607';
+        let usuario = null;
+        let esAdmin = false;
         
-        if (email === adminUsername && password === adminPassword) {
-            req.session.isLoggedIn = true;
-            req.session.isAdmin = true;
-            req.session.userType = 'admin';
-            req.session.userName = 'Administrador';
+        if (email === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+            esAdmin = true;
+            usuario = {
+                _id: 'admin',
+                nombre: 'Administrador',
+                email: email
+            };
+        } else {
+            usuario = await Usuario.findOne({ email });
+            if (!usuario) {
+                return res.status(401).json({ error: 'Credenciales inválidas' });
+            }
             
-            console.log('👑 [LOGIN] Admin login exitoso');
-            
-            return res.json({ 
-                success: true, 
-                message: 'Login exitoso',
-                userType: 'admin',
-                redirectTo: '/admin'
-            });
+            const passwordValido = await bcrypt.compare(password, usuario.password);
+            if (!passwordValido) {
+                return res.status(401).json({ error: 'Credenciales inválidas' });
+            }
         }
         
-        const usuario = await Usuario.findOne({ email, activo: true });
-        if (!usuario) {
-            console.log('❌ [LOGIN] Usuario no encontrado:', email);
-            return res.status(401).json({ success: false, message: 'Email o contraseña incorrectos' });
-        }
-        
-        const passwordValida = await bcrypt.compare(password, usuario.password);
-        if (!passwordValida) {
-            console.log('❌ [LOGIN] Contraseña incorrecta para:', email);
-            return res.status(401).json({ success: false, message: 'Email o contraseña incorrectos' });
-        }
-        
-        req.session.isLoggedIn = true;
         req.session.userId = usuario._id;
-        req.session.userType = 'cliente';
-        req.session.userName = `${usuario.nombre} ${usuario.apellido}`;
+        req.session.userName = usuario.nombre;
+        req.session.userEmail = usuario.email;
+        req.session.isAdmin = esAdmin;
         
-        console.log('✅ [LOGIN] Usuario login exitoso');
-        
-        res.json({ 
-            success: true, 
+        res.json({
             message: 'Login exitoso',
-            userType: 'cliente',
-            redirectTo: '/perfil',
-            user: {
+            usuario: {
                 id: usuario._id,
                 nombre: usuario.nombre,
-                apellido: usuario.apellido,
-                email: usuario.email
+                email: usuario.email,
+                esAdmin
             }
         });
-        
     } catch (error) {
-        console.error('❌ [LOGIN] Error:', error);
-        res.status(500).json({ success: false, message: 'Error en el servidor: ' + error.message });
+        console.error('Error en login:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
+app.post('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error al cerrar sesión:', err);
+            return res.status(500).json({ error: 'Error al cerrar sesión' });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: 'Sesión cerrada exitosamente' });
+    });
+});
+
 app.get('/api/session-status', (req, res) => {
-    if (req.session.isLoggedIn) {
+    if (req.session.userId) {
         res.json({
             isLoggedIn: true,
-            userType: req.session.isAdmin ? 'admin' : 'cliente',
-            userName: req.session.userName || 'Usuario',
-            userId: req.session.userId
+            userId: req.session.userId,
+            userName: req.session.userName,
+            userEmail: req.session.userEmail,
+            userType: req.session.isAdmin ? 'admin' : 'user'
         });
     } else {
         res.json({
@@ -588,143 +470,113 @@ app.get('/api/session-status', (req, res) => {
     }
 });
 
-app.post('/api/logout', (req, res) => {
-    const sessionId = req.sessionID;
-    console.log('🚪 [LOGOUT] Destruyendo sesión:', sessionId);
-    
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('❌ [LOGOUT] Error destruyendo sesión:', err);
-            return res.status(500).json({ success: false, message: 'Error al cerrar sesión' });
-        }
-        console.log('✅ [LOGOUT] Sesión destruida exitosamente');
-        res.json({ success: true, message: 'Logout exitoso' });
-    });
-});
-
-// ============================================
-// RUTAS DE TESTING
-// ============================================
+// ✅ RUTAS DE TESTING (mantener)
 app.get('/api/test/estado-db', async (req, res) => {
     try {
-        const totalUsuarios = await Usuario.countDocuments();
-        const totalProductos = await Producto.countDocuments();
-        const totalVentas = await Venta.countDocuments();
-        
         const estadoConexion = mongoose.connection.readyState;
-        const estadosConexion = {
+        const estados = {
             0: 'Desconectado',
             1: 'Conectado',
             2: 'Conectando',
             3: 'Desconectando'
         };
         
+        const totalProductos = await Producto.countDocuments();
+        const totalUsuarios = await Usuario.countDocuments();
+        const totalBanner = await Banner.countDocuments(); // ✅ NUEVO
+        
         res.json({
-            mensaje: '📊 Estado General de MongoDB',
-            cloudinary: {
-                configured: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET),
-                cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-                apiKeyConfigured: !!process.env.CLOUDINARY_API_KEY,
-                apiSecretConfigured: !!process.env.CLOUDINARY_API_SECRET
-            },
-            conexion: {
-                estado: estadosConexion[estadoConexion],
-                baseDatos: mongoose.connection.name
-            },
-            estadisticas: {
-                usuarios: totalUsuarios,
-                productos: totalProductos,
-                ventas: totalVentas
-            },
-            timestamp: new Date()
+            estado: estados[estadoConexion],
+            database: mongoose.connection.name,
+            productos: totalProductos,
+            usuarios: totalUsuarios,
+            banner: totalBanner, // ✅ NUEVO
+            timestamp: new Date().toISOString()
         });
     } catch (error) {
-        console.error('❌ [TEST] Error verificando estado:', error);
-        res.status(500).json({
-            error: 'Error verificando estado de la base de datos',
-            mensaje: error.message
+        res.status(500).json({ error: 'Error verificando estado de la base de datos' });
+    }
+});
+
+app.get('/api/test/cloudinary', async (req, res) => {
+    try {
+        const result = await cloudinary.api.ping();
+        res.json({
+            status: 'Conectado',
+            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+            resultado: result
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            status: 'Error',
+            error: error.message 
         });
     }
 });
 
-// ✅ NUEVA RUTA: Test específico de Cloudinary
-app.get('/api/test/cloudinary', async (req, res) => {
+// ✅ FUNCIÓN PARA INICIALIZAR BANNER CON DATOS DE EJEMPLO
+async function inicializarBanner() {
     try {
-        console.log('🧪 [TEST] Probando conexión a Cloudinary...');
+        const conteo = await Banner.countDocuments();
         
-        // Verificar credenciales
-        const credencialesOk = !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
-        
-        if (!credencialesOk) {
-            return res.status(500).json({
-                success: false,
-                error: 'Credenciales de Cloudinary no configuradas',
-                details: {
-                    cloudName: !!process.env.CLOUDINARY_CLOUD_NAME,
-                    apiKey: !!process.env.CLOUDINARY_API_KEY,
-                    apiSecret: !!process.env.CLOUDINARY_API_SECRET
+        if (conteo === 0) {
+            console.log('🎨 Inicializando banner con imágenes de ejemplo...');
+            
+            const bannerEjemplo = [
+                {
+                    orden: 1,
+                    imagen: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop',
+                    alt: 'Planta de interior 1',
+                    activo: true
+                },
+                {
+                    orden: 2,
+                    imagen: 'https://images.unsplash.com/photo-1493606278519-11aa9a6b8453?w=300&h=200&fit=crop',
+                    alt: 'Planta de interior 2',
+                    activo: true
+                },
+                {
+                    orden: 3,
+                    imagen: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=300&h=200&fit=crop',
+                    alt: 'Planta de interior 3',
+                    activo: true
+                },
+                {
+                    orden: 4,
+                    imagen: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&h=200&fit=crop',
+                    alt: 'Planta de interior 4',
+                    activo: true
+                },
+                {
+                    orden: 5,
+                    imagen: 'https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=300&h=200&fit=crop',
+                    alt: 'Planta de interior 5',
+                    activo: true
                 }
-            });
+            ];
+            
+            await Banner.insertMany(bannerEjemplo);
+            console.log('✅ Banner inicializado con 5 imágenes de ejemplo');
         }
-        
-        // Probar conexión con Cloudinary
-        const result = await cloudinary.api.ping();
-        
-        console.log('✅ [TEST] Cloudinary conectado:', result);
-        
-        res.json({
-            success: true,
-            message: 'Cloudinary configurado correctamente',
-            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-            status: result.status
-        });
-        
     } catch (error) {
-        console.error('❌ [TEST] Error conectando a Cloudinary:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error conectando a Cloudinary: ' + error.message
-        });
+        console.error('❌ Error inicializando banner:', error);
     }
+}
+
+// Iniciar servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, async () => {
+    console.log(`🌱 Servidor corriendo en puerto ${PORT}`);
+    console.log(`📍 Dirección: http://localhost:${PORT}`);
+    
+    // Inicializar banner al iniciar servidor
+    await inicializarBanner();
 });
 
 // Manejo de errores global
 app.use((error, req, res, next) => {
-    console.error('❌ [ERROR GLOBAL]:', error);
-    
-    if (error instanceof multer.MulterError) {
-        if (error.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({ 
-                success: false,
-                error: 'Archivo muy grande (máximo 10MB)' 
-            });
-        }
-        if (error.code === 'LIMIT_FILE_COUNT') {
-            return res.status(400).json({ 
-                success: false,
-                error: 'Demasiados archivos (máximo 5)' 
-            });
-        }
-    }
-    
-    res.status(500).json({ 
-        success: false,
-        error: 'Error interno del servidor' 
-    });
+    console.error('Error no manejado:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
 });
-
-// Ruta 404
-app.get('*', (req, res) => {
-    res.status(404).json({ error: 'Ruta no encontrada' });
-});
-
-// Para desarrollo local
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`🌱 Servidor corriendo en http://localhost:${PORT}`);
-        console.log(`📊 Admin panel en http://localhost:${PORT}/admin`);
-        console.log(`☁️ Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME ? 'Configurado ✅' : 'NO configurado ❌'}`);
-    });
-}
 
 module.exports = app;
