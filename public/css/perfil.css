@@ -1,0 +1,481 @@
+/* ===============================================
+   PERFIL.CSS - ESTILOS PARA PÁGINA DE PERFIL
+   =============================================== */
+
+/* ESTILOS PARA BOTONES DINÁMICOS */
+.user-actions-container {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.login-btn-small {
+    background: rgba(45, 80, 22, 0.1);
+    color: #2d5016;
+    border: 1px solid #2d5016;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-btn-small:hover {
+    background: #2d5016;
+    color: white;
+}
+
+.user-profile-btn {
+    background: #2d5016;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.user-profile-btn:hover {
+    background: #1a3009;
+}
+
+.admin-btn-small {
+    background: linear-gradient(135deg, #2d5016, #1a3009);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.admin-btn-small:hover {
+    background: linear-gradient(135deg, #1a3009, #0d1a05);
+    transform: translateY(-1px);
+}
+
+.logout-btn-small {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.4rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.logout-btn-small:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.user-name-small {
+    color: #2d5016;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.loading-user {
+    color: #666;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* ESTILOS DEL PERFIL */
+.perfil-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 140px 20px 60px;
+    min-height: 100vh;
+}
+
+.perfil-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.1);
+}
+
+.perfil-header h1 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 3.5rem;
+    color: #2d5016;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(45, 80, 22, 0.1);
+}
+
+.perfil-header p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.tienda-btn {
+    font-family: 'Satisfy', cursive;
+    background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+    color: white;
+    padding: 1.2rem 3rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.tienda-btn:hover {
+    background: linear-gradient(135deg, #1a3009 0%, #2d5016 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(45, 80, 22, 0.4);
+}
+
+.subtitle-text {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.perfil-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.perfil-sidebar {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    height: fit-content;
+}
+
+.perfil-avatar {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #2d5016, #4a7c59);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2.5rem;
+    color: white;
+    box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+}
+
+.user-name {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    color: #2d5016;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.user-email {
+    font-family: 'Inter', sans-serif;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.menu-perfil {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-perfil li {
+    margin-bottom: 0.5rem;
+}
+
+.menu-perfil a {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    color: #333;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.menu-perfil a:hover,
+.menu-perfil a.active {
+    background: #f8fff8;
+    color: #2d5016;
+    transform: translateX(5px);
+}
+
+.perfil-main {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.section-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    color: #2d5016;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-section {
+    display: none;
+}
+
+.form-section.active {
+    display: block;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-family: 'Inter', sans-serif;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2d5016;
+    font-weight: 600;
+}
+
+.form-group input {
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2d5016;
+    box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+}
+
+.btn-actualizar {
+    font-family: 'Satisfy', cursive;
+    background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-actualizar:hover {
+    background: linear-gradient(135deg, #1a3009 0%, #2d5016 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+}
+
+.btn-logout {
+    font-family: 'Inter', sans-serif;
+    background: #e74c3c;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-logout:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.loading i {
+    font-size: 2rem;
+    color: #2d5016;
+    margin-bottom: 1rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #2d5016;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.empty-state h3 {
+    margin-bottom: 1rem;
+    color: #2d5016;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+}
+
+.empty-state p {
+    margin-bottom: 2rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.error-state {
+    text-align: center;
+    padding: 3rem;
+    color: #e74c3c;
+}
+
+.error-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.error-state p {
+    font-family: 'Inter', sans-serif;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.alert.show {
+    display: flex;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .perfil-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .perfil-header h1 {
+        font-size: 2.5rem;
+    }
+    
+    .tienda-btn {
+        font-size: 1.1rem;
+        padding: 1rem 2rem;
+    }
+    
+    .user-actions-container {
+        gap: 0.5rem;
+    }
+    
+    .login-btn-small, .user-profile-btn, .admin-btn-small {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .user-name-small {
+        font-size: 0.7rem;
+    }
+    
+    .perfil-container {
+        padding: 120px 15px 40px;
+    }
+    
+    .perfil-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .perfil-sidebar,
+    .perfil-main {
+        padding: 1.5rem;
+    }
+}

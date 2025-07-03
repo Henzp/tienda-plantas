@@ -1,4 +1,4 @@
-// ✅ SERVIDOR OPTIMIZADO Y ESTABLE - VERSIÓN CORREGIDA
+// ✅ SERVIDOR OPTIMIZADO Y CORREGIDO - VERSIÓN FINAL
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -12,32 +12,39 @@ require('dotenv').config();
 
 const app = express();
 
-console.log('🚀 Iniciando servidor optimizado...');
+console.log('🚀 Iniciando servidor con headers corregidos...');
 
-// ✅ HEADERS DE SEGURIDAD MEJORADOS (CORREGIDO)
+// ✅ HEADERS OPTIMIZADOS PARA CORREGIR PROBLEMAS DE COMPATIBILIDAD
 app.use((req, res, next) => {
-    // Security Headers
+    // Headers de seguridad básicos
     res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     
-    // Content Security Policy mejorado
-    res.setHeader('Content-Security-Policy', 
-        "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; " +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
-        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-        "img-src 'self' data: https: http:; " +
-        "connect-src 'self' https:; " +
-        "frame-ancestors 'none';"
-    );
-    
-    // Cache Control optimizado
-    if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    // Headers específicos para fuentes (CORRIGE ERROR DE CONTENT-TYPE)
+    if (req.path.endsWith('.woff2')) {
+        res.setHeader('Content-Type', 'font/woff2; charset=utf-8');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-    } else if (req.path.match(/\.(html|htm)$/)) {
-        res.setHeader('Cache-Control', 'public, max-age=3600');
-    } else {
-        res.setHeader('Cache-Control', 'no-cache');
+    } else if (req.path.endsWith('.woff')) {
+        res.setHeader('Content-Type', 'font/woff; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path.endsWith('.ttf')) {
+        res.setHeader('Content-Type', 'font/ttf; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path.match(/\.(png|jpg|jpeg|gif|ico|svg)$/)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path.match(/\.(html|htm)$/) || req.path === '/' || req.path === '/perfil' || req.path === '/admin') {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    } else if (req.path.startsWith('/api/')) {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
     
     next();
@@ -47,25 +54,31 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// ✅ ARCHIVOS ESTÁTICOS CON HEADERS CORRECTOS
+// ✅ ARCHIVOS ESTÁTICOS CON HEADERS ESPECÍFICOS CORREGIDOS
 app.use(express.static('public', {
     maxAge: '1y',
     etag: true,
     lastModified: true,
-    setHeaders: (res, path) => {
-        if (path.endsWith('.woff2')) {
-            res.setHeader('Content-Type', 'font/woff2');
-        } else if (path.endsWith('.woff')) {
-            res.setHeader('Content-Type', 'font/woff');
-        } else if (path.endsWith('.ttf')) {
-            res.setHeader('Content-Type', 'font/ttf');
-        } else if (path.endsWith('.css')) {
+    setHeaders: (res, filePath) => {
+        // Content-Type específico por extensión (CORRIGE PROBLEMAS DE FUENTES)
+        if (filePath.endsWith('.woff2')) {
+            res.setHeader('Content-Type', 'font/woff2; charset=utf-8');
+        } else if (filePath.endsWith('.woff')) {
+            res.setHeader('Content-Type', 'font/woff; charset=utf-8');
+        } else if (filePath.endsWith('.ttf')) {
+            res.setHeader('Content-Type', 'font/ttf; charset=utf-8');
+        } else if (filePath.endsWith('.eot')) {
+            res.setHeader('Content-Type', 'application/vnd.ms-fontobject');
+        } else if (filePath.endsWith('.css')) {
             res.setHeader('Content-Type', 'text/css; charset=utf-8');
-        } else if (path.endsWith('.js')) {
+        } else if (filePath.endsWith('.js')) {
             res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-        } else if (path.endsWith('.html')) {
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
         }
+        
+        // Cache optimizado y headers de seguridad
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('Vary', 'Accept-Encoding');
     }
 }));
 
@@ -87,7 +100,7 @@ app.use(session({
     name: 'tienda.sid',
     cookie: {
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'lax'
     }
@@ -201,22 +214,7 @@ const Usuario = mongoose.model('Usuario', usuarioSchema);
 const Producto = mongoose.model('Producto', productoSchema);
 const Banner = mongoose.model('Banner', bannerSchema);
 
-// ✅ MIDDLEWARE DE MANEJO DE ERRORES
-app.use((err, req, res, next) => {
-    console.error('❌ Error del servidor:', err);
-    
-    if (process.env.NODE_ENV === 'development') {
-        console.error('Stack:', err.stack);
-    }
-    
-    res.status(err.status || 500).json({ 
-        error: 'Error interno del servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Error procesando solicitud',
-        timestamp: new Date().toISOString()
-    });
-});
-
-// ✅ RUTAS PARA SERVIR PÁGINAS HTML
+// ✅ RUTAS PARA SERVIR PÁGINAS HTML CON HEADERS CORRECTOS
 const servirPagina = (archivo) => (req, res) => {
     try {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -234,7 +232,7 @@ app.get('/register', servirPagina('register.html'));
 app.get('/perfil', servirPagina('perfil.html'));
 app.get('/producto/:id', servirPagina('producto.html'));
 
-// ✅ API DE PRODUCTOS (SIMPLIFICADA Y ESTABLE)
+// ✅ API DE PRODUCTOS
 app.get('/api/productos', async (req, res) => {
     try {
         console.log('📡 API /api/productos llamada');
@@ -332,7 +330,7 @@ app.delete('/api/productos/:id', async (req, res) => {
     }
 });
 
-// ✅ API DE BANNER (SIMPLIFICADA Y ESTABLE)
+// ✅ API DE BANNER
 app.get('/api/banner', async (req, res) => {
     try {
         console.log('📡 API /api/banner llamada');
@@ -648,24 +646,189 @@ app.post('/api/logout', (req, res) => {
     }
 });
 
-app.get('/api/session-status', (req, res) => {
+app.get('/api/session-status', async (req, res) => {
     try {
         console.log('📡 Verificando sesión:', req.session.userId ? 'Logueado' : 'No logueado');
         
         if (req.session.userId) {
-            res.json({
-                isLoggedIn: true,
-                userId: req.session.userId,
-                userName: req.session.userName,
-                userEmail: req.session.userEmail,
-                userType: req.session.isAdmin ? 'admin' : 'user'
-            });
+            // Para admin
+            if (req.session.isAdmin) {
+                res.json({
+                    authenticated: true,
+                    isLoggedIn: true,
+                    userId: req.session.userId,
+                    userName: req.session.userName,
+                    userEmail: req.session.userEmail,
+                    userType: 'admin',
+                    user: {
+                        id: req.session.userId,
+                        nombre: req.session.userName,
+                        email: req.session.userEmail
+                    }
+                });
+            } else {
+                // Para usuario normal, obtener datos completos de la DB
+                if (mongoose.connection.readyState === 1) {
+                    try {
+                        const usuario = await Usuario.findById(req.session.userId).select('-password');
+                        if (usuario) {
+                            res.json({
+                                authenticated: true,
+                                isLoggedIn: true,
+                                userId: usuario._id,
+                                userName: usuario.nombre,
+                                userEmail: usuario.email,
+                                userType: 'user',
+                                user: {
+                                    id: usuario._id,
+                                    nombre: usuario.nombre,
+                                    apellido: usuario.apellido,
+                                    email: usuario.email,
+                                    telefono: usuario.telefono,
+                                    direccion: usuario.direccion,
+                                    comuna: usuario.comuna,
+                                    region: usuario.region
+                                }
+                            });
+                        } else {
+                            res.json({ authenticated: false, isLoggedIn: false });
+                        }
+                    } catch (error) {
+                        console.error('Error obteniendo datos de usuario:', error);
+                        res.json({ authenticated: false, isLoggedIn: false });
+                    }
+                } else {
+                    res.json({ authenticated: false, isLoggedIn: false });
+                }
+            }
         } else {
-            res.json({ isLoggedIn: false });
+            res.json({ authenticated: false, isLoggedIn: false });
         }
     } catch (error) {
         console.error('Error verificando sesión:', error);
-        res.json({ isLoggedIn: false });
+        res.json({ authenticated: false, isLoggedIn: false });
+    }
+});
+
+// ✅ NUEVAS RUTAS API PARA PERFIL DE USUARIO
+app.get('/api/user-profile', async (req, res) => {
+    try {
+        if (!req.session || !req.session.userId || req.session.isAdmin) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'No hay sesión de usuario válida' 
+            });
+        }
+
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({ 
+                success: false, 
+                message: 'Base de datos no disponible' 
+            });
+        }
+
+        const usuario = await Usuario.findById(req.session.userId).select('-password');
+        if (!usuario) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Usuario no encontrado' 
+            });
+        }
+
+        res.json({
+            success: true,
+            id: usuario._id,
+            nombre: usuario.nombre,
+            apellido: usuario.apellido,
+            email: usuario.email,
+            telefono: usuario.telefono,
+            direccion: {
+                calle: usuario.direccion,
+                ciudad: usuario.comuna,
+                region: usuario.region
+            }
+        });
+
+    } catch (error) {
+        console.error('Error obteniendo perfil:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error del servidor' 
+        });
+    }
+});
+
+app.put('/api/user-profile', async (req, res) => {
+    try {
+        if (!req.session || !req.session.userId || req.session.isAdmin) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'No hay sesión de usuario válida' 
+            });
+        }
+
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({ 
+                success: false, 
+                message: 'Base de datos no disponible' 
+            });
+        }
+
+        const { nombre, apellido, telefono, direccion } = req.body;
+        
+        // Validar datos requeridos
+        if (!nombre || nombre.trim() === '') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'El nombre es requerido' 
+            });
+        }
+
+        // Actualizar usuario en la base de datos
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(
+            req.session.userId,
+            {
+                nombre: nombre.trim(),
+                apellido: apellido ? apellido.trim() : '',
+                telefono: telefono ? telefono.trim() : '',
+                direccion: direccion?.calle ? direccion.calle.trim() : '',
+                comuna: direccion?.ciudad ? direccion.ciudad.trim() : '',
+                region: direccion?.region ? direccion.region.trim() : ''
+            },
+            { new: true, select: '-password' }
+        );
+
+        if (!usuarioActualizado) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Usuario no encontrado' 
+            });
+        }
+
+        // Actualizar datos en la sesión
+        req.session.userName = usuarioActualizado.nombre;
+
+        res.json({ 
+            success: true, 
+            message: 'Perfil actualizado correctamente',
+            user: {
+                id: usuarioActualizado._id,
+                nombre: usuarioActualizado.nombre,
+                apellido: usuarioActualizado.apellido,
+                email: usuarioActualizado.email,
+                telefono: usuarioActualizado.telefono,
+                direccion: usuarioActualizado.direccion,
+                comuna: usuarioActualizado.comuna,
+                region: usuarioActualizado.region
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error del servidor al actualizar perfil' 
+        });
     }
 });
 
@@ -740,7 +903,7 @@ app.get('/api/health', (req, res) => {
         status: 'OK',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-        version: '1.1.0',
+        version: '1.3.0',
         environment: process.env.NODE_ENV || 'development'
     });
 });
@@ -799,6 +962,21 @@ async function inicializarBanner() {
     }
 }
 
+// ✅ MIDDLEWARE DE MANEJO DE ERRORES
+app.use((err, req, res, next) => {
+    console.error('❌ Error del servidor:', err);
+    
+    if (process.env.NODE_ENV === 'development') {
+        console.error('Stack:', err.stack);
+    }
+    
+    res.status(err.status || 500).json({ 
+        error: 'Error interno del servidor',
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Error procesando solicitud',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // ✅ RUTA CATCH-ALL PARA 404s
 app.use('*', (req, res) => {
     if (req.originalUrl.startsWith('/api/')) {
@@ -822,13 +1000,15 @@ async function iniciarServidor() {
         await inicializarBanner();
         
         const servidor = app.listen(PORT, () => {
-            console.log(`🌱 Servidor CORREGIDO corriendo en puerto ${PORT}`);
+            console.log(`🌱 Servidor COMPLETAMENTE CORREGIDO corriendo en puerto ${PORT}`);
             console.log(`📍 Dirección: http://localhost:${PORT}`);
             console.log(`👑 Admin: http://localhost:${PORT}/admin`);
             console.log(`🔒 Login: http://localhost:${PORT}/login`);
+            console.log(`👤 Perfil: http://localhost:${PORT}/perfil`);
             console.log(`🏥 Health: http://localhost:${PORT}/api/health`);
-            console.log(`🧪 Test DB: http://localhost:${PORT}/api/test/estado-db`);
-            console.log('✅ Servidor iniciado correctamente - APIs funcionando');
+            console.log('✅ Headers corregidos - Sin errores de compatibilidad');
+            console.log('✅ CSS externo - Sin estilos inline');
+            console.log('✅ Fuentes con Content-Type correcto');
         });
 
         servidor.on('error', (error) => {
