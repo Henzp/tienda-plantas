@@ -1,4 +1,4 @@
-// ✅ SERVIDOR OPTIMIZADO Y CORREGIDO - VERSIÓN FINAL
+// ✅ SERVIDOR OPTIMIZADO Y CORREGIDO - VERSIÓN FINAL SIN DUPLICACIONES
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -82,12 +82,13 @@ app.use(express.static('public', {
     }
 }));
 
-/// ✅ CONFIGURACIÓN DE CORS CORREGIDA PARA VERCEL
+// ✅ CONFIGURACIÓN DE CORS CORREGIDA PARA TU USUARIO GITHUB
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
         ? [
             'https://tienda-plantas.vercel.app',
-            'https://tienda-plantas-git-main-tu-usuario.vercel.app', // Reemplaza 'tu-usuario' con tu usuario de GitHub
+            'https://tienda-plantas-git-main-henzp.vercel.app',
+            'https://tienda-plantas-henzp.vercel.app',
             /\.vercel\.app$/  // Permite cualquier subdominio de vercel.app
           ]
         : true,
@@ -996,7 +997,10 @@ app.use('*', (req, res) => {
     }
 });
 
-// ✅ INICIAR SERVIDOR
+// ===============================================
+// INICIALIZACIÓN CORREGIDA PARA VERCEL (SIN DUPLICACIONES)
+// ===============================================
+
 const PORT = process.env.PORT || 3000;
 
 async function iniciarServidor() {
@@ -1011,9 +1015,7 @@ async function iniciarServidor() {
             console.log(`🔒 Login: http://localhost:${PORT}/login`);
             console.log(`👤 Perfil: http://localhost:${PORT}/perfil`);
             console.log(`🏥 Health: http://localhost:${PORT}/api/health`);
-            console.log('✅ Headers corregidos - Sin errores de compatibilidad');
-            console.log('✅ CSS externo - Sin estilos inline');
-            console.log('✅ Fuentes con Content-Type correcto');
+            console.log('✅ Aplicación lista para recibir requests');
         });
 
         servidor.on('error', (error) => {
@@ -1044,39 +1046,42 @@ async function iniciarServidor() {
     }
 }
 
+// ✅ LÓGICA DE INICIALIZACIÓN BASADA EN ENTORNO (SIN DUPLICACIONES)
+if (process.env.VERCEL) {
+    // ESTAMOS EN VERCEL - Solo inicializar servicios
+    console.log('🌐 VERCEL DETECTADO: Inicializando servicios...');
+    conectarMongoDB()
+        .then(() => {
+            console.log('✅ VERCEL: MongoDB conectado');
+            return inicializarBanner();
+        })
+        .then(() => {
+            console.log('✅ VERCEL: Banner inicializado');
+            console.log('🚀 VERCEL: Aplicación lista');
+        })
+        .catch(error => {
+            console.error('❌ VERCEL: Error en inicialización:', error);
+        });
+} else {
+    // DESARROLLO LOCAL - Iniciar servidor completo
+    console.log('💻 DESARROLLO LOCAL: Iniciando servidor...');
+    iniciarServidor();
+}
+
 // ✅ MANEJO DE ERRORES NO CAPTURADOS
 process.on('uncaughtException', (error) => {
     console.error('❌ Error no capturado:', error);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+        process.exit(1);
+    }
 });
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('❌ Promesa rechazada:', reason);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+        process.exit(1);
+    }
 });
 
-// Iniciar servidor
-iniciarServidor();
-
-// ===============================================
-// OPTIMIZACIÓN ESPECIAL PARA VERCEL
-// Agregar esto AL FINAL de server.js, ANTES de module.exports = app;
-// ===============================================
-
-// ✅ PARA VERCEL: No iniciar servidor si estamos en producción
-if (process.env.NODE_ENV !== 'production') {
-    // Solo iniciar servidor en desarrollo (localhost)
-    iniciarServidor();
-} else {
-    // En producción (Vercel), solo conectar a MongoDB
-    console.log('🌐 Modo VERCEL: Conectando solo a MongoDB...');
-    conectarMongoDB().then(() => {
-        inicializarBanner().then(() => {
-            console.log('✅ VERCEL: MongoDB y Banner inicializados');
-        });
-    }).catch(error => {
-        console.error('❌ VERCEL: Error inicializando:', error);
-    });
-}
-
+// ✅ EXPORT PARA VERCEL
 module.exports = app;
