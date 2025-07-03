@@ -1,0 +1,13 @@
+# Archivos que Vercel debe ignorar
+.env
+.env.local
+.env.example
+node_modules
+.git
+.gitignore
+README.md
+.vscode
+*.log
+uploads/
+.DS_Store
+Thumbs.db

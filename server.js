@@ -82,14 +82,19 @@ app.use(express.static('public', {
     }
 }));
 
-// ✅ CONFIGURACIÓN DE CORS
+/// ✅ CONFIGURACIÓN DE CORS CORREGIDA PARA VERCEL
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://tienda-plantas.vercel.app']
+        ? [
+            'https://tienda-plantas.vercel.app',
+            'https://tienda-plantas-git-main-tu-usuario.vercel.app', // Reemplaza 'tu-usuario' con tu usuario de GitHub
+            /\.vercel\.app$/  // Permite cualquier subdominio de vercel.app
+          ]
         : true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200
 }));
 
 // ✅ CONFIGURACIÓN DE SESIONES
@@ -1052,5 +1057,26 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Iniciar servidor
 iniciarServidor();
+
+// ===============================================
+// OPTIMIZACIÓN ESPECIAL PARA VERCEL
+// Agregar esto AL FINAL de server.js, ANTES de module.exports = app;
+// ===============================================
+
+// ✅ PARA VERCEL: No iniciar servidor si estamos en producción
+if (process.env.NODE_ENV !== 'production') {
+    // Solo iniciar servidor en desarrollo (localhost)
+    iniciarServidor();
+} else {
+    // En producción (Vercel), solo conectar a MongoDB
+    console.log('🌐 Modo VERCEL: Conectando solo a MongoDB...');
+    conectarMongoDB().then(() => {
+        inicializarBanner().then(() => {
+            console.log('✅ VERCEL: MongoDB y Banner inicializados');
+        });
+    }).catch(error => {
+        console.error('❌ VERCEL: Error inicializando:', error);
+    });
+}
 
 module.exports = app;
