@@ -1,7 +1,5 @@
-// ✅ SERVERLESS FUNCTION COMPLETA PARA VERCEL: api/index.js
-// REEMPLAZAR TODO EL CONTENIDO DE api/index.js CON ESTO
-
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
@@ -9,41 +7,36 @@ const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
-const path = require('path');
 require('dotenv').config();
 
 console.log('🚀 [VERCEL] Iniciando Serverless Function...');
 
-// ✅ CONFIGURACIÓN EXPRESS
 const app = express();
 
-// ✅ HEADERS Y MIDDLEWARE
+// ✅ MIDDLEWARE DE SEGURIDAD Y HEADERS
 app.use((req, res, next) => {
-    // Headers de seguridad
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     
-    // Headers específicos para archivos
-    if (req.path.endsWith('.woff2')) {
-        res.setHeader('Content-Type', 'font/woff2; charset=utf-8');
-    } else if (req.path.endsWith('.woff')) {
-        res.setHeader('Content-Type', 'font/woff; charset=utf-8');
-    } else if (req.path.endsWith('.ttf')) {
-        res.setHeader('Content-Type', 'font/ttf; charset=utf-8');
-    } else if (req.path.endsWith('.css')) {
+    if (req.path.endsWith('.css')) {
         res.setHeader('Content-Type', 'text/css; charset=utf-8');
     } else if (req.path.endsWith('.js')) {
         res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    } else if (req.path.endsWith('.woff2')) {
+        res.setHeader('Content-Type', 'font/woff2; charset=utf-8');
+    } else if (req.path.endsWith('.woff')) {
+        res.setHeader('Content-Type', 'font/woff; charset=utf-8');
     }
     
     next();
 });
 
+// ✅ CONFIGURACIÓN EXPRESS
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// ✅ CORS PARA VERCEL
+// ✅ CORS
 app.use(cors({
     origin: true,
     credentials: true,
@@ -51,14 +44,17 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// ✅ SESIONES
+// ✅ ARCHIVOS ESTÁTICOS - CORRECCIÓN CLAVE PARA VERCEL
+app.use(express.static(path.join(process.cwd(), 'public')));
+
+// ✅ CONFIGURACIÓN DE SESIONES
 app.use(session({
     secret: process.env.SESSION_SECRET || 'tienda-plantas-secret-key-2024',
     resave: false,
     saveUninitialized: false,
     name: 'tienda.sid',
     cookie: {
-        secure: false, // Cambiado a false para debugging
+        secure: false,
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'lax'
@@ -77,7 +73,7 @@ try {
     console.error('❌ [VERCEL] Error configurando Cloudinary:', error);
 }
 
-// ✅ CONFIGURACIÓN MULTER SIMPLIFICADA
+// ✅ CONFIGURACIÓN MULTER
 let upload;
 try {
     if (process.env.CLOUDINARY_CLOUD_NAME) {
@@ -174,14 +170,13 @@ async function inicializarBanner() {
     }
 }
 
-// ✅ SERVIR PÁGINAS HTML
+// ✅ FUNCIÓN PARA SERVIR ARCHIVOS HTML - CORRECCIÓN CLAVE
 const servirHTML = (archivo) => async (req, res) => {
     try {
         await conectarMongoDB();
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.setHeader('Cache-Control', 'no-cache');
         
-        // Construir path absoluto para las vistas
         const htmlPath = path.join(process.cwd(), 'views', archivo);
         res.sendFile(htmlPath);
     } catch (error) {
@@ -190,7 +185,7 @@ const servirHTML = (archivo) => async (req, res) => {
     }
 };
 
-// ✅ RUTAS PRINCIPALES
+// ✅ RUTAS PRINCIPALES - PÁGINAS HTML
 app.get('/', servirHTML('index.html'));
 app.get('/admin', servirHTML('admin.html'));
 app.get('/login', servirHTML('login.html'));
@@ -836,7 +831,6 @@ app.use('*', (req, res) => {
     }
 });
 
-// ✅ INICIALIZAR EN VERCEL
 console.log('🌐 [VERCEL] Aplicación inicializada');
 
 // ✅ EXPORT PARA VERCEL
