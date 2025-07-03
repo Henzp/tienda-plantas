@@ -1,59 +1,5 @@
 {
   "version": 2,
-  "name": "tienda-plantas",
-  "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["views/**", "public/**"]
-      }
-    }
-  ],
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/admin",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/login",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/register", 
-      "dest": "/server.js"
-    },
-    {
-      "src": "/perfil",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/producto/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/",
-      "dest": "/server.js"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "server.js": {
-      "maxDuration": 30,
-      "memory": 1024
-    }
-  }
-  {
-  "version": 2,
   "functions": {
     "api/index.js": {
       "maxDuration": 30

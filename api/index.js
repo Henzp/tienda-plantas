@@ -1,6 +1,4 @@
-// ✅ SERVERLESS FUNCTION PARA VERCEL: api/index.js
-// Este archivo debe estar en la ruta: api/index.js
-
+// ✅ SERVERLESS FUNCTION COMPLETA PARA VERCEL: api/index.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -221,88 +219,6 @@ app.get('/api/productos', async (req, res) => {
     }
 });
 
-app.post('/api/productos', async (req, res) => {
-    try {
-        if (mongoose.connection.readyState !== 1) {
-            return res.status(503).json({ error: 'Base de datos no disponible' });
-        }
-        const nuevoProducto = new Producto(req.body);
-        const productoGuardado = await nuevoProducto.save();
-        res.status(201).json(productoGuardado);
-    } catch (error) {
-        console.error('Error creando producto:', error);
-        res.status(500).json({ error: 'Error creando producto' });
-    }
-});
-
-// ✅ API BANNER
-app.get('/api/banner', async (req, res) => {
-    try {
-        console.log('📡 API /api/banner llamada');
-        if (mongoose.connection.readyState !== 1) {
-            console.log('⚠️ DB no conectada, devolviendo array vacío');
-            return res.json([]);
-        }
-        const bannerItems = await Banner.find({ activo: true }).sort({ orden: 1 }).select('-__v').lean();
-        console.log('✅ Banner items encontrados:', bannerItems.length);
-        res.json(bannerItems);
-    } catch (error) {
-        console.error('❌ Error obteniendo banner:', error);
-        res.json([]);
-    }
-});
-
-// ✅ API AUTH
-app.post('/api/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email y password son requeridos' });
-        }
-        
-        let usuario = null;
-        let esAdmin = false;
-        
-        if (email === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
-            esAdmin = true;
-            usuario = { _id: 'admin', nombre: 'Administrador', email: email };
-            console.log('✅ Login de administrador exitoso');
-        } else {
-            if (mongoose.connection.readyState === 1) {
-                usuario = await Usuario.findOne({ email: email.toLowerCase() }).select('+password');
-                if (!usuario) {
-                    return res.status(401).json({ error: 'Credenciales inválidas' });
-                }
-                const passwordValido = await bcrypt.compare(password, usuario.password);
-                if (!passwordValido) {
-                    return res.status(401).json({ error: 'Credenciales inválidas' });
-                }
-                console.log('✅ Login de usuario normal exitoso');
-            } else {
-                return res.status(503).json({ error: 'Base de datos no disponible' });
-            }
-        }
-        
-        req.session.userId = usuario._id;
-        req.session.userName = usuario.nombre;
-        req.session.userEmail = usuario.email;
-        req.session.isAdmin = esAdmin;
-        
-        res.json({
-            message: 'Login exitoso',
-            usuario: { id: usuario._id, nombre: usuario.nombre, email: usuario.email, esAdmin },
-            userType: esAdmin ? 'admin' : 'user',
-            redirectTo: esAdmin ? '/admin' : '/perfil'
-        });
-    } catch (error) {
-        console.error('❌ Error en login:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
-});
-
-// ✅ TODAS LAS RUTAS API RESTANTES
-
-// API PRODUCTOS - Rutas adicionales
 app.get('/api/productos/:id', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
@@ -316,6 +232,20 @@ app.get('/api/productos/:id', async (req, res) => {
     } catch (error) {
         console.error('Error obteniendo producto:', error);
         res.status(500).json({ error: 'Error obteniendo producto' });
+    }
+});
+
+app.post('/api/productos', async (req, res) => {
+    try {
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({ error: 'Base de datos no disponible' });
+        }
+        const nuevoProducto = new Producto(req.body);
+        const productoGuardado = await nuevoProducto.save();
+        res.status(201).json(productoGuardado);
+    } catch (error) {
+        console.error('Error creando producto:', error);
+        res.status(500).json({ error: 'Error creando producto' });
     }
 });
 
@@ -351,7 +281,23 @@ app.delete('/api/productos/:id', async (req, res) => {
     }
 });
 
-// API BANNER - Rutas adicionales  
+// ✅ API BANNER
+app.get('/api/banner', async (req, res) => {
+    try {
+        console.log('📡 API /api/banner llamada');
+        if (mongoose.connection.readyState !== 1) {
+            console.log('⚠️ DB no conectada, devolviendo array vacío');
+            return res.json([]);
+        }
+        const bannerItems = await Banner.find({ activo: true }).sort({ orden: 1 }).select('-__v').lean();
+        console.log('✅ Banner items encontrados:', bannerItems.length);
+        res.json(bannerItems);
+    } catch (error) {
+        console.error('❌ Error obteniendo banner:', error);
+        res.json([]);
+    }
+});
+
 app.post('/api/banner', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
@@ -406,7 +352,54 @@ app.delete('/api/banner/:id', async (req, res) => {
     }
 });
 
-// API AUTH - Rutas adicionales
+// ✅ API AUTH
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email y password son requeridos' });
+        }
+        
+        let usuario = null;
+        let esAdmin = false;
+        
+        if (email === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+            esAdmin = true;
+            usuario = { _id: 'admin', nombre: 'Administrador', email: email };
+            console.log('✅ Login de administrador exitoso');
+        } else {
+            if (mongoose.connection.readyState === 1) {
+                usuario = await Usuario.findOne({ email: email.toLowerCase() }).select('+password');
+                if (!usuario) {
+                    return res.status(401).json({ error: 'Credenciales inválidas' });
+                }
+                const passwordValido = await bcrypt.compare(password, usuario.password);
+                if (!passwordValido) {
+                    return res.status(401).json({ error: 'Credenciales inválidas' });
+                }
+                console.log('✅ Login de usuario normal exitoso');
+            } else {
+                return res.status(503).json({ error: 'Base de datos no disponible' });
+            }
+        }
+        
+        req.session.userId = usuario._id;
+        req.session.userName = usuario.nombre;
+        req.session.userEmail = usuario.email;
+        req.session.isAdmin = esAdmin;
+        
+        res.json({
+            message: 'Login exitoso',
+            usuario: { id: usuario._id, nombre: usuario.nombre, email: usuario.email, esAdmin },
+            userType: esAdmin ? 'admin' : 'user',
+            redirectTo: esAdmin ? '/admin' : '/perfil'
+        });
+    } catch (error) {
+        console.error('❌ Error en login:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
 app.post('/api/register', async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
@@ -524,7 +517,7 @@ app.get('/api/session-status', async (req, res) => {
     }
 });
 
-// API PERFIL
+// ✅ API PERFIL
 app.get('/api/user-profile', async (req, res) => {
     try {
         if (!req.session || !req.session.userId || req.session.isAdmin) {
@@ -600,7 +593,7 @@ app.put('/api/user-profile', async (req, res) => {
     }
 });
 
-// API IMÁGENES
+// ✅ API IMÁGENES
 app.post('/api/upload-images', (req, res) => {
     upload.array('images', 10)(req, res, async (err) => {
         if (err) {
@@ -687,6 +680,47 @@ async function inicializarBanner() {
     }
 }
 
+// ✅ RUTAS DE TESTING
+app.get('/api/test/estado-db', async (req, res) => {
+    try {
+        const estadoConexion = mongoose.connection.readyState;
+        const estados = { 0: 'Desconectado', 1: 'Conectado', 2: 'Conectando', 3: 'Desconectando' };
+        let totalProductos = 0, totalUsuarios = 0, totalBanner = 0;
+        if (estadoConexion === 1) {
+            try {
+                [totalProductos, totalUsuarios, totalBanner] = await Promise.all([
+                    Producto.countDocuments(), Usuario.countDocuments(), Banner.countDocuments()
+                ]);
+            } catch (error) {
+                console.error('Error contando documentos:', error);
+            }
+        }
+        res.json({
+            estado: estados[estadoConexion],
+            database: mongoose.connection.name || 'No conectado',
+            productos: totalProductos, usuarios: totalUsuarios, banner: totalBanner,
+            servidor: { nodeVersion: process.version, uptime: process.uptime(), memoria: process.memoryUsage() },
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error verificando estado:', error);
+        res.status(500).json({ error: 'Error verificando estado de la base de datos' });
+    }
+});
+
+app.get('/api/test/cloudinary', async (req, res) => {
+    try {
+        const result = await cloudinary.api.ping();
+        res.json({
+            status: 'Conectado', cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+            resultado: result, timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error testing Cloudinary:', error);
+        res.status(500).json({ status: 'Error', error: error.message, timestamp: new Date().toISOString() });
+    }
+});
+
 // ✅ HEALTH CHECK
 app.get('/api/health', (req, res) => {
     res.json({
@@ -701,9 +735,7 @@ app.use('*', (req, res) => {
     if (req.originalUrl.startsWith('/api/')) {
         res.status(404).json({ 
             error: 'Endpoint no encontrado',
-            path: req.originalUrl,
-            method: req.method,
-            timestamp: new Date().toISOString()
+            path: req.originalUrl, method: req.method, timestamp: new Date().toISOString()
         });
     } else {
         res.redirect('/');
