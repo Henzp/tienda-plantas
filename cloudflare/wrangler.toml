@@ -1,0 +1,12 @@
+# cloudflare/wrangler.toml
+# Configuración simple para Cloudflare Worker
+
+name = "tienda-plantas-api"
+main = "worker/index.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Variables públicas
+[vars]
+ENVIRONMENT = "production"
+APP_NAME = "Entre Hojas y Amigas"

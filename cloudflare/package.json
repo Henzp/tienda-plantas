@@ -1,0 +1,61 @@
+{
+  "name": "tienda-plantas-cloudflare",
+  "version": "1.0.0",
+  "description": "Entre Hojas y Amigas - Implementación Cloudflare Workers + Pages",
+  "main": "worker/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env development",
+    "deploy:production": "wrangler deploy --env production",
+    "tail": "wrangler tail",
+    "setup": "npm run setup:secrets && npm run setup:pages",
+    "setup:secrets": "node scripts/setup-secrets.js",
+    "setup:pages": "node scripts/setup-pages.js",
+    "test:worker": "wrangler dev --test",
+    "logs": "wrangler tail --format json",
+    "build": "echo 'No build step needed for Cloudflare Pages'",
+    "start": "wrangler dev --local",
+    "copy:assets": "node scripts/copy-assets.js",
+    "full-deploy": "npm run copy:assets && npm run deploy && echo 'Deployment completo!'",
+    "check:config": "node scripts/check-config.js"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20241106.0",
+    "itty-router": "^4.0.13"
+  },
+  "devDependencies": {
+    "wrangler": "^3.78.12",
+    "typescript": "^5.6.3",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Henzp/tienda-plantas.git",
+    "directory": "cloudflare"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "pages",
+    "plantas",
+    "ecommerce",
+    "tienda",
+    "serverless"
+  ],
+  "author": "TamyPau",
+  "license": "ISC",
+  "cloudflare": {
+    "worker": {
+      "name": "tienda-plantas-api",
+      "route": "api.tu-sitio.com/*"
+    },
+    "pages": {
+      "name": "tienda-plantas-frontend",
+      "domain": "tienda-plantas.pages.dev"
+    }
+  }
+}
