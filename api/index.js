@@ -11,6 +11,21 @@ require('dotenv').config();
 
 console.log('🚀 [VERCEL] Iniciando Serverless Function...');
 
+// 🔧 FALLBACK PARA VARIABLES DE ENTORNO (SOLUCIÓN AL PROBLEMA)
+if (!process.env.MONGODB_URI) {
+    console.log('⚠️ [VERCEL] Variables de entorno no detectadas, usando fallback...');
+    process.env.MONGODB_URI = 'mongodb+srv://tamypau:Isii2607@bd-plantas.2idkemi.mongodb.net/tienda-plantas?retryWrites=true&w=majority&appName=BD-PLANTAS';
+    process.env.ADMIN_USERNAME = 'tamypau';
+    process.env.ADMIN_PASSWORD = 'Isii2607';
+    process.env.SESSION_SECRET = 'tienda-plantas-secret-key-2024';
+    process.env.CLOUDINARY_CLOUD_NAME = 'dqi6yvjxt';
+    process.env.CLOUDINARY_API_KEY = '713778997184742';
+    process.env.CLOUDINARY_API_SECRET = 'dsq3LwGEg24B3y6hDWGo8VrYFts';
+    process.env.NODE_ENV = 'production';
+}
+
+console.log('🔍 [DEBUG] MONGODB_URI:', process.env.MONGODB_URI ? 'Configurado ✅' : 'NO DEFINIDO ❌');
+
 const app = express();
 
 // ✅ MIDDLEWARE DE SEGURIDAD Y HEADERS
@@ -99,6 +114,7 @@ let mongoConnected = false;
 async function conectarMongoDB() {
     if (mongoConnected) return;
     try {
+        console.log('🔗 [VERCEL] Intentando conectar a MongoDB...');
         await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -106,7 +122,7 @@ async function conectarMongoDB() {
             socketTimeoutMS: 10000
         });
         mongoConnected = true;
-        console.log('✅ [VERCEL] Conectado a MongoDB');
+        console.log('✅ [VERCEL] Conectado a MongoDB exitosamente');
         await inicializarBanner();
     } catch (error) {
         console.error('❌ [VERCEL] Error conectando a MongoDB:', error);
@@ -163,7 +179,9 @@ async function inicializarBanner() {
                 { orden: 3, imagen: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=800&h=400&fit=crop', alt: 'Decoración con plantas', activo: true }
             ];
             await Banner.insertMany(bannerEjemplo);
-            console.log('✅ [VERCEL] Banner inicializado');
+            console.log('✅ [VERCEL] Banner inicializado con 3 imágenes');
+        } else {
+            console.log(`📊 [VERCEL] Banner ya existe: ${conteo} imágenes`);
         }
     } catch (error) {
         console.error('❌ [VERCEL] Error inicializando banner:', error);
@@ -199,7 +217,11 @@ app.get('/api/health', (req, res) => {
         status: 'OK',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV,
-        mongodb: mongoose.connection.readyState === 1 ? 'Conectado' : 'Desconectado'
+        mongodb: mongoose.connection.readyState === 1 ? 'Conectado' : 'Desconectado',
+        variables: {
+            mongoUri: process.env.MONGODB_URI ? 'Configurado' : 'No configurado',
+            cloudinary: process.env.CLOUDINARY_CLOUD_NAME ? 'Configurado' : 'No configurado'
+        }
     });
 });
 
@@ -210,6 +232,7 @@ app.get('/api/productos', async (req, res) => {
         console.log('📡 [API] GET /api/productos');
         
         if (mongoose.connection.readyState !== 1) {
+            console.log('⚠️ [API] MongoDB no conectado, retornando array vacío');
             return res.json([]);
         }
         
@@ -310,6 +333,7 @@ app.get('/api/banner', async (req, res) => {
         console.log('📡 [API] GET /api/banner');
         
         if (mongoose.connection.readyState !== 1) {
+            console.log('⚠️ [API] MongoDB no conectado, retornando array vacío');
             return res.json([]);
         }
         
