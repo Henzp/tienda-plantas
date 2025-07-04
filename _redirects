@@ -1,0 +1,53 @@
+# 🌐 CLOUDFLARE PAGES - CONFIGURACIÓN DE RUTAS
+# Archivo: cloudflare/_redirects
+
+# 🔄 REDIRECCIONES A WORKER API
+# Todas las rutas /api/* se redirigen al Worker
+/api/* https://tienda-plantas-api.tu-usuario.workers.dev/api/:splat 200!
+
+# 🏠 PÁGINAS PRINCIPALES
+# Servir archivos HTML desde la carpeta views/
+/ /views/index.html 200
+/admin /views/admin.html 200
+/login /views/login.html 200
+/register /views/register.html 200
+/perfil /views/perfil.html 200
+
+# 🛍️ PÁGINAS DE PRODUCTOS
+/producto/:id /views/producto.html 200
+/productos /views/index.html 200
+
+# 📱 PÁGINAS ADICIONALES (si se crean)
+/about /views/about.html 200
+/contact /views/contact.html 200
+/terms /views/terms.html 200
+/privacy /views/privacy.html 200
+
+# 🔧 REDIRECCIONES DE COMPATIBILIDAD
+# Para mantener URLs de Vercel funcionando
+/api/health https://tienda-plantas-api.tu-usuario.workers.dev/api/health 301
+/api/productos https://tienda-plantas-api.tu-usuario.workers.dev/api/productos 301
+/api/banner https://tienda-plantas-api.tu-usuario.workers.dev/api/banner 301
+
+# 🎯 MANEJO DE ERRORES
+# 404 personalizado
+/404 /views/404.html 404
+/not-found /views/404.html 404
+
+# 🔒 RUTAS PROTEGIDAS
+# Admin solo disponible si está logueado (se maneja en JS)
+/admin/* /views/admin.html 200
+
+# 📦 ARCHIVOS ESTÁTICOS
+# Servir desde public/ si no está en la raíz
+/css/* /public/css/:splat 200
+/js/* /public/js/:splat 200
+/images/* /public/images/:splat 200
+/fonts/* /public/fonts/:splat 200
+
+# 🌐 REDIRECCIONES DE DOMINIO (opcional)
+# https://www.tu-dominio.com/* https://tu-dominio.com/:splat 301!
+
+# 🔄 FALLBACKS
+# Si no se encuentra nada, servir la página principal (SPA behavior)
+/* /views/index.html 200

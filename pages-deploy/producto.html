@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producto - Entre Hojas y Amigas</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ESTILOS ESPECÍFICOS PARA PÁGINA DE PRODUCTO */
+        .producto-detalle-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 20px 60px;
+            min-height: 100vh;
+        }
+
+        .producto-detalle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        /* GALERÍA DE IMÁGENES */
+        .producto-galeria {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .imagen-principal {
+            width: 100%;
+            height: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .imagen-principal img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+
+        .imagen-principal img:hover {
+            transform: scale(1.05);
+        }
+
+        .imagenes-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 100px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail.active {
+            border-color: #2d5016;
+            transform: scale(1.05);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* INFORMACIÓN DEL PRODUCTO */
+        .producto-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .breadcrumb {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: #2d5016;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .producto-titulo {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: #2d5016;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(45, 80, 22, 0.1);
+        }
+
+        .producto-categoria {
+            background: linear-gradient(135deg, #2d5016, #4a7c59);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .producto-precio-grande {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(231, 76, 60, 0.1);
+        }
+
+        .producto-descripcion-completa {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .producto-stock {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8fff8;
+            border-radius: 12px;
+            border-left: 4px solid #2d5016;
+        }
+
+        .stock-disponible {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .stock-bajo {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        /* SECCIÓN DE COMPRA */
+        .compra-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #e8f5e8;
+        }
+
+        .cantidad-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .cantidad-label {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .cantidad-controls {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .cantidad-btn {
+            background: #f8f9fa;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d5016;
+            transition: background 0.3s ease;
+        }
+
+        .cantidad-btn:hover {
+            background: #e8f5e8;
+        }
+
+        .cantidad-input {
+            border: none;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 80px;
+            background: white;
+        }
+
+        .botones-compra {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-principal {
+            font-family: 'Satisfy', cursive;
+            background: linear-gradient(135deg, #2d5016, #4a7c59);
+            color: white;
+            border: none;
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-principal:hover {
+            background: linear-gradient(135deg, #1a3009, #2d5016);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.4);
+        }
+
+        .btn-secundario {
+            font-family: 'Satisfy', cursive;
+            background: transparent;
+            color: #2d5016;
+            border: 2px solid #2d5016;
+            padding: 1.2rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secundario:hover {
+            background: #2d5016;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* INFORMACIÓN ADICIONAL */
+        .info-adicional {
+            margin-top: 4rem;
+        }
+
+        .info-tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 2rem;
+        }
+
+        .info-tab {
+            font-family: 'Inter', sans-serif;
+            background: none;
+            border: none;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .info-tab.active {
+            color: #2d5016;
+            border-bottom-color: #2d5016;
+        }
+
+        .info-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .info-panel {
+            display: none;
+        }
+
+        .info-panel.active {
+            display: block;
+        }
+
+        .info-panel h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: #2d5016;
+            margin-bottom: 1rem;
+        }
+
+        .info-panel p {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .info-panel ul {
+            font-family: 'Inter', sans-serif;
+            padding-left: 1.5rem;
+            color: #333;
+        }
+
+        .info-panel li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* PRODUCTOS RELACIONADOS */
+        .productos-relacionados {
+            margin-top: 4rem;
+            padding-top: 4rem;
+            border-top: 2px solid #e8f5e8;
+        }
+
+        .productos-relacionados h2 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.5rem;
+            color: #2d5016;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .productos-relacionados-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        /* BOTÓN VOLVER */
+        .btn-volver {
+            font-family: 'Inter', sans-serif;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            text-decoration: none;
+        }
+
+        .btn-volver:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .producto-detalle {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .producto-titulo {
+                font-size: 2.5rem;
+            }
+
+            .producto-precio-grande {
+                font-size: 2.2rem;
+            }
+
+            .imagen-principal {
+                height: 400px;
+            }
+
+            .compra-section {
+                padding: 1.5rem;
+            }
+
+            .botones-compra {
+                gap: 0.8rem;
+            }
+
+            .btn-principal, .btn-secundario {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .info-tabs {
+                flex-direction: column;
+            }
+
+            .info-tab {
+                padding: 0.8rem 1rem;
+                text-align: left;
+            }
+        }
+
+        /* ESTILOS PARA BOTONES DINÁMICOS DEL HEADER */
+        .user-actions-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .login-btn-small, .user-profile-btn, .admin-btn-small, .logout-btn-small, .user-name-small, .loading-user {
+            /* Usar los mismos estilos del index */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header (igual al index) -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="container">
+                <div class="logo-container">
+                    <div class="logo">
+                        <img src="/images/logo-entre-hojas-amigas.png" alt="Entre Hojas y Amigas" class="logo-img">
+                        <h1>🌿 Entre Hojas y Amigas</h1>
+                    </div>
+                    
+                    <div class="nav-actions">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="cart-btn" onclick="toggleCarrito()">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count" id="cartCount">0</span>
+                        </button>
+                        
+                        <div id="userActions" class="user-actions-container">
+                            <span class="loading-user">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="navbar">
+            <div class="container">
+                <ul class="nav-menu">
+                    <li><a href="/">Inicio</a></li>
+                    <li class="dropdown">
+                        <a href="/#productos">Plantas <i class="fas fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/#productos">Interior</a></li>
+                            <li><a href="/#productos">Exterior</a></li>
+                            <li><a href="/#productos">Pet Friendly</a></li>
+                            <li><a href="/#productos">Fácil Cuidado</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#maceteros">Maceteros</a></li>
+                    <li><a href="#regalos">Regalos</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="producto-detalle-container">
+        <!-- Botón volver -->
+        <a href="/" class="btn-volver">
+            <i class="fas fa-arrow-left"></i> Volver a la tienda
+        </a>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Inicio</a> / <a href="/#productos">Plantas</a> / <span id="breadcrumbCategoria">Cargando...</span> / <span id="breadcrumbNombre">Cargando...</span>
+        </div>
+
+        <!-- Detalle del producto -->
+        <div class="producto-detalle">
+            <!-- Galería de imágenes -->
+            <div class="producto-galeria">
+                <div class="imagen-principal">
+                    <img id="imagenPrincipal" src="" alt="" onclick="ampliarImagen()">
+                </div>
+                <div class="imagenes-thumbnails" id="thumbnailsContainer">
+                    <!-- Las thumbnails se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Información del producto -->
+            <div class="producto-info">
+                <h1 class="producto-titulo" id="productoNombre">Cargando...</h1>
+                <div class="producto-categoria" id="productoCategoria">Cargando...</div>
+                <div class="producto-precio-grande" id="productoPrecio">$0</div>
+                
+                <div class="producto-descripcion-completa" id="productoDescripcion">
+                    Cargando descripción...
+                </div>
+
+                <div class="producto-stock" id="productoStock">
+                    <i class="fas fa-box"></i>
+                    <span>Verificando disponibilidad...</span>
+                </div>
+
+                <!-- Sección de compra -->
+                <div class="compra-section">
+                    <div class="cantidad-selector">
+                        <span class="cantidad-label">Cantidad:</span>
+                        <div class="cantidad-controls">
+                            <button class="cantidad-btn" onclick="cambiarCantidad(-1)">-</button>
+                            <input type="number" class="cantidad-input" id="cantidadInput" value="1" min="1" readonly>
+                            <button class="cantidad-btn" onclick="cambiarCantidad(1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="botones-compra">
+                        <button class="btn-principal" id="btnAgregarCarrito" onclick="agregarAlCarrito()">
+                            <i class="fas fa-cart-plus"></i>
+                            Agregar al carrito
+                        </button>
+                        <button class="btn-secundario" id="btnComprarAhora" onclick="comprarAhora()">
+                            <i class="fas fa-bolt"></i>
+                            Comprar ahora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="info-adicional">
+            <div class="info-tabs">
+                <button class="info-tab active" onclick="cambiarTab('cuidados')">Cuidados</button>
+                <button class="info-tab" onclick="cambiarTab('envio')">Envío</button>
+                <button class="info-tab" onclick="cambiarTab('garantia')">Garantía</button>
+            </div>
+
+            <div class="info-content">
+                <div class="info-panel active" id="cuidados-panel">
+                    <h3>Cuidados de la planta</h3>
+                    <p>Esta hermosa planta requiere cuidados específicos para mantener su belleza y salud:</p>
+                    <ul>
+                        <li><strong>Luz:</strong> Luz indirecta brillante, evitar sol directo</li>
+                        <li><strong>Riego:</strong> Mantener la tierra húmeda pero no empapada</li>
+                        <li><strong>Humedad:</strong> Ambiente húmedo, rociar ocasionalmente</li>
+                        <li><strong>Temperatura:</strong> Entre 18-24°C, evitar corrientes de aire</li>
+                        <li><strong>Fertilización:</strong> Una vez al mes en primavera y verano</li>
+                    </ul>
+                </div>
+
+                <div class="info-panel" id="envio-panel">
+                    <h3>Información de envío</h3>
+                    <p>Nos encargamos de que tu planta llegue en perfectas condiciones:</p>
+                    <ul>
+                        <li><strong>Embalaje especial:</strong> Protección profesional para plantas</li>
+                        <li><strong>Tiempo de entrega:</strong> 2-5 días hábiles en Santiago</li>
+                        <li><strong>Costo de envío:</strong> $5.990 (Gratis en compras sobre $50.000)</li>
+                        <li><strong>Seguimiento:</strong> Código de seguimiento incluido</li>
+                        <li><strong>Horario:</strong> Entregas de lunes a sábado, 9:00-18:00</li>
+                    </ul>
+                </div>
+
+                <div class="info-panel" id="garantia-panel">
+                    <h3>Garantía y devoluciones</h3>
+                    <p>Tu satisfacción es nuestra prioridad:</p>
+                    <ul>
+                        <li><strong>Garantía:</strong> 30 días por defectos o problemas de salud</li>
+                        <li><strong>Asesoría:</strong> Soporte gratuito por WhatsApp</li>
+                        <li><strong>Cambios:</strong> Cambio sin costo por planta similar</li>
+                        <li><strong>Devolución:</strong> 100% del dinero si no queda satisfecho</li>
+                        <li><strong>Condiciones:</strong> Seguir las instrucciones de cuidado básicas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos relacionados -->
+        <div class="productos-relacionados">
+            <h2>También te pueden gustar</h2>
+            <div class="productos-relacionados-grid" id="productosRelacionados">
+                <!-- Se cargarán productos de la misma categoría -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Carrito Sidebar (igual al index) -->
+    <div class="carrito-sidebar" id="carritoSidebar">
+        <!-- Contenido del carrito -->
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleCarrito()"></div>
+
+    <!-- Footer (igual al index) -->
+    <footer class="footer" id="contacto">
+        <!-- Contenido del footer -->
+    </footer>
+
+    <script>
+        let productoActual = null;
+        let cantidadSeleccionada = 1;
+
+        // Obtener ID del producto desde la URL
+        function obtenerIdProducto() {
+            const path = window.location.pathname;
+            const id = path.split('/').pop();
+            return id;
+        }
+
+        // Cargar producto específico
+        async function cargarProducto() {
+            const productoId = obtenerIdProducto();
+            
+            try {
+                const response = await fetch(`/api/productos/${productoId}`);
+                if (!response.ok) {
+                    throw new Error('Producto no encontrado');
+                }
+                
+                const producto = await response.json();
+                productoActual = producto;
+                mostrarProducto(producto);
+                cargarProductosRelacionados(producto.categoria);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.querySelector('main').innerHTML = `
+                    <div style="text-align: center; padding: 4rem;">
+                        <h2>Producto no encontrado</h2>
+                        <p>Lo sentimos, el producto que buscas no existe.</p>
+                        <a href="/" class="btn-principal">Volver a la tienda</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Mostrar información del producto
+        function mostrarProducto(producto) {
+            // Actualizar título de la página
+            document.title = `${producto.nombre} - Entre Hojas y Amigas`;
+            
+            // Breadcrumb
+            document.getElementById('breadcrumbCategoria').textContent = producto.categoria;
+            document.getElementById('breadcrumbNombre').textContent = producto.nombre;
+            
+            // Información básica
+            document.getElementById('productoNombre').textContent = producto.nombre;
+            document.getElementById('productoCategoria').textContent = producto.categoria;
+            document.getElementById('productoPrecio').textContent = `$${formatearPrecio(producto.precio)}`;
+            document.getElementById('productoDescripcion').textContent = producto.descripcion;
+            
+            // Stock
+            mostrarStock(producto.stock);
+            
+            // Imágenes
+            mostrarImagenes(producto.imagenes || []);
+            
+            // Configurar límite de cantidad
+            document.getElementById('cantidadInput').max = producto.stock;
+        }
+
+        // Mostrar stock
+        function mostrarStock(stock) {
+            const stockElement = document.getElementById('productoStock');
+            const btnAgregar = document.getElementById('btnAgregarCarrito');
+            const btnComprar = document.getElementById('btnComprarAhora');
+            
+            if (stock <= 0) {
+                stockElement.innerHTML = `
+                    <i class="fas fa-times-circle"></i>
+                    <span class="stock-bajo">Producto agotado</span>
+                `;
+                btnAgregar.disabled = true;
+                btnComprar.disabled = true;
+                btnAgregar.textContent = 'Agotado';
+                btnComprar.textContent = 'No disponible';
+            } else if (stock <= 5) {
+                stockElement.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span class="stock-bajo">¡Últimas ${stock} unidades disponibles!</span>
+                `;
+            } else {
+                stockElement.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span class="stock-disponible">En stock (${stock} disponibles)</span>
+                `;
+            }
+        }
+
+        // Mostrar imágenes
+        function mostrarImagenes(imagenes) {
+            const imagenPrincipal = document.getElementById('imagenPrincipal');
+            const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+            
+            if (imagenes.length === 0) {
+                imagenes = ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600'];
+            }
+            
+            // Imagen principal
+            imagenPrincipal.src = imagenes[0];
+            imagenPrincipal.alt = productoActual?.nombre || 'Producto';
+            
+            // Thumbnails
+            if (imagenes.length > 1) {
+                thumbnailsContainer.innerHTML = imagenes.map((imagen, index) => `
+                    <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="cambiarImagenPrincipal('${imagen}', ${index})">
+                        <img src="${imagen}" alt="Vista ${index + 1}">
+                    </div>
+                `).join('');
+            } else {
+                thumbnailsContainer.style.display = 'none';
+            }
+        }
+
+        // Cambiar imagen principal
+        function cambiarImagenPrincipal(nuevaImagen, index) {
+            document.getElementById('imagenPrincipal').src = nuevaImagen;
+            
+            // Actualizar thumbnail activo
+            document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        // Cambiar cantidad
+        function cambiarCantidad(cambio) {
+            const input = document.getElementById('cantidadInput');
+            const nuevaCantidad = parseInt(input.value) + cambio;
+            const maxStock = parseInt(input.max);
+            
+            if (nuevaCantidad >= 1 && nuevaCantidad <= maxStock) {
+                input.value = nuevaCantidad;
+                cantidadSeleccionada = nuevaCantidad;
+            }
+        }
+
+        // Cambiar tab de información
+        function cambiarTab(tabName) {
+            // Actualizar tabs
+            document.querySelectorAll('.info-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Actualizar paneles
+            document.querySelectorAll('.info-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(tabName + '-panel').classList.add('active');
+        }
+
+        // Cargar productos relacionados
+        async function cargarProductosRelacionados(categoria) {
+            try {
+                const response = await fetch('/api/productos');
+                const productos = await response.json();
+                
+                // Filtrar productos de la misma categoría (excluyendo el actual)
+                const relacionados = productos
+                    .filter(p => p.categoria === categoria && p._id !== productoActual._id)
+                    .slice(0, 4);
+                
+                const container = document.getElementById('productosRelacionados');
+                
+                if (relacionados.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666;">No hay productos relacionados disponibles.</p>';
+                    return;
+                }
+                
+                container.innerHTML = relacionados.map(producto => `
+                    <div class="producto-card" onclick="window.location.href='/producto/${producto._id}'">
+                        <div class="producto-images" style="height: 200px;">
+                            <img src="${producto.imagenes[0] || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'}" 
+                                 alt="${producto.nombre}" 
+                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; cursor: pointer;">
+                        </div>
+                        <div style="padding: 1rem; text-align: center;">
+                            <h3 style="font-family: 'Dancing Script', cursive; font-size: 1.2rem; color: #2d5016; margin-bottom: 0.5rem;">${producto.nombre}</h3>
+                            <p style="font-family: 'Dancing Script', cursive; font-size: 1.1rem; color: #e74c3c; font-weight: bold;">$${formatearPrecio(producto.precio)}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error cargando productos relacionados:', error);
+            }
+        }
+
+        // Funciones de compra
+        function agregarAlCarrito() {
+            if (!productoActual) return;
+            
+            console.log('Agregando al carrito:', {
+                producto: productoActual._id,
+                cantidad: cantidadSeleccionada
+            });
+            
+            // Aquí implementarías la lógica del carrito
+            alert(`¡${productoActual.nombre} agregado al carrito!\nCantidad: ${cantidadSeleccionada}`);
+        }
+
+        function comprarAhora() {
+            if (!productoActual) return;
+            
+            console.log('Comprando ahora:', {
+                producto: productoActual._id,
+                cantidad: cantidadSeleccionada
+            });
+            
+            // Aquí implementarías la lógica de compra directa
+            alert(`Procediendo a comprar ${cantidadSeleccionada} ${productoActual.nombre}`);
+        }
+
+        function ampliarImagen() {
+            // Aquí podrías implementar un modal para ver la imagen en grande
+            console.log('Ampliar imagen');
+        }
+
+        function toggleCarrito() {
+            // Función del carrito
+        }
+
+        function formatearPrecio(precio) {
+            return precio.toLocaleString('es-CL');
+        }
+
+        // Función para actualizar botones de usuario (simplificada)
+        async function updateUserButtons() {
+            // Implementar igual que en index.html
+        }
+
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarProducto();
+            updateUserButtons();
+        });
+    </script>
+</body>
+</html>

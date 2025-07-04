@@ -1,0 +1,70 @@
+# 🌐 CLOUDFLARE PAGES - CONFIGURACIÓN DE HEADERS
+# Archivo: cloudflare/_headers
+
+# Headers globales de seguridad
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  
+# Headers para APIs (si se usan desde Pages)
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization, Cookie
+  Access-Control-Allow-Credentials: true
+  Cache-Control: no-cache
+
+# Optimización de archivos CSS
+/*.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Encoding: gzip
+
+# Optimización de archivos JavaScript
+/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Encoding: gzip
+
+# Optimización de fuentes
+/*.woff2
+  Content-Type: font/woff2
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.woff
+  Content-Type: font/woff
+  Cache-Control: public, max-age=31536000, immutable
+
+# Optimización de imágenes
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+  
+/*.gif
+  Cache-Control: public, max-age=31536000, immutable
+
+# Headers específicos para páginas HTML
+/*.html
+  Cache-Control: public, max-age=300
+  Content-Type: text/html; charset=utf-8
+
+# Headers para service worker (si se implementa)
+/sw.js
+  Cache-Control: no-cache
+  Content-Type: application/javascript
+
+# Headers para manifest (si se implementa PWA)
+/manifest.json
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=86400

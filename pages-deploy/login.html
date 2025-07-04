@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Iniciar Sesión - Entre Hojas y Amigas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- NUEVO: Google Fonts cursivas -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Pacifico&family=Great+Vibes&family=Satisfy&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #1a3009 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 500px;
+        }
+
+        .login-image {
+            background: linear-gradient(rgba(45, 80, 22, 0.8), rgba(26, 48, 9, 0.8)),
+                        url('https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800') center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* MODIFICADO: Logo con fuente cursiva */
+        .login-image h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-image p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        .login-form {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* MODIFICADO: Título con fuente cursiva */
+        .form-header h2 {
+            font-family: 'Great Vibes', cursive;
+            color: #2d5016;
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 400;
+            text-shadow: 1px 1px 2px rgba(45, 80, 22, 0.1);
+        }
+
+        .form-header p {
+            font-family: 'Inter', sans-serif;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .form-group input {
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2d5016;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .form-group input:focus + .input-icon {
+            color: #2d5016;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #2d5016;
+        }
+
+        /* MODIFICADO: Botón con fuente cursiva */
+        .login-btn {
+            font-family: 'Satisfy', cursive;
+            background: linear-gradient(135deg, #2d5016 0%, #1a3009 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 80, 22, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-btn .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        .login-btn.loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* MODIFICADO: Sección de tipos de usuario */
+        .user-type-section {
+            background: #e8f5e8;
+            border: 1px solid #2d5016;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .user-type-section h4 {
+            font-family: 'Dancing Script', cursive;
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-type-section p {
+            font-family: 'Inter', sans-serif;
+            color: #666;
+            margin: 0.3rem 0;
+        }
+
+        .user-type-section code {
+            background: #d4edda;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #2d5016;
+        }
+
+        /* NUEVO: Sección de registro */
+        .register-section {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .register-section p {
+            font-family: 'Inter', sans-serif;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .register-link {
+            font-family: 'Satisfy', cursive;
+            background: linear-gradient(135deg, #90ee90 0%, #4a7c59 100%);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .register-link:hover {
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5016 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            font-family: 'Inter', sans-serif;
+            color: #2d5016;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .back-link a:hover {
+            color: #1a3009;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* NUEVO: Indicador de tipo de login */
+        .login-type-indicator {
+            background: #f8fff8;
+            border: 1px solid #90ee90;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: #2d5016;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                margin: 1rem;
+            }
+
+            .login-image {
+                padding: 2rem 1rem;
+                min-height: 200px;
+            }
+
+            .login-image h1 {
+                font-size: 2.5rem;
+            }
+
+            .form-header h2 {
+                font-size: 2.2rem;
+            }
+
+            .login-form {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Animaciones */
+        .login-container {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Lado izquierdo - Imagen -->
+        <div class="login-image">
+            <h1><i class="fas fa-leaf"></i> Entre Hojas y Amigas</h1>
+            <p>Accede a tu cuenta o al panel de administración</p>
+        </div>
+
+        <!-- Lado derecho - Formulario -->
+        <div class="login-form">
+            <div class="form-header">
+                <h2>Iniciar Sesión</h2>
+                <p>Ingresa tu email o credenciales de administrador</p>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <!-- NUEVO: Indicador de tipo de login -->
+            <div class="login-type-indicator" id="loginTypeIndicator">
+                💌 Ingresa tu email para acceso como cliente, o "tamypau" para admin
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email" id="emailLabel">Email / Usuario Admin</label>
+                    <div class="input-container">
+                        <input type="text" id="email" name="email" required autocomplete="username" placeholder="tu@email.com o tamypau">
+                        <i class="fas fa-user input-icon" id="emailIcon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-container">
+                        <input type="password" id="password" name="password" required autocomplete="current-password">
+                        <i class="fas fa-lock input-icon"></i>
+                        <button type="button" class="password-toggle" onclick="togglePassword()" 
+                                aria-label="Mostrar contraseña" 
+                                title="Mostrar contraseña"
+                                id="passwordToggleBtn">
+                            <i class="fas fa-eye" id="passwordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <div class="spinner"></div>
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <!-- MODIFICADO: Sección de información de usuarios -->
+            <div class="user-type-section">
+                <h4><i class="fas fa-info-circle"></i> Tipos de Acceso</h4>
+                <p><strong>👥 Clientes:</strong> Usa tu email y contraseña</p>
+                <p><strong>🔑 Admin:</strong> <code>tamypau</code> / <code>Isii2607</code></p>
+            </div>
+
+            <!-- NUEVO: Sección de registro -->
+            <div class="register-section">
+                <p>¿No tienes cuenta aún?</p>
+                <a href="/register" class="register-link">
+                    <i class="fas fa-user-plus"></i>
+                    Crear Cuenta Nueva
+                </a>
+            </div>
+
+            <div class="back-link">
+                <a href="/">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver a la tienda
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MODIFICADO: Sistema de login mejorado
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Mostrar loading
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+            hideAlert();
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Mensaje personalizado según el tipo de usuario
+                    const message = data.userType === 'admin' 
+                        ? '¡Bienvenida Administradora! Redirigiendo al panel...' 
+                        : `¡Bienvenida ${data.user?.nombre || ''}! Redirigiendo a tu perfil...`;
+                    
+                    showAlert(message, 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = data.redirectTo || (data.userType === 'admin' ? '/admin' : '/perfil');
+                    }, 2000);
+                } else {
+                    showAlert(data.message || 'Credenciales incorrectas', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error de conexión. Intenta nuevamente.', 'error');
+            } finally {
+                // Ocultar loading
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+            }
+        });
+
+        // NUEVO: Detectar tipo de usuario mientras escribe
+        document.getElementById('email').addEventListener('input', function() {
+            const value = this.value.trim();
+            const indicator = document.getElementById('loginTypeIndicator');
+            const emailIcon = document.getElementById('emailIcon');
+            
+            if (value === 'tamypau' || value === 'admin') {
+                indicator.innerHTML = '🔑 Modo Administrador detectado';
+                indicator.style.background = '#fff3cd';
+                indicator.style.borderColor = '#ffc107';
+                indicator.style.color = '#856404';
+                emailIcon.className = 'fas fa-crown input-icon';
+            } else if (value.includes('@')) {
+                indicator.innerHTML = '👤 Modo Cliente detectado';
+                indicator.style.background = '#d1ecf1';
+                indicator.style.borderColor = '#17a2b8';
+                indicator.style.color = '#0c5460';
+                emailIcon.className = 'fas fa-envelope input-icon';
+            } else {
+                indicator.innerHTML = '💌 Ingresa tu email para acceso como cliente, o "tamypau" para admin';
+                indicator.style.background = '#f8fff8';
+                indicator.style.borderColor = '#90ee90';
+                indicator.style.color = '#2d5016';
+                emailIcon.className = 'fas fa-user input-icon';
+            }
+        });
+
+        // ✅ FUNCIÓN CORREGIDA: Mostrar/ocultar contraseña CON ACCESIBILIDAD
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
+            const toggleBtn = document.getElementById('passwordToggleBtn');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+                // Actualizar textos para accesibilidad
+                toggleBtn.setAttribute('aria-label', 'Ocultar contraseña');
+                toggleBtn.setAttribute('title', 'Ocultar contraseña');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+                // Actualizar textos para accesibilidad
+                toggleBtn.setAttribute('aria-label', 'Mostrar contraseña');
+                toggleBtn.setAttribute('title', 'Mostrar contraseña');
+            }
+        }
+
+        // Mostrar alerta
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass} show">
+                    <i class="${icon}"></i>
+                    ${message}
+                </div>
+            `;
+        }
+
+        // Ocultar alerta
+        function hideAlert() {
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+
+        // Enviar formulario con Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Efectos de foco en los inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // NUEVO: Auto-sugerencias para testing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Solo en desarrollo - puedes comentar esta línea en producción
+            // document.getElementById('email').value = 'tamypau';
+            // document.getElementById('password').value = 'Isii2607';
+        });
+    </script>
+</body>
+</html>

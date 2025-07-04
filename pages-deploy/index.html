@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Entre Hojas y Amigas - Plantas de interior y exterior a domicilio</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ✅ NUEVO: ESTILOS PARA IMÁGENES UNIFORMES Y CLICKEABLES */
+        .producto-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            height: 100%; /* Asegurar que todas las cards tengan la misma altura */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .producto-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border-color: #90ee90;
+        }
+
+        /* ✅ CONTENEDOR DE IMÁGENES CON TAMAÑO FIJO Y CLICKEABLE */
+        .producto-images {
+            position: relative;
+            height: 280px; /* Altura fija para todas las imágenes */
+            width: 100%;
+            overflow: hidden;
+            background: #f8f9fa; /* Color de fondo por si la imagen no carga */
+            cursor: pointer; /* Indica que es clickeable */
+            transition: all 0.3s ease;
+        }
+
+        .producto-images:hover {
+            transform: scale(1.02);
+        }
+
+        /* ✅ IMAGEN PRINCIPAL CON TAMAÑO UNIFORME */
+        .producto-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* ✅ ARREGLADO: Muestra imagen completa */
+            object-position: center; /* Centra la imagen */
+            transition: all 0.5s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .producto-image:not(.active) {
+            opacity: 0;
+        }
+
+        .producto-image.active {
+            opacity: 1;
+        }
+
+        /* ✅ INDICADORES DE MÚLTIPLES IMÁGENES */
+        .image-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .dot.active {
+            background: white;
+            transform: scale(1.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* ✅ CONTENIDO DE LA TARJETA */
+        .producto-info {
+            padding: 2rem;
+            flex: 1; /* Ocupa el espacio restante */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* ✅ INFORMACIÓN DEL PRODUCTO */
+        .producto-content {
+            flex: 1;
+        }
+
+        .producto-nombre {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2d5016;
+            margin-bottom: 0.8rem;
+            text-shadow: 1px 1px 2px rgba(45, 80, 22, 0.1);
+            line-height: 1.2;
+            cursor: pointer; /* Nombre también clickeable */
+            transition: color 0.3s ease;
+        }
+
+        .producto-nombre:hover {
+            color: #1a3009;
+        }
+
+        .producto-descripcion {
+            font-family: 'Inter', sans-serif;
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Limita a 3 líneas */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .producto-precio {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(231, 76, 60, 0.1);
+        }
+
+        /* ✅ BOTONES DE ACCIÓN MEJORADOS */
+        .producto-botones {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: auto; /* Empuja los botones hacia abajo */
+        }
+
+        .btn-agregar, .btn-comprar {
+            font-family: 'Satisfy', cursive;
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .btn-agregar {
+            background: linear-gradient(135deg, #2d5016, #4a7c59);
+            color: white;
+        }
+
+        .btn-comprar {
+            background: transparent;
+            color: #2d5016;
+            border: 2px solid #2d5016;
+        }
+
+        .btn-agregar:hover {
+            background: linear-gradient(135deg, #1a3009, #2d5016);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+        }
+
+        .btn-comprar:hover {
+            background: #2d5016;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ✅ GRID DE PRODUCTOS MEJORADO */
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        /* ✅ INDICADOR DE STOCK */
+        .stock-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(45, 80, 22, 0.9);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            z-index: 5;
+        }
+
+        .stock-indicator.low-stock {
+            background: rgba(231, 76, 60, 0.9);
+        }
+
+        /* ✅ BADGE DE CATEGORÍA */
+        .categoria-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2d5016;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(45, 80, 22, 0.2);
+            z-index: 5;
+        }
+
+        /* ✅ LOADING MEJORADO */
+        .loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #2d5016;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ✅ ESTADO VACÍO */
+        .no-productos {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem;
+            color: #666;
+        }
+
+        .no-productos i {
+            font-size: 4rem;
+            color: #2d5016;
+            margin-bottom: 2rem;
+            opacity: 0.3;
+        }
+
+        .no-productos h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #2d5016;
+            margin-bottom: 1rem;
+        }
+
+        /* ✅ BANNER DE IMÁGENES ANIMADO */
+        .banner-imagenes {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            padding: 4rem 0;
+            overflow: hidden;
+            position: relative;
+            margin-top: 2rem;
+        }
+
+        .banner-imagenes::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><defs><pattern id="bannerLeaves" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse"><circle cx="40" cy="40" r="1.5" fill="%2390ee90" opacity="0.1"/><circle cx="20" cy="20" r="1" fill="%234a7c59" opacity="0.08"/><circle cx="60" cy="60" r="0.8" fill="%232d5016" opacity="0.06"/></pattern></defs><rect width="100%" height="100%" fill="url(%23bannerLeaves)"/></svg>') center/300px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .banner-container {
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-track {
+            display: flex;
+            gap: 2rem;
+            animation: scroll-left 30s linear infinite;
+            width: calc(200% + 4rem); /* Ancho doble para el efecto infinito */
+        }
+
+        .banner-item {
+            flex: 0 0 300px;
+            height: 200px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+            position: relative;
+            background: white;
+            border: 3px solid rgba(144, 238, 144, 0.3);
+        }
+
+        .banner-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            border-color: #90ee90;
+        }
+
+        .banner-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            transition: transform 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .banner-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Animación de desplazamiento infinito */
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Efecto de pausa al hacer hover */
+        .banner-track:hover {
+            animation-play-state: paused;
+        }
+
+        /* ✅ RESPONSIVE MEJORADO */
+        @media (max-width: 768px) {
+            .productos-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 2rem;
+            }
+            
+            .producto-images {
+                height: 250px; /* Altura un poco menor en móvil */
+            }
+            
+            .producto-info {
+                padding: 1.5rem;
+            }
+            
+            .producto-nombre {
+                font-size: 1.4rem;
+            }
+            
+            .producto-precio {
+                font-size: 1.6rem;
+            }
+            
+            .btn-agregar, .btn-comprar {
+                font-size: 0.9rem;
+                padding: 0.8rem;
+            }
+
+            /* Banner responsive */
+            .banner-imagenes {
+                padding: 2rem 0;
+            }
+            
+            .banner-item {
+                flex: 0 0 250px;
+                height: 160px;
+            }
+            
+            .banner-track {
+                gap: 1.5rem;
+                animation-duration: 25s;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .productos-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .producto-images {
+                height: 220px;
+            }
+
+            .banner-item {
+                flex: 0 0 200px;
+                height: 130px;
+            }
+            
+            .banner-track {
+                gap: 1rem;
+                animation-duration: 20s;
+            }
+        }
+
+        /* ESTILOS PARA BOTONES DINÁMICOS (COPIADOS DEL ORIGINAL) */
+        .user-actions-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .login-btn-small {
+            background: rgba(45, 80, 22, 0.1);
+            color: #2d5016;
+            border: 1px solid #2d5016;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .login-btn-small:hover {
+            background: #2d5016;
+            color: white;
+        }
+
+        .user-profile-btn {
+            background: #2d5016;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .user-profile-btn:hover {
+            background: #1a3009;
+        }
+
+        .admin-btn-small {
+            background: linear-gradient(135deg, #2d5016, #1a3009);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-btn-small:hover {
+            background: linear-gradient(135deg, #1a3009, #0d1a05);
+            transform: translateY(-1px);
+        }
+
+        .logout-btn-small {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.4rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn-small:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .user-name-small {
+            color: #2d5016;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .loading-user {
+            color: #666;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .user-actions-container {
+                gap: 0.5rem;
+            }
+            
+            .login-btn-small, .user-profile-btn, .admin-btn-small {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+            
+            .user-name-small {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="container">
+                <div class="logo-container">
+                    <div class="logo">
+                        <img src="/images/logo-entre-hojas-amigas.png" alt="Entre Hojas y Amigas" class="logo-img">
+                        <h1>🌿 Entre Hojas y Amigas</h1>
+                    </div>
+                    
+                    <!-- nav-actions con botones pequeños y estéticos -->
+                    <div class="nav-actions">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="cart-btn" onclick="toggleCarrito()">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count" id="cartCount">0</span>
+                        </button>
+                        
+                        <!-- Contenedor mejorado de acciones de usuario -->
+                        <div id="userActions" class="user-actions-container">
+                            <!-- Loading inicial -->
+                            <span class="loading-user">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Section -->
+        <nav class="navbar">
+            <div class="container">
+                <ul class="nav-menu">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li class="dropdown">
+                        <a href="#productos">Plantas <i class="fas fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-categoria="Interior">Interior</a></li>
+                            <li><a href="#" data-categoria="Exterior">Exterior</a></li>
+                            <li><a href="#" data-categoria="Pet Friendly">Pet Friendly</a></li>
+                            <li><a href="#" data-categoria="Fácil Cuidado">Fácil Cuidado</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#maceteros">Maceteros</a></li>
+                    <li><a href="#regalos">Regalos</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+                
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="hero-content">
+            <h1>Plantas de interior y exterior a domicilio</h1>
+            <p>Encuentra una gran variedad de plantas de interior y exterior a domicilio. Elige la tuya con macetero autorregante, te asesoramos en el cuidado de las plantas.</p>
+            <button class="cta-button" onclick="document.getElementById('productos').scrollIntoView()">
+                Ver Plantas
+            </button>
+        </div>
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800" alt="Plantas hermosas">
+        </div>
+    </section>
+
+    <!-- Categorías destacadas -->
+    <section class="categorias-destacadas">
+        <div class="container">
+            <h2>Colecciones destacadas</h2>
+            <div class="categorias-grid">
+                <div class="categoria-card" data-categoria="Interior Grande">
+                    <img src="https://images.unsplash.com/photo-1493606278519-11aa9a6b8453?w=400" alt="Plantas Grandes">
+                    <div class="categoria-overlay">
+                        <h3>Plantas Grandes</h3>
+                        <p>Plantas de interior sobre 1 metro</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Pet Friendly">
+                    <img src="https://images.unsplash.com/photo-1544568100-847a948585b9?w=400" alt="Pet Friendly">
+                    <div class="categoria-overlay">
+                        <h3>Pet Friendly</h3>
+                        <p>Plantas que puedes tener con mascotas</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Autorregante">
+                    <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400" alt="Autorregantes">
+                    <div class="categoria-overlay">
+                        <h3>Autorregantes</h3>
+                        <p>Maceteros Autorregantes</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Fácil Cuidado">
+                    <img src="https://images.unsplash.com/photo-1509423350716-97f2360af8e4?w=400" alt="Fácil Cuidado">
+                    <div class="categoria-overlay">
+                        <h3>Fácil Cuidado</h3>
+                        <p>Ideales para comenzar</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+                
+                <div class="categoria-card" data-categoria="Regalo">
+                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400" alt="Para Regalo">
+                    <div class="categoria-overlay">
+                        <h3>Para Regalo</h3>
+                        <p>Plantas con Macetero para regalo</p>
+                        <button class="ver-mas">Ver más</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Productos -->
+    <section class="productos-section" id="productos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nuestras Plantas</h2>
+                <div class="filtros">
+                    <button class="filtro-btn active" data-categoria="todas">Todas</button>
+                    <button class="filtro-btn" data-categoria="Interior">Interior</button>
+                    <button class="filtro-btn" data-categoria="Exterior">Exterior</button>
+                    <button class="filtro-btn" data-categoria="Pet Friendly">Pet Friendly</button>
+                    <button class="filtro-btn" data-categoria="Fácil Cuidado">Fácil Cuidado</button>
+                </div>
+            </div>
+            
+            <div class="productos-grid" id="productosGrid">
+                <!-- Los productos se cargarán dinámicamente desde la base de datos -->
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando plantas...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Misión -->
+    <section class="mision">
+        <div class="container">
+            <div class="mision-content">
+                <h2>Compartiendo una conexión especial con la naturaleza, entregando alegría, pero en macetas</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- ✅ NUEVO: Banner de Imágenes Animado (Dinámico) -->
+    <section class="banner-imagenes" id="bannerSection" style="display: none;">
+        <div class="banner-container">
+            <div class="banner-track" id="bannerTrack">
+                <!-- Las imágenes se cargarán dinámicamente -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Carrito Sidebar -->
+    <div class="carrito-sidebar" id="carritoSidebar">
+        <div class="carrito-header">
+            <h3><i class="fas fa-shopping-cart"></i> Mi Carrito</h3>
+            <button class="close-carrito" onclick="toggleCarrito()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="carrito-items" id="carritoItems">
+            <div class="carrito-vacio">
+                <i class="fas fa-leaf"></i>
+                <p>Tu carrito está vacío</p>
+                <small>¡Agrega algunas plantas hermosas!</small>
+            </div>
+        </div>
+        <div class="carrito-footer">
+            <div class="carrito-total">
+                <strong>Total: $<span id="carritoTotal">0</span></strong>
+            </div>
+            <button class="btn-comprar-carrito" onclick="procesarCompra()">
+                Procesar Compra
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleCarrito()"></div>
+
+    <!-- Footer -->
+    <footer class="footer" id="contacto">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🌿 Entre Hojas y Amigas</h3>
+                    <p>Tu tienda de plantas de confianza</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contacto</h4>
+                    <p><i class="fas fa-envelope"></i> contacto@entrehojas.cl</p>
+                    <p><i class="fas fa-phone"></i> +56 9 1234 5678</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Santiago, Chile</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Horarios</h4>
+                    <p>Lun - Vie: 9:00am - 19:00pm</p>
+                    <p>Sábado: 10:00 - 16:00</p>
+                    <p>Domingo: 10:30 - 16:00</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Categorías</h4>
+                    <a href="#">Plantas de Interior</a>
+                    <a href="#">Plantas de Exterior</a>
+                    <a href="#">Maceteros</a>
+                    <a href="#">Pet Friendly</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Entre Hojas y Amigas. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/main.js"></script>
+    
+    <script>
+        // DEBUG: Variable global para ver el estado
+        let currentUserState = null;
+
+        // Función mejorada para verificar estado de sesión
+        async function updateUserButtons() {
+            const userActionsContainer = document.getElementById('userActions');
+            
+            try {
+                console.log('🔍 Verificando estado de sesión...');
+                
+                const response = await fetch('/api/session-status');
+                console.log('📡 Respuesta del servidor:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const sessionData = await response.json();
+                console.log('📊 Datos de sesión:', sessionData);
+                
+                currentUserState = sessionData; // Para debugging
+                
+                if (sessionData.isLoggedIn) {
+                    if (sessionData.userType === 'admin') {
+                        // Admin logueado - botón pequeño
+                        userActionsContainer.innerHTML = `
+                            <span class="user-name-small">👑 ${sessionData.userName}</span>
+                            <a href="/admin" class="admin-btn-small">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        `;
+                        console.log('✅ UI actualizada para ADMIN');
+                    } else {
+                        // Usuario normal logueado
+                        userActionsContainer.innerHTML = `
+                            <span class="user-name-small">👤 ${sessionData.userName}</span>
+                            <a href="/perfil" class="user-profile-btn">
+                                <i class="fas fa-user"></i> Mi Perfil
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        `;
+                        console.log('✅ UI actualizada para USUARIO');
+                    }
+                } else {
+                    // No logueado - solo botón pequeño de login
+                    userActionsContainer.innerHTML = `
+                        <a href="/login" class="login-btn-small">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    `;
+                    console.log('✅ UI actualizada para NO LOGUEADO');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error al verificar sesión:', error);
+                
+                // Por defecto, mostrar login si hay error
+                userActionsContainer.innerHTML = `
+                    <a href="/login" class="login-btn-small">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                `;
+            }
+        }
+
+        // Función para cerrar sesión con mejor manejo
+        async function logout() {
+            try {
+                console.log('🚪 Cerrando sesión...');
+                
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    console.log('✅ Sesión cerrada');
+                    // Actualizar UI inmediatamente
+                    await updateUserButtons();
+                    // Opcional: recargar para limpiar completamente
+                    window.location.reload();
+                } else {
+                    console.error('❌ Error al cerrar sesión');
+                }
+            } catch (error) {
+                console.error('❌ Error de red al cerrar sesión:', error);
+            }
+        }
+
+        // Función de debugging para el usuario
+        function checkUserState() {
+            console.log('🔍 Estado actual del usuario:', currentUserState);
+            return currentUserState;
+        }
+
+        // ✅ NUEVA FUNCIÓN: Cargar banner dinámicamente
+        async function cargarBannerDinamico() {
+            try {
+                const response = await fetch('/api/banner');
+                const bannerItems = await response.json();
+                
+                if (bannerItems.length === 0) {
+                    // Ocultar banner si no hay imágenes
+                    document.getElementById('bannerSection').style.display = 'none';
+                    return;
+                }
+                
+                // Mostrar banner
+                document.getElementById('bannerSection').style.display = 'block';
+                
+                // Crear HTML del banner
+                const bannerTrack = document.getElementById('bannerTrack');
+                
+                // Duplicar las imágenes para efecto infinito
+                const imagenesHTML = bannerItems.map(item => `
+                    <div class="banner-item">
+                        <img src="${item.imagen}" 
+                             alt="${item.alt}" 
+                             onerror="this.src='https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop'">
+                    </div>
+                `).join('');
+                
+                // Primera ronda + segunda ronda (para efecto infinito)
+                bannerTrack.innerHTML = imagenesHTML + imagenesHTML;
+                
+                console.log('✅ Banner cargado con', bannerItems.length, 'imágenes');
+                
+            } catch (error) {
+                console.error('❌ Error cargando banner:', error);
+                // Mantener banner oculto si hay error
+                document.getElementById('bannerSection').style.display = 'none';
+            }
+        }
+        async function cargarProductos() {
+            const productosGrid = document.getElementById('productosGrid');
+            
+            try {
+                const response = await fetch('/api/productos');
+                const productos = await response.json();
+                
+                if (productos.length === 0) {
+                    productosGrid.innerHTML = `
+                        <div class="no-productos">
+                            <i class="fas fa-seedling"></i>
+                            <h3>Próximamente nuevas plantas</h3>
+                            <p>Estamos preparando un hermoso catálogo de plantas para ti</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                productosGrid.innerHTML = productos.map(producto => {
+                    const imagenes = producto.imagenes || [];
+                    const imagenPrincipal = imagenes[0] || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400';
+                    
+                    // Determinar indicador de stock
+                    let stockInfo = '';
+                    if (producto.stock <= 0) {
+                        stockInfo = '<div class="stock-indicator">Agotado</div>';
+                    } else if (producto.stock <= 5) {
+                        stockInfo = `<div class="stock-indicator low-stock">Últimas ${producto.stock}</div>`;
+                    } else {
+                        stockInfo = `<div class="stock-indicator">Stock: ${producto.stock}</div>`;
+                    }
+                    
+                    return `
+                        <div class="producto-card" data-categoria="${producto.categoria}">
+                            <div class="producto-images" onclick="verProducto('${producto._id}')" title="Ver detalles de ${producto.nombre}">
+                                <div class="categoria-badge">${producto.categoria}</div>
+                                ${stockInfo}
+                                
+                                ${imagenes.map((imagen, index) => `
+                                    <img src="${imagen}" 
+                                         alt="${producto.nombre}" 
+                                         class="producto-image ${index === 0 ? 'active' : ''}"
+                                         onerror="this.src='https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'">
+                                `).join('')}
+                                
+                                ${imagenes.length > 1 ? `
+                                    <div class="image-dots">
+                                        ${imagenes.map((_, index) => `
+                                            <span class="dot ${index === 0 ? 'active' : ''}" 
+                                                  onclick="event.stopPropagation(); cambiarImagen(this, ${index})"
+                                                  title="Imagen ${index + 1}"></span>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="producto-info">
+                                <div class="producto-content">
+                                    <h3 class="producto-nombre" onclick="verProducto('${producto._id}')" title="Ver detalles de ${producto.nombre}">${producto.nombre}</h3>
+                                    <p class="producto-descripcion">${producto.descripcion}</p>
+                                    <div class="producto-precio">$${formatearPrecio(producto.precio)}</div>
+                                </div>
+                                
+                                <div class="producto-botones">
+                                    <button class="btn-agregar" onclick="agregarAlCarrito('${producto._id}')" ${producto.stock <= 0 ? 'disabled' : ''}>
+                                        <i class="fas fa-cart-plus"></i> ${producto.stock <= 0 ? 'Agotado' : 'Agregar'}
+                                    </button>
+                                    <button class="btn-comprar" onclick="verProducto('${producto._id}')">
+                                        <i class="fas fa-eye"></i> Ver más
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Configurar filtros
+                configurarFiltros(productos);
+                
+            } catch (error) {
+                console.error('Error cargando productos:', error);
+                productosGrid.innerHTML = `
+                    <div class="no-productos">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error al cargar productos</h3>
+                        <p>Por favor, recarga la página</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ✅ NUEVA FUNCIÓN: Ir a la página del producto
+        function verProducto(productoId) {
+            console.log('🔍 Navegando a producto:', productoId);
+            window.location.href = `/producto/${productoId}`;
+        }
+
+        // ✅ NUEVA FUNCIÓN: Cambiar imagen en el carrusel
+        function cambiarImagen(dotElement, imageIndex) {
+            const card = dotElement.closest('.producto-card');
+            const imagenes = card.querySelectorAll('.producto-image');
+            const dots = card.querySelectorAll('.dot');
+            
+            // Remover clase active de todas las imágenes y dots
+            imagenes.forEach(img => img.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            // Activar la imagen y dot seleccionados
+            imagenes[imageIndex].classList.add('active');
+            dotElement.classList.add('active');
+        }
+
+        // Función para formatear precios
+        function formatearPrecio(precio) {
+            return precio.toLocaleString('es-CL');
+        }
+
+        // Función para configurar filtros
+        function configurarFiltros(productos) {
+            const filtros = document.querySelectorAll('.filtro-btn');
+            const cards = document.querySelectorAll('.producto-card');
+            
+            filtros.forEach(filtro => {
+                filtro.addEventListener('click', () => {
+                    // Actualizar botones activos
+                    filtros.forEach(f => f.classList.remove('active'));
+                    filtro.classList.add('active');
+                    
+                    const categoria = filtro.dataset.categoria;
+                    
+                    // Filtrar productos
+                    cards.forEach(card => {
+                        if (categoria === 'todas' || card.dataset.categoria === categoria) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Funciones del carrito (simplificadas)
+        function agregarAlCarrito(productoId) {
+            console.log('Agregando al carrito:', productoId);
+            // Aquí implementarías la lógica del carrito
+            alert('¡Función de carrito en desarrollo! 🛒');
+        }
+
+        function toggleCarrito() {
+            const sidebar = document.getElementById('carritoSidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function procesarCompra() {
+            console.log('Procesando compra...');
+            // Aquí implementarías la lógica de checkout
+            alert('¡Función de checkout en desarrollo! 💳');
+        }
+
+        // Ejecutar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página cargada, inicializando...');
+            updateUserButtons();
+            cargarProductos();
+            cargarBannerDinamico(); // ✅ NUEVO: Cargar banner dinámico
+            
+            // Verificar cada 30 segundos
+            setInterval(updateUserButtons, 30000);
+        });
+
+        // Exponer función de debug globalmente
+        window.checkUserState = checkUserState;
+        window.updateUserButtons = updateUserButtons;
+    </script>
+</body>
+</html>

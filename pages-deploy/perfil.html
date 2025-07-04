@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Entre Hojas y Amigas</title>
+    
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Satisfy&family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CSS Externos - SIN ESTILOS INLINE -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+</head>
+<body>
+    <!-- Header con navegación -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="container">
+                <div class="logo-container">
+                    <div class="logo">
+                        <img src="/images/logo-entre-hojas-amigas.png" alt="Entre Hojas y Amigas" class="logo-img">
+                        <h1>🌿 Entre Hojas y Amigas</h1>
+                    </div>
+                    
+                    <div class="nav-actions">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="cart-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">0</span>
+                        </button>
+                        
+                        <div id="userActions" class="user-actions-container">
+                            <span class="loading-user">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="navbar">
+            <div class="container">
+                <ul class="nav-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="#"><i class="fas fa-seedling"></i> Plantas</a></li>
+                    <li><a href="#"><i class="fas fa-tools"></i> Maceteros</a></li>
+                    <li><a href="#"><i class="fas fa-gift"></i> Regalos</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> Contacto</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="perfil-container">
+        <div class="perfil-header">
+            <h1>Mi Jardín Personal 🌱</h1>
+            <p id="welcomeMessage">Bienvenida a tu espacio verde</p>
+            
+            <a href="/" class="tienda-btn">
+                <i class="fas fa-store"></i>
+                Explorar Tienda
+            </a>
+            <p class="subtitle-text">
+                Descubre nuevas plantas para tu colección
+            </p>
+        </div>
+
+        <div class="perfil-content">
+            <!-- Sidebar -->
+            <div class="perfil-sidebar">
+                <div class="perfil-avatar">
+                    <div class="avatar-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-email" id="userEmail">Cargando...</div>
+                </div>
+
+                <ul class="menu-perfil">
+                    <li>
+                        <a href="#" class="menu-item active" data-section="datos">
+                            <i class="fas fa-user-edit"></i>
+                            Mis Datos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="menu-item" data-section="compras">
+                            <i class="fas fa-shopping-bag"></i>
+                            Mis Compras
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="menu-item" data-section="cuidados">
+                            <i class="fas fa-seedling"></i>
+                            Guías de Cuidado
+                        </a>
+                    </li>
+                </ul>
+
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </button>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="perfil-main">
+                <div id="alertContainer"></div>
+
+                <!-- Sección: Mis Datos -->
+                <div class="form-section active" id="datos-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-edit"></i>
+                        Mis Datos Personales
+                    </h2>
+
+                    <form id="profileForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" name="nombre" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="apellido">Apellido</label>
+                                <input type="text" id="apellido" name="apellido" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="+56 9 1234 5678">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="direccion">Dirección</label>
+                            <input type="text" id="direccion" name="direccion" placeholder="Calle y número">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="ciudad">Ciudad</label>
+                                <input type="text" id="ciudad" name="ciudad">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="region">Región</label>
+                                <input type="text" id="region" name="region">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-actualizar">
+                            <i class="fas fa-save"></i>
+                            Actualizar Datos
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Sección: Mis Compras -->
+                <div class="form-section" id="compras-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-shopping-bag"></i>
+                        Historial de Compras
+                    </h2>
+
+                    <div id="comprasContainer">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Cargando tus compras...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección: Guías de Cuidado -->
+                <div class="form-section" id="cuidados-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-seedling"></i>
+                        Guías de Cuidado
+                    </h2>
+
+                    <div class="empty-state">
+                        <i class="fas fa-seedling"></i>
+                        <h3>Próximamente...</h3>
+                        <p>Estamos preparando increíbles guías de cuidado para tus plantas favoritas.</p>
+                        <a href="/" class="tienda-btn">
+                            <i class="fas fa-store"></i>
+                            Ver Catálogo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let userData = null;
+
+        // Cargar datos del usuario al iniciar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await updateUserButtons();
+            await loadUserProfile();
+            setupEventListeners();
+        });
+
+        // Función para botones dinámicos
+        async function updateUserButtons() {
+            const userActionsContainer = document.getElementById('userActions');
+            
+            try {
+                const response = await fetch('/api/session-status');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const sessionData = await response.json();
+                
+                if (sessionData.authenticated) {
+                    if (sessionData.userType === 'admin') {
+                        userActionsContainer.innerHTML = `
+                            <span class="user-name-small">👑 ${sessionData.userName}</span>
+                            <a href="/admin" class="admin-btn-small">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        `;
+                    } else {
+                        userActionsContainer.innerHTML = `
+                            <span class="user-name-small">👤 ${sessionData.userName}</span>
+                            <a href="/perfil" class="user-profile-btn">
+                                <i class="fas fa-user"></i> Mi Perfil
+                            </a>
+                            <button class="logout-btn-small" onclick="logout()" title="Cerrar Sesión">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        `;
+                    }
+                } else {
+                    userActionsContainer.innerHTML = `
+                        <a href="/login" class="login-btn-small">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error al verificar sesión:', error);
+                userActionsContainer.innerHTML = `
+                    <a href="/login" class="login-btn-small">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                `;
+            }
+        }
+
+        // Cargar perfil del usuario
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user-profile');
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                userData = await response.json();
+                
+                // Actualizar UI con datos del usuario
+                document.getElementById('userName').textContent = `${userData.nombre} ${userData.apellido}`;
+                document.getElementById('userEmail').textContent = userData.email;
+                document.getElementById('welcomeMessage').textContent = `¡Hola ${userData.nombre}! Gestiona tu perfil y descubre nuevas plantas`;
+
+                // Llenar formulario
+                document.getElementById('nombre').value = userData.nombre || '';
+                document.getElementById('apellido').value = userData.apellido || '';
+                document.getElementById('telefono').value = userData.telefono || '';
+                
+                if (userData.direccion) {
+                    document.getElementById('direccion').value = userData.direccion.calle || '';
+                    document.getElementById('ciudad').value = userData.direccion.ciudad || '';
+                    document.getElementById('region').value = userData.direccion.region || '';
+                }
+
+            } catch (error) {
+                console.error('Error cargando perfil:', error);
+                showAlert('Error al cargar el perfil', 'error');
+            }
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Menú de navegación
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remover active de todos
+                    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+                    
+                    // Activar seleccionado
+                    this.classList.add('active');
+                    const section = this.dataset.section;
+                    document.getElementById(section + '-section').classList.add('active');
+                    
+                    // Cargar datos específicos de la sección
+                    if (section === 'compras') {
+                        loadCompras();
+                    }
+                });
+            });
+
+            // Formulario de actualización
+            document.getElementById('profileForm').addEventListener('submit', updateProfile);
+        }
+
+        // Actualizar perfil
+        async function updateProfile(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const updateData = {
+                nombre: formData.get('nombre'),
+                apellido: formData.get('apellido'),
+                telefono: formData.get('telefono'),
+                direccion: {
+                    calle: formData.get('direccion'),
+                    ciudad: formData.get('ciudad'),
+                    region: formData.get('region')
+                }
+            };
+
+            try {
+                const response = await fetch('/api/user-profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Perfil actualizado exitosamente', 'success');
+                    await loadUserProfile();
+                    await updateUserButtons();
+                } else {
+                    showAlert('Error al actualizar perfil', 'error');
+                }
+            } catch (error) {
+                showAlert('Error de conexión', 'error');
+            }
+        }
+
+        // Cargar historial de compras
+        async function loadCompras() {
+            const container = document.getElementById('comprasContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Cargando tus compras...</p>
+                </div>
+            `;
+
+            try {
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-bag"></i>
+                            <h3>¡Aún no tienes compras!</h3>
+                            <p>Cuando realices tu primera compra, aparecerá aquí.</p>
+                            <a href="/" class="tienda-btn">
+                                <i class="fas fa-store"></i>
+                                Ir a la Tienda
+                            </a>
+                        </div>
+                    `;
+                }, 1000);
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error al cargar las compras</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Cerrar sesión
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass} show">
+                    <i class="${icon}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            // Auto-ocultar después de 5 segundos
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
